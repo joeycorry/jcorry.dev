@@ -1,0 +1,43 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "ESNext",
+        "lib": ["DOM", "DOM.Iterable", "ESNext"],
+        "allowJs": false,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "isolatedModules": true,
+        "jsx": "react-jsx",
+        "moduleResolution": "Node",
+        "noEmit": true,
+        "noFallthroughCasesInSwitch": true,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "sourceMap": true,
+        "types": ["vite/client", "node", "jest", "@testing-library/jest-dom"],
+        "baseUrl": ".",
+        "paths": {
+            "common/*": ["common/*"],
+            "pages/*": ["pages/*"],
+            "renderer/*": ["renderer/*"],
+            "server/*": ["server/*"]
+        }
+    },
+    "ts-node": {
+        "transpileOnly": true,
+        "esm": true,
+        "compilerOptions": {
+            "moduleResolution": "Node16"
+        }
+    },
+    "include": [
+        "common",
+        "pages",
+        "renderer",
+        "server",
+        "jest.setup.ts",
+        "vite.config.ts"
+    ]
+}

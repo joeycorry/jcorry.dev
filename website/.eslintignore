@@ -1,0 +1,6 @@
+node_modules/
+dist/
+public/
+__mocks__/
+jest.config.js
+*.d.ts

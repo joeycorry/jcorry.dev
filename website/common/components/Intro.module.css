@@ -1,0 +1,41 @@
+.intro {
+    z-index: 10;
+
+    font-size: 5em;
+
+    color: var(--primary-color);
+
+    pointer-events: none;
+    user-select: none;
+}
+
+.intro h1 {
+    font-weight: 100;
+}
+
+.intro h6 {
+    text-align: center;
+}
+
+.tech-name {
+    font-weight: 700;
+
+    color: var(--primary-color);
+}
+
+.tech-name::after {
+    content: attr(data-hidden-tech-name);
+
+    background-color: var(--primary-color);
+    color: transparent;
+}
+
+.job-title {
+    font-weight: 100;
+}
+
+h1,
+.tech-name-button span,
+.job-title {
+    transition: color 0.4s;
+}

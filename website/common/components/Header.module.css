@@ -1,0 +1,74 @@
+.header {
+    position: fixed;
+    top: 0;
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    width: 100%;
+
+    padding: 15px;
+
+    pointer-events: none;
+}
+
+.header ul {
+    list-style-type: none;
+
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column-reverse;
+
+    height: 25em;
+}
+
+.header ul li a,
+.header ul li button:not(:disabled) {
+    pointer-events: initial;
+}
+
+.header ul li a svg,
+.header ul li button svg {
+    height: 5em;
+    width: 5em;
+
+    transition: stroke 0.4s, fill 0.4s;
+}
+
+@media (min-width: 300px) {
+    .header {
+        padding: 25px;
+    }
+}
+
+@media (min-width: 750px) {
+    .header {
+        padding: 35px;
+    }
+
+    .header ul {
+        flex-direction: row;
+
+        height: initial;
+        width: 15em;
+    }
+
+    .header ul li a svg,
+    .header ul li button svg {
+        height: 2.5em;
+        width: 2.5em;
+    }
+}
+
+@media (min-width: 1500px) {
+    .header ul {
+        width: 10em;
+    }
+
+    .header ul li a svg,
+    .header ul li button svg {
+        height: 2em;
+        width: 2em;
+    }
+}

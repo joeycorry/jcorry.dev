@@ -1,0 +1,13 @@
+.background {
+    position: absolute;
+
+    opacity: 1;
+
+    transition: opacity 1s;
+}
+
+.background[data-is-visible='false'] {
+    opacity: 0;
+
+    transition: opacity 0.4s;
+}
