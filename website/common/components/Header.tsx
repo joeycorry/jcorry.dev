@@ -39,21 +39,13 @@ function PlayPauseButton() {
     );
     const currentPrimaryColorString = ColorHooks.useCurrentPrimaryColorString();
     const onPlayPauseButtonClick = usePlayPauseButtonClickListener();
+    const [title, Icon] = techNameAnimationShouldRepeat
+        ? ['Pause Color Changes', Pause]
+        : ['Initiate Color Changes', Play];
 
     return (
-        <button
-            title={
-                techNameAnimationShouldRepeat
-                    ? 'Pause Color Changes'
-                    : 'Initiate Color Changes'
-            }
-            onClick={onPlayPauseButtonClick}
-        >
-            {techNameAnimationShouldRepeat ? (
-                <Pause stroke={currentPrimaryColorString} />
-            ) : (
-                <Play stroke={currentPrimaryColorString} />
-            )}
+        <button title={title} onClick={onPlayPauseButtonClick}>
+            <Icon stroke={currentPrimaryColorString} />
         </button>
     );
 }
@@ -76,18 +68,17 @@ function ColorSchemeButton() {
     const shouldUseDarkMode = useAtomValue(shouldUseDarkModeAtom);
     const currentPrimaryColorString = ColorHooks.useCurrentPrimaryColorString();
     const onColorSchemeButtonClick = useColorSchemeButtonClickListener();
+    const [title, Icon] = shouldUseDarkMode
+        ? ['Enable Light Mode', Moon]
+        : ['Enable Dark Mode', Sun];
 
     return (
         <button
             disabled={!backgroundIsVisible}
-            title={`Enable ${shouldUseDarkMode ? 'Light' : 'Dark'} Mode`}
+            title={title}
             onClick={onColorSchemeButtonClick}
         >
-            {shouldUseDarkMode ? (
-                <Moon stroke={currentPrimaryColorString} />
-            ) : (
-                <Sun stroke={currentPrimaryColorString} />
-            )}
+            <Icon stroke={currentPrimaryColorString} />
         </button>
     );
 }
