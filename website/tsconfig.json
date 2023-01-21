@@ -37,6 +37,7 @@
         "pages",
         "renderer",
         "server",
+        "globals.d.ts",
         "jest.setup.ts",
         "vite.config.ts"
     ],

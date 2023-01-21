@@ -1,5 +1,5 @@
 import compression from 'compression';
-import express from 'express';
+import express, { Response } from 'express';
 import { URL } from 'url';
 import type { UserConfig } from 'vite';
 import { renderPage } from 'vite-plugin-ssr';
@@ -8,6 +8,24 @@ const __dirname = new URL('.', import.meta.url).pathname.slice(0, -1);
 const root = `${__dirname}/..`;
 
 const isProduction = process.env.NODE_ENV === 'production';
+
+async function pipeReadableStreamToExpressResponse<R>(
+    readableStream: ReadableStream<R>,
+    response: Response
+) {
+    const streamReader = readableStream.getReader();
+    let lastReadResult: ReadableStreamReadResult<R> | undefined;
+
+    while (!lastReadResult?.done) {
+        if (lastReadResult !== undefined) {
+            response.write(lastReadResult.value);
+        }
+
+        lastReadResult = await streamReader.read();
+    }
+
+    response.end();
+}
 
 async function startServer() {
     const app = express();
@@ -49,13 +67,17 @@ async function startServer() {
             return next();
         }
 
-        const { body, statusCode, contentType, earlyHints } = httpResponse;
+        const { statusCode, contentType, earlyHints } = httpResponse;
+        const readableStream = httpResponse.getReadableWebStream();
 
         if (res.writeEarlyHints) {
             res.writeEarlyHints({ link: earlyHints.map(e => e.earlyHintLink) });
         }
 
-        res.status(statusCode).type(contentType).send(body);
+        await pipeReadableStreamToExpressResponse(
+            readableStream,
+            res.status(statusCode).type(contentType)
+        );
     });
 
     const port = 3000;

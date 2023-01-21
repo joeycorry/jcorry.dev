@@ -51,7 +51,7 @@ export default defineConfig({
                       [
                           'jotai',
                           'react-dom/client',
-                          'react-dom/server',
+                          'react-dom/server.browser',
                           'react-feather',
                           'react/jsx-runtime',
                           'react',

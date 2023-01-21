@@ -1,4 +1,4 @@
-import { renderToString } from 'react-dom/server';
+import { renderToReadableStream } from 'react-dom/server.browser';
 import { dangerouslySkipEscape, escapeInject } from 'vite-plugin-ssr';
 
 import styles from './_default.css?inline';
@@ -11,7 +11,9 @@ export async function render(pageContext: ServerPageContext) {
     const htmlStyleString = Object.entries(colorCssVariablesByName)
         .map(([name, value]) => `${name}:${value}`)
         .join('; ');
-    const viewHtml = renderToString(<Page {...pageProps} />);
+    const readableStream = await renderToReadableStream(
+        <Page {...pageProps} />
+    );
 
     return escapeInject`
       <!DOCTYPE html>
@@ -23,7 +25,7 @@ export async function render(pageContext: ServerPageContext) {
           <style>${dangerouslySkipEscape(styles)}</style>
         </head>
         <body>
-          <div id="root">${dangerouslySkipEscape(viewHtml)}</div>
+          <div id="root">${readableStream}</div>
         </body>
       </html>
     `;

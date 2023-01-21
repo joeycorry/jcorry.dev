@@ -19,6 +19,7 @@ services:
       - 3001
     volumes:
       - ./website/common:/home/website/common
+      - ./website/globals.d.ts:/home/website/globals.d.ts
       - ./website/pages:/home/website/pages
       - ./website/renderer:/home/website/renderer
       - ./website/server:/home/website/server

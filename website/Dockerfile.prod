@@ -1,8 +1,8 @@
 FROM node:18.13.0
 
 WORKDIR /home/website
-COPY .eslintrc .eslintignore .prettierrc nodemon.json package.json tsconfig.eslint.json tsconfig.json \
-    vite.config.ts yarn.lock ./
+COPY .eslintrc .eslintignore .prettierrc globals.d.ts nodemon.json package.json tsconfig.eslint.json \
+    tsconfig.json vite.config.ts yarn.lock ./
 COPY common/ ./common/
 COPY pages/ ./pages/
 COPY renderer/ ./renderer/
