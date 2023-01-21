@@ -1,6 +1,5 @@
 {
-    "watch": [
-        "server/",
-        "vite.config.ts"
-    ]
+    "exec": "ts-node ./server/index.ts",
+    "ext": "css,ts,tsx",
+    "watch": ["pages/", "renderer/", "server/", "vite.config.ts"]
 }

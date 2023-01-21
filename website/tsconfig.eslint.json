@@ -11,5 +11,5 @@
         "jest.setup.ts",
         "vite.config.ts"
     ],
-    "exclude": ["node_modules", "**/dist"]
+    "exclude": ["dist", "node_modules"]
 }

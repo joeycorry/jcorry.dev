@@ -9,4 +9,4 @@ COPY renderer/ ./renderer/
 COPY server/ ./server/
 RUN yarn --frozen-lockfile --non-interactive
 
-CMD yarn build && yarn serve
+CMD yarn prod

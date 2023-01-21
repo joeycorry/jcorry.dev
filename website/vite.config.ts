@@ -9,7 +9,7 @@ import packageJson from './package.json' assert { type: 'json' };
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-function getJsDeliverEsmUrl(importPath: string) {
+function getEsmUrl(importPath: string) {
     const importPathSegments = importPath.split('/');
     const [baseImportPath, subImportPath] = [
         importPathSegments[0],
@@ -25,9 +25,9 @@ function getJsDeliverEsmUrl(importPath: string) {
         throw new Error('Invalid import path');
     }
 
-    return `https://cdn.jsdelivr.net/npm/${baseImportPath}@${version}${
+    return `https://esm.sh/${baseImportPath}@${version}${
         subImportPath ? `/${subImportPath}` : ''
-    }/+esm`;
+    }`;
 }
 
 export default defineConfig({
@@ -55,10 +55,7 @@ export default defineConfig({
                           'react-feather',
                           'react/jsx-runtime',
                           'react',
-                      ].map(importPath => [
-                          importPath,
-                          getJsDeliverEsmUrl(importPath),
-                      ])
+                      ].map(importPath => [importPath, getEsmUrl(importPath)])
                   )
                 : {}),
         },
