@@ -22,8 +22,16 @@ export function useEffects({ canvasElementRef }: UseEffectsParameter) {
         }
 
         const canvasElement = canvasElementRef.current;
-        canvasElement.width = viewport.width;
-        canvasElement.height = viewport.height;
+        const canvasContext = canvasElement.getContext('2d')!;
+        canvasElement.width = viewport.width * viewport.devicePixelRatio;
+        canvasElement.height = viewport.height * viewport.devicePixelRatio;
+        canvasElement.style.width = `${viewport.width}px`;
+        canvasElement.style.height = `${viewport.height}px`;
+
+        canvasContext.scale(
+            viewport.devicePixelRatio,
+            viewport.devicePixelRatio
+        );
     }, [canvasElementRef, viewport]);
 
     useEffect(() => {

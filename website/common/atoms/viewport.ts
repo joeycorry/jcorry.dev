@@ -1,8 +1,9 @@
 import * as AtomUtils from 'common/utils/atom';
 
 const getViewportValue = import.meta.env.SSR
-    ? () => ({ width: 0, height: 0 })
+    ? () => ({ devicePixelRatio: 1, width: 0, height: 0 })
     : () => ({
+          devicePixelRatio: window.devicePixelRatio,
           width: window.innerWidth,
           height: window.innerHeight,
       });

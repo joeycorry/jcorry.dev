@@ -16,7 +16,7 @@ function useDebouncedSetViewport() {
     );
 }
 
-function useViewportResizeListener() {
+function useViewportChangeListener() {
     const debouncedSetViewport = useDebouncedSetViewport();
     const setBackgroundIsVisible = useSetAtom(backgroundIsVisibleAtom);
 
@@ -31,11 +31,24 @@ function useViewportResizeListener() {
 }
 
 export function useEffects() {
-    const resizeListener = useViewportResizeListener();
+    const changeListener = useViewportChangeListener();
+    const devicePixelRatio =
+        typeof window !== 'undefined' ? window.devicePixelRatio : 1;
 
     useEffect(() => {
-        window.addEventListener('resize', resizeListener);
+        window.addEventListener('resize', changeListener);
 
-        return () => window.removeEventListener('resize', resizeListener);
-    }, [resizeListener]);
+        return () => window.removeEventListener('resize', changeListener);
+    }, [changeListener]);
+
+    useEffect(() => {
+        const mediaQueryList = window.matchMedia(
+            `(resolution: ${devicePixelRatio}dppx)`
+        );
+
+        mediaQueryList.addEventListener('change', changeListener);
+
+        return () =>
+            mediaQueryList.removeEventListener('change', changeListener);
+    }, [changeListener, devicePixelRatio]);
 }

@@ -107,11 +107,8 @@ export function setupRibbonCanvasRenderers({
         ribbonWidthBounds;
     const xAxisAdjacentAngle = 0.35 * Math.PI;
     const ribbonsHeight =
-        (canvasElement.width >= 1500
-            ? 0.8
-            : canvasElement.width >= 750
-            ? 0.6
-            : 0.4) * viewport.height;
+        (viewport.width >= 1500 ? 0.8 : viewport.width >= 750 ? 0.6 : 0.4) *
+        viewport.height;
 
     const leftStartingYs = [0];
     const leftYLimit = ribbonsHeight;
