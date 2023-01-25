@@ -1,8 +1,2 @@
-nginx/certs/*
-website/__mocks__
-website/dist/
-website/jest*
-website/node_modules/
-website/.eslintcache
 TODO
 !**/.gitkeep
