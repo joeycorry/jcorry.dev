@@ -8,6 +8,7 @@ const __dirname = new URL('.', import.meta.url).pathname.slice(0, -1);
 const root = `${__dirname}/..`;
 
 const isProduction = process.env.NODE_ENV === 'production';
+const port = parseInt(process.env.JCORRY_DEV_SERVER_PORT || '3000');
 
 async function pipeReadableStreamToExpressResponse<R>(
     readableStream: ReadableStream<R>,
@@ -79,8 +80,6 @@ async function startServer() {
             res.status(statusCode).type(contentType)
         );
     });
-
-    const port = 3000;
 
     app.listen(port);
     console.log(`Serving at http://localhost:${port}`);

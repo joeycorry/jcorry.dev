@@ -11,9 +11,11 @@ services:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./nginx/certs/bare.pem:/etc/nginx/ssl/bare.pem
       - ./nginx/certs/bare.key.pem:/etc/nginx/ssl/bare.key.pem
-  website:
+  local:
     build: ./website
-    container_name: jcorry-dev_website
+    container_name: jcorry-dev_local
+    environment:
+      - JCORRY_DEV_DOCUMENT_TITLE=Joey Corry (Local)
     expose:
       - 3000
       - 3001

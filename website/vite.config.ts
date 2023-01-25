@@ -8,6 +8,7 @@ import ssr from 'vite-plugin-ssr/plugin';
 import packageJson from './package.json' assert { type: 'json' };
 
 const isProduction = process.env.NODE_ENV === 'production';
+const port = parseInt(process.env.JCORRY_DEV_VITE_PORT || '3001');
 
 function getEsmUrl(importPath: string) {
     const importPathSegments = importPath.split('/');
@@ -64,9 +65,9 @@ export default defineConfig({
         hmr: {
             clientPort: 443,
             path: '/vite',
-            port: 3001,
+            port,
         },
-        port: 3001,
+        port,
         proxy: {
             '/vite': {
                 target: 'ws://vite.jcorry-dev.local',
