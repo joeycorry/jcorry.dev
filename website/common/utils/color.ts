@@ -18,9 +18,9 @@ export function getColorsByVariant({
 }: GetVariantsParameter): ColorsByVariant {
     if (shouldUseDarkMode === undefined) {
         return {
-            primaryColor: color.withAlpha(0),
-            secondaryColor: color.withAlpha(0),
-            tertiaryColor: color.withAlpha(0),
+            primaryColor: color,
+            secondaryColor: color,
+            tertiaryColor: color,
         };
     }
 
