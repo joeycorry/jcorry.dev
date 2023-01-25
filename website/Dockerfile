@@ -7,8 +7,8 @@ FROM node:18.13.0
 # - ./website/server:/home/website/server
 
 WORKDIR /home/website
-COPY .eslintrc .eslintignore .gitignore .prettierrc nodemon.json package.json tsconfig.eslint.json \
-    tsconfig.json vite.config.ts yarn.lock ./
+COPY .eslintrc .eslintignore .gitignore .prettierrc .prettierignore nodemon.json package.json \
+    tsconfig.eslint.json tsconfig.json vite.config.ts yarn.lock ./
 RUN yarn --frozen-lockfile --non-interactive
 
 CMD yarn dev

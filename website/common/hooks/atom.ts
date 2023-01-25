@@ -1,6 +1,4 @@
-import * as AtomUtils from 'common/utils/atom';
-import { Atom, useSetAtom, WritableAtom } from 'jotai';
-import * as JotaiUtils from 'jotai/utils';
+import { useSetAtom, WritableAtom } from 'jotai';
 
 export function useNoArgumentSetAtom<
     Value,

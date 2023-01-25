@@ -10,8 +10,10 @@
     "description": "A personal website for Joey Corry",
     "scripts": {
         "dev": "nodemon",
-        "format": "prettier . --write --ignore-path .gitignore",
-        "lint": "eslint . --ext .ts,.tsx --ignore-path .gitignore",
+        "format": "npm run format:write",
+        "format:check": "prettier . --check",
+        "format:write": "prettier . --write",
+        "lint": "eslint --cache --ext .ts,.tsx .",
         "prod": "npm run prod:build && npm run prod:serve",
         "prod:build": "rm -rf dist/ && npm run typecheck && vite build && npm run prod:build:server",
         "prod:build:server": "esbuild --minify ./server/index.ts --outfile=./dist/server.js",
