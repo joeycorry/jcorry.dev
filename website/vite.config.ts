@@ -8,6 +8,7 @@ import ssr from 'vite-plugin-ssr/plugin';
 import packageJson from './package.json' assert { type: 'json' };
 
 const isProduction = process.env.NODE_ENV === 'production';
+const isViaDocker = process.env.JCORRY_DEV_IS_VIA_DOCKER === 'true';
 const port = parseInt(process.env.JCORRY_DEV_VITE_PORT || '3001');
 
 function getEsmUrl(importPath: string) {
@@ -61,19 +62,23 @@ export default defineConfig({
                 : {}),
         },
     },
-    server: {
-        hmr: {
-            clientPort: 443,
-            path: '/vite',
-            port,
-        },
-        port,
-        proxy: {
-            '/vite': {
-                target: 'ws://vite.jcorry-dev.local',
-                ws: true,
-            },
-        },
-        strictPort: true,
-    },
+    ...(isViaDocker
+        ? {
+              server: {
+                  hmr: {
+                      clientPort: 443,
+                      path: '/vite',
+                      port,
+                  },
+                  port,
+                  proxy: {
+                      '/vite': {
+                          target: 'ws://vite.jcorry-dev.local',
+                          ws: true,
+                      },
+                  },
+                  strictPort: true,
+              },
+          }
+        : {}),
 });

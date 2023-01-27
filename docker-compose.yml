@@ -16,6 +16,7 @@ services:
     container_name: jcorry-dev_local
     environment:
       - JCORRY_DEV_DOCUMENT_TITLE=Joey Corry (Local)
+      - JCORRY_DEV_IS_VIA_DOCKER=true
     expose:
       - 3000
       - 3001

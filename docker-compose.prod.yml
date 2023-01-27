@@ -17,6 +17,8 @@ services:
       context: ./website
       dockerfile: Dockerfile.prod
     container_name: jcorry-dev_live-prod
+    environment:
+      - JCORRY_DEV_IS_VIA_DOCKER=true
     expose:
       - 3000
     restart: on-failure
