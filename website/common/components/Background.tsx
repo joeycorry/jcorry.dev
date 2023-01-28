@@ -2,11 +2,11 @@ import { backgroundIsVisibleAtom } from 'common/atoms/background';
 import * as BackgroundHooks from 'common/hooks/background';
 import * as CanvasRendererManagerHooks from 'common/hooks/canvasRendererManager';
 import { useAtomValue } from 'jotai';
-import { useRef } from 'react';
+import { memo, useRef } from 'react';
 
 import styles from './Background.module.css';
 
-export default function Background() {
+function Background() {
     const isVisible = useAtomValue(backgroundIsVisibleAtom);
     const canvasElementRef = useRef<HTMLCanvasElement>(null);
 
@@ -21,3 +21,5 @@ export default function Background() {
         />
     );
 }
+
+export default memo(Background);

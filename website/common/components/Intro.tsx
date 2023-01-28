@@ -1,9 +1,10 @@
 import { techNameDisplayDataAtom } from 'common/atoms/techName';
 import { useAtomValue } from 'jotai';
+import { memo } from 'react';
 
 import styles from './Intro.module.css';
 
-export default function Intro() {
+function Intro() {
     const { hiddenTechName, visibleTechName } = useAtomValue(
         techNameDisplayDataAtom
     );
@@ -23,3 +24,5 @@ export default function Intro() {
         </section>
     );
 }
+
+export default memo(Intro);

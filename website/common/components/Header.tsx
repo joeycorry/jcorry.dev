@@ -6,7 +6,7 @@ import * as ColorHooks from 'common/hooks/color';
 import * as TechNameHooks from 'common/hooks/techName';
 import * as AsyncUtils from 'common/utils/async';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import { GitHub, Moon, Pause, Play, Sun } from 'react-feather';
 
 import styles from './Header.module.css';
@@ -50,6 +50,8 @@ function PlayPauseButton() {
     );
 }
 
+const MemoizedPlayPauseButton = memo(PlayPauseButton);
+
 function useColorSchemeButtonClickListener() {
     const setBackgroundIsVisible = useSetAtom(backgroundIsVisibleAtom);
     const toggleDarkMode = AtomHooks.useNoArgumentSetAtom(
@@ -83,6 +85,8 @@ function ColorSchemeButton() {
     );
 }
 
+const MemoizedColorSchemeButton = memo(ColorSchemeButton);
+
 function GitHubLink() {
     const currentPrimaryColorString = ColorHooks.useCurrentPrimaryColorString();
 
@@ -98,20 +102,24 @@ function GitHubLink() {
     );
 }
 
-export default function Header() {
+const MemoizedGitHubLink = memo(GitHubLink);
+
+function Header() {
     return (
         <header className={styles.header}>
             <ul>
                 <li>
-                    <PlayPauseButton />
+                    <MemoizedPlayPauseButton />
                 </li>
                 <li>
-                    <ColorSchemeButton />
+                    <MemoizedColorSchemeButton />
                 </li>
                 <li>
-                    <GitHubLink />
+                    <MemoizedGitHubLink />
                 </li>
             </ul>
         </header>
     );
 }
+
+export default memo(Header);
