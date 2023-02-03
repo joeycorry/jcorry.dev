@@ -71,7 +71,7 @@ export default class CanvasRendererManager {
 
         this._isRunning = true;
         this._animationFrameRequestId = window.requestAnimationFrame(
-            timestamp => this.stepAnimation(timestamp)
+            this.stepAnimation
         );
     }
 
@@ -95,7 +95,7 @@ export default class CanvasRendererManager {
 
         if (this._renderers.length > 0 && this._isRunning) {
             this._animationFrameRequestId = window.requestAnimationFrame(
-                timestamp => this.stepAnimation(timestamp)
+                this.stepAnimation
             );
         }
     }
@@ -162,7 +162,7 @@ export default class CanvasRendererManager {
         }
     }
 
-    private stepAnimation(timestamp: number) {
+    private stepAnimation = (timestamp: number) => {
         if (!this._isRunning) {
             return;
         }
@@ -172,7 +172,7 @@ export default class CanvasRendererManager {
         this.deleteFinishedRenderers();
 
         this._animationFrameRequestId = window.requestAnimationFrame(
-            timestamp => this.stepAnimation(timestamp)
+            this.stepAnimation
         );
-    }
+    };
 }
