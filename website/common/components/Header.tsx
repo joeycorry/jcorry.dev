@@ -71,8 +71,8 @@ function ColorSchemeButton() {
     const currentPrimaryColorString = ColorHooks.useCurrentPrimaryColorString();
     const onColorSchemeButtonClick = useColorSchemeButtonClickListener();
     const [title, Icon] = shouldUseDarkMode
-        ? ['Enable Light Mode', Moon]
-        : ['Enable Dark Mode', Sun];
+        ? ['Enable Light Mode', Sun]
+        : ['Enable Dark Mode', Moon];
 
     return (
         <button
