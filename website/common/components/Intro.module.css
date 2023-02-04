@@ -35,7 +35,7 @@
 }
 
 h1,
-.tech-name span,
+.tech-name,
 .job-title {
     transition: color 0.4s;
 }
