@@ -3,6 +3,9 @@ version: '3.7'
 services:
   nginx:
     container_name: jcorry-dev_nginx-prod
+    depends_on:
+      live:
+        condition: service_healthy
     image: nginx:1.23.3
     ports:
       - '0.0.0.0:80:80'
@@ -21,4 +24,8 @@ services:
       - JCORRY_DEV_IS_VIA_DOCKER=true
     expose:
       - 3000
+    healthcheck:
+      test: curl -f http://localhost:3000 || exit 1
+      interval: 10s
+      timeout: 10s
     restart: on-failure

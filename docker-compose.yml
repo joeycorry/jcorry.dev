@@ -3,6 +3,9 @@ version: '3.7'
 services:
   nginx:
     container_name: jcorry-dev_nginx
+    depends_on:
+      local:
+        condition: service_healthy
     image: nginx:1.23.3
     ports:
       - '0.0.0.0:80:80'
@@ -20,6 +23,10 @@ services:
     expose:
       - 3000
       - 3001
+    healthcheck:
+      test: curl -f http://localhost:3000 || exit 1
+      interval: 10s
+      timeout: 10s
     volumes:
       - ./website/common:/home/website/common
       - ./website/globals.d.ts:/home/website/globals.d.ts
