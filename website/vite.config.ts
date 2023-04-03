@@ -71,12 +71,6 @@ export default defineConfig({
                       port,
                   },
                   port,
-                  proxy: {
-                      '/vite': {
-                          target: 'ws://vite.jcorry-dev.local',
-                          ws: true,
-                      },
-                  },
                   strictPort: true,
               },
           }

@@ -1,0 +1,15 @@
+{
+	email jcorry.git@gmail.com
+}
+
+jcorry-dev.local {
+	tls /etc/ssl/bare.pem /etc/ssl/bare.key.pem
+
+	reverse_proxy http://local:3000 {
+		header_up X-Real-IP {remote_host}
+	}
+
+	reverse_proxy /vite http://local:3001 {
+		header_up X-Real-IP {remote_host}
+	}
+}

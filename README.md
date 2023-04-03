@@ -10,7 +10,7 @@
 - [Vite](https://vitejs.dev)
 - [vite-plugin-ssr](https://vite-plugin-ssr.com)
 - [Docker](https://www.docker.com/)
-- [NGINX](https://www.nginx.com)
+- [Caddy](https://caddyserver.com/)
 
 ## Setup for local environment
 
@@ -51,8 +51,8 @@ echo "127.0.0.1 jcorry-dev.local" | sudo tee -a /etc/hosts
 
 # Setup SSL Certs
 mkcert -install
-pushd nginx/certs
-mkcert -cert-file bare.pem -key-file bare.key.pem jcorry-dev.local
+pushd caddy/certs
+mkcert -ecdsa -cert-file bare.pem -key-file bare.key.pem jcorry-dev.local
 popd
 
 # Start Docker containers
