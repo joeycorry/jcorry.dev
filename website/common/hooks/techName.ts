@@ -9,12 +9,12 @@ import * as TechNameUtils from 'common/utils/techName';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect } from 'react';
 
-import * as AtomHooks from './atom';
+import * as JotaiHooks from './jotai';
 
 export function useAnimationStarter() {
     const animationIsFinished = useAtomValue(techNameAnimationIsFinishedAtom);
     const setBackgroundIsVisible = useSetAtom(backgroundIsVisibleAtom);
-    const setNextAnimationData = AtomHooks.useNoArgumentSetAtom(
+    const setNextAnimationData = JotaiHooks.useNoArgumentSetAtom(
         techNameAnimationDataAtom
     );
 
@@ -30,9 +30,9 @@ export function useAnimationStarter() {
 
 function useAnimationStepper() {
     const techName = useAtomValue(techNameAtom);
-    const setNextTechName = AtomHooks.useNoArgumentSetAtom(techNameAtom);
+    const setNextTechName = JotaiHooks.useNoArgumentSetAtom(techNameAtom);
     const animationData = useAtomValue(techNameAnimationDataAtom);
-    const setNextTechNameAnimationData = AtomHooks.useNoArgumentSetAtom(
+    const setNextTechNameAnimationData = JotaiHooks.useNoArgumentSetAtom(
         techNameAnimationDataAtom
     );
 

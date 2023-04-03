@@ -1,37 +1,55 @@
+import { colorAtom } from 'common/atoms/color';
+import { shouldUseDarkModeAtom } from 'common/atoms/shouldUseDarkMode';
 import * as ColorUtils from 'common/utils/color';
 import * as CookieUtils from 'common/utils/cookie';
+import * as JotaiUtils from 'common/utils/jotai';
 import * as TechNameUtils from 'common/utils/techName';
-import { CustomServerPageContext, ServerPageContextInit } from 'renderer/types';
+import { ServerOnBeforeRenderResult, ServerPageContext } from 'renderer/types';
+
+import type { PageProps } from './index.page';
+import defaultStyle from './index.page.css?inline';
+
+const title = process.env.JCORRY_DEV_DOCUMENT_TITLE || 'Joey Corry';
 
 export async function onBeforeRender({
-    requestCookie,
-}: ServerPageContextInit): Promise<{
-    pageContext: CustomServerPageContext;
-}> {
-    const shouldUseDarkModeCookieItem = CookieUtils.getItem({
+    originalRequest,
+}: ServerPageContext): Promise<ServerOnBeforeRenderResult<PageProps>> {
+    const requestCookie = originalRequest.header('cookie') || '';
+    const shouldUseDarkModeCookieValue = CookieUtils.getItem({
         getCookie: () => requestCookie,
         key: 'shouldUseDarkMode',
     });
-    const shouldUseDarkMode =
-        shouldUseDarkModeCookieItem === null
-            ? undefined
-            : shouldUseDarkModeCookieItem === 'true';
-    const techName = TechNameUtils.getRandomTechName();
-    const color = ColorUtils.getColorForTechName(techName);
+    const jotaiStoreSetParametersByName: JotaiUtils.JotaiStoreSetParametersByName =
+        {
+            shouldUseDarkMode: [
+                shouldUseDarkModeCookieValue === null
+                    ? undefined
+                    : shouldUseDarkModeCookieValue === 'true',
+            ],
+            techName: [TechNameUtils.getRandomTechName()],
+        };
+    const jotaiStore = JotaiUtils.createJotaiStore(
+        jotaiStoreSetParametersByName
+    );
     const colorCssVariablesByName = ColorUtils.getCssVariablesByName({
-        color,
-        shouldUseDarkMode,
+        color: jotaiStore.get(colorAtom),
+        shouldUseDarkMode: jotaiStore.get(shouldUseDarkModeAtom),
     });
-    const valuesByBaseAtomName = {
-        shouldUseDarkModeAtom: shouldUseDarkMode,
-        techNameAtom: techName,
-    };
+    const htmlStyle = Object.entries(colorCssVariablesByName)
+        .map(([name, value]) => `${name}:${value}`)
+        .join('; ');
 
     return {
         pageContext: {
-            colorCssVariablesByName,
+            documentProps: {
+                defaultStyle,
+                htmlAttributes: {
+                    style: htmlStyle,
+                },
+                title,
+            },
             pageProps: {
-                valuesByBaseAtomName,
+                jotaiStoreSetParametersByName,
             },
         },
     };

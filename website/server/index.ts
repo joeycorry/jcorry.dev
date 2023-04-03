@@ -58,7 +58,7 @@ async function startServer() {
 
     app.get('*', async (req, res, next) => {
         const pageContextInit = {
-            requestCookie: req.header('cookie') || '',
+            originalRequest: req,
             urlOriginal: req.originalUrl,
         };
         const pageContext = await renderPage(pageContextInit);

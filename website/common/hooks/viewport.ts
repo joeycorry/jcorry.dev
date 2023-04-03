@@ -4,10 +4,10 @@ import * as FunctionalUtils from 'common/utils/functional';
 import { useSetAtom } from 'jotai';
 import { useCallback, useEffect } from 'react';
 
-import * as AtomHooks from './atom';
+import * as JotaiHooks from './jotai';
 
 function useDebouncedSetViewport() {
-    const setViewport = AtomHooks.useNoArgumentSetAtom(viewportAtom);
+    const setViewport = JotaiHooks.useNoArgumentSetAtom(viewportAtom);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     return useCallback(

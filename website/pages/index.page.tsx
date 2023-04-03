@@ -1,16 +1,14 @@
 import App from 'common/components/App';
-import AtomProvider from 'common/components/AtomProvider';
-import { StrictMode } from 'react';
-import * as RendererTypes from 'renderer/types';
+import * as JotaiUtils from 'common/utils/jotai';
 
-type PageProps = RendererTypes.PageProps;
+export type PageProps = {
+    jotaiStoreSetParametersByName: JotaiUtils.JotaiStoreSetParametersByName;
+};
 
-export function Page({ valuesByBaseAtomName }: PageProps) {
-    return (
-        <StrictMode>
-            <AtomProvider valuesByBaseAtomName={valuesByBaseAtomName}>
-                <App />
-            </AtomProvider>
-        </StrictMode>
+export function Page({ jotaiStoreSetParametersByName }: PageProps) {
+    const jotaiStore = JotaiUtils.createJotaiStore(
+        jotaiStoreSetParametersByName
     );
+
+    return <App jotaiStore={jotaiStore} />;
 }

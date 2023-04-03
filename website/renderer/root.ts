@@ -1,0 +1,1 @@
+export const rootHtmlId = 'root';

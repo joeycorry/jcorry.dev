@@ -1,8 +1,8 @@
 import { backgroundIsVisibleAtom } from 'common/atoms/background';
 import { shouldUseDarkModeAtom } from 'common/atoms/shouldUseDarkMode';
 import { techNameAnimationShouldRepeatAtom } from 'common/atoms/techName';
-import * as AtomHooks from 'common/hooks/atom';
 import * as ColorHooks from 'common/hooks/color';
+import * as JotaiHooks from 'common/hooks/jotai';
 import * as TechNameHooks from 'common/hooks/techName';
 import * as AsyncUtils from 'common/utils/async';
 import { useAtomValue, useSetAtom } from 'jotai';
@@ -16,7 +16,7 @@ function usePlayPauseButtonClickListener() {
     const techNameAnimationShouldRepeat = useAtomValue(
         techNameAnimationShouldRepeatAtom
     );
-    const toggleTechNameAnimationShouldRepeat = AtomHooks.useNoArgumentSetAtom(
+    const toggleTechNameAnimationShouldRepeat = JotaiHooks.useNoArgumentSetAtom(
         techNameAnimationShouldRepeatAtom
     );
 
@@ -54,7 +54,7 @@ const MemoizedPlayPauseButton = memo(PlayPauseButton);
 
 function useColorSchemeButtonClickListener() {
     const setBackgroundIsVisible = useSetAtom(backgroundIsVisibleAtom);
-    const toggleDarkMode = AtomHooks.useNoArgumentSetAtom(
+    const toggleDarkMode = JotaiHooks.useNoArgumentSetAtom(
         shouldUseDarkModeAtom
     );
 

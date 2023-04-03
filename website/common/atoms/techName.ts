@@ -3,21 +3,23 @@ import { atom, WritableAtom } from 'jotai';
 
 export const techNameAtom = atom(
     TechNameUtils.getRandomTechName(),
-    (get, set) =>
+    (get, set, techName) =>
         set(
-            techNameAtom as unknown as WritableAtom<
-                TechNameUtils.TechName,
-                TechNameUtils.TechName
-            >,
-            TechNameUtils.getNextTechName(get(techNameAtom))
+            techNameAtom,
+            techName || TechNameUtils.getNextTechName(get(techNameAtom))
         )
-) as WritableAtom<TechNameUtils.TechName, undefined, void>;
+) as WritableAtom<
+    TechNameUtils.TechName,
+    [TechNameUtils.TechName | undefined],
+    void
+>;
 
 techNameAtom.debugLabel = 'techNameAtom';
 
 export const techNameAnimationDataAtom = atom<
     TechNameUtils.AnimationData,
-    undefined
+    [undefined],
+    void
 >(
     {
         visibleLength: 0,
@@ -27,7 +29,8 @@ export const techNameAnimationDataAtom = atom<
         const techNameAnimationDataAtom_ =
             techNameAnimationDataAtom as unknown as WritableAtom<
                 TechNameUtils.AnimationData,
-                TechNameUtils.AnimationData
+                [TechNameUtils.AnimationData],
+                void
             >;
         const techName = get(techNameAtom);
         const { animationStatus, visibleLength } = get(
@@ -96,11 +99,12 @@ export const techNameAnimationShouldRepeatAtom = atom(true, (get, set) =>
     set(
         techNameAnimationShouldRepeatAtom as unknown as WritableAtom<
             boolean,
-            boolean
+            [boolean],
+            void
         >,
         !get(techNameAnimationShouldRepeatAtom)
     )
-) as WritableAtom<boolean, undefined, void>;
+) as WritableAtom<boolean, [undefined], void>;
 
 export const techNameDisplayDataAtom = atom(get => {
     const techName = get(techNameAtom);

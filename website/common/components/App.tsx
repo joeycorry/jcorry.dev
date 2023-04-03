@@ -1,29 +1,21 @@
-import * as ColorHooks from 'common/hooks/color';
-import * as FaviconHooks from 'common/hooks/favicon';
-import * as ShouldUseDarkModeHooks from 'common/hooks/shouldUseDarkMode';
-import * as TechNameHooks from 'common/hooks/techName';
-import * as ViewportHooks from 'common/hooks/viewport';
-import { memo } from 'react';
+import type * as JotaiUtils from 'common/utils/jotai';
+import { Provider as JotaiProvider } from 'jotai';
+import { StrictMode } from 'react';
 
-import styles from './App.module.css';
-import Background from './Background';
-import Header from './Header';
-import Intro from './Intro';
+import AppContent from './AppContent';
 
-function App() {
-    ShouldUseDarkModeHooks.useEffects();
-    ColorHooks.useEffects();
-    FaviconHooks.useEffects();
-    TechNameHooks.useEffects();
-    ViewportHooks.useEffects();
+type CreateJotaiStoreParameter = {
+    jotaiStore: JotaiUtils.JotaiStore;
+};
 
+export type AppProps = CreateJotaiStoreParameter;
+
+export default function App({ jotaiStore }: AppProps) {
     return (
-        <main className={styles.app}>
-            <Background />
-            <Header />
-            <Intro />
-        </main>
+        <StrictMode>
+            <JotaiProvider store={jotaiStore}>
+                <AppContent />
+            </JotaiProvider>
+        </StrictMode>
     );
 }
-
-export default memo(App);
