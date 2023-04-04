@@ -12,7 +12,7 @@ services:
       - '0.0.0.0:443:443'
     restart: on-failure
     volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/Caddyfile.prod:/etc/caddy/Caddyfile
       - ./caddy/certs/bare.pem:/etc/ssl/bare.pem
       - ./caddy/certs/bare.key.pem:/etc/ssl/bare.key.pem
   live:
