@@ -68,12 +68,8 @@ async function startServer() {
             return next();
         }
 
-        const { statusCode, contentType, earlyHints } = httpResponse;
+        const { statusCode, contentType } = httpResponse;
         const readableStream = httpResponse.getReadableWebStream();
-
-        if (res.writeEarlyHints) {
-            res.writeEarlyHints({ link: earlyHints.map(e => e.earlyHintLink) });
-        }
 
         await pipeReadableStreamToExpressResponse(
             readableStream,
