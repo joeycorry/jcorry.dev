@@ -5,6 +5,8 @@
 jcorry.dev {
 	tls /etc/ssl/bare.pem /etc/ssl/bare.key.pem
 
+	header -Server
+
 	reverse_proxy http://live:3000 {
 		header_up X-Real-IP {remote_host}
 	}

@@ -31,6 +31,7 @@ async function pipeReadableStreamToExpressResponse<R>(
 async function startServer() {
     const app = express();
 
+    app.disable('x-powered-by');
     app.use(compression());
 
     if (isProduction) {
