@@ -10,6 +10,7 @@ services:
     ports:
       - '0.0.0.0:80:80'
       - '0.0.0.0:443:443'
+      - '0.0.0.0:443:443/udp'
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
       - ./caddy/certs/bare.pem:/etc/ssl/bare.pem
