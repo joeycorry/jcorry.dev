@@ -28,7 +28,7 @@ export async function render(pageContext: ServerPageContext) {
               getDefaultStyleString(pageContext)
           )}</style>
         </head>
-        <body>
+        <body class="no-transition">
           <div id="${rootHtmlId}">${readableStream}</div>
         </body>
       </html>

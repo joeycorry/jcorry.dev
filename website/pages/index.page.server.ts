@@ -38,9 +38,9 @@ export async function onBeforeRender({
         color: jotaiStore.get(colorAtom),
         shouldUseDarkMode: jotaiStore.get(shouldUseDarkModeAtom),
     });
-    const htmlStyle = Object.entries(colorCssVariablesByName)
+    const htmlStyle = `${Object.entries(colorCssVariablesByName)
         .map(([name, value]) => `${name}:${value}`)
-        .join('; ');
+        .join('; ')};`;
 
     return {
         pageContext: {
