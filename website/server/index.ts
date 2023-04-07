@@ -57,6 +57,11 @@ async function startServer() {
         app.use(viteDevMiddleware);
     }
 
+    app.get('/ok', async (_, res) => {
+        res.status(200).type('text/plain').write('jcorry.dev is OK!');
+        res.end();
+    });
+
     app.get('*', async (req, res, next) => {
         const pageContextInit = {
             originalRequest: req,
