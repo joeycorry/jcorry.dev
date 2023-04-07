@@ -1,6 +1,6 @@
-import type Color from 'common/lib/color';
-import Renderer from 'common/lib/renderer';
-import Trapezoid from 'common/lib/shape/trapezoid';
+import type Color from '~/common/lib/color';
+import Renderer from '~/common/lib/renderer';
+import Trapezoid from '~/common/lib/shape/trapezoid';
 
 import type { Tuple } from './miscellaneous';
 import * as ShapeUtils from './shape';

@@ -1,5 +1,5 @@
-import Renderable from 'common/lib/renderable';
-import * as NumberUtils from 'common/utils/number';
+import Renderable from '~/common/lib/renderable';
+import * as NumberUtils from '~/common/utils/number';
 
 export type ShapeConstructorParameter = {
     canvasContext: CanvasRenderingContext2D;

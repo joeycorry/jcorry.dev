@@ -1,8 +1,9 @@
-import { backgroundIsVisibleAtom } from 'common/atoms/background';
-import { viewportAtom } from 'common/atoms/viewport';
-import * as FunctionalUtils from 'common/utils/functional';
 import { useSetAtom } from 'jotai';
 import { useCallback, useEffect } from 'react';
+
+import { backgroundIsVisibleAtom } from '~/common/atoms/background';
+import { viewportAtom } from '~/common/atoms/viewport';
+import * as FunctionalUtils from '~/common/utils/functional';
 
 import * as JotaiHooks from './jotai';
 

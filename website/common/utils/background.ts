@@ -1,6 +1,6 @@
-import type Color from 'common/lib/color';
-import type Renderer from 'common/lib/renderer';
-import RendererManager from 'common/lib/rendererManager';
+import type Color from '~/common/lib/color';
+import type Renderer from '~/common/lib/renderer';
+import RendererManager from '~/common/lib/rendererManager';
 
 import * as ArrayUtils from './array';
 import * as FunctionalUtils from './functional';

@@ -44,10 +44,7 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            common: fileURLToPath(new URL('./common', import.meta.url)),
-            pages: fileURLToPath(new URL('./pages', import.meta.url)),
-            renderer: fileURLToPath(new URL('./renderer', import.meta.url)),
-            server: fileURLToPath(new URL('./server', import.meta.url)),
+            '~': fileURLToPath(new URL('.', import.meta.url)),
             ...(isProduction
                 ? Object.fromEntries(
                       [

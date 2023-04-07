@@ -1,5 +1,5 @@
-import * as NumberUtils from 'common/utils/number';
-import type * as RendererUtils from 'common/utils/renderer';
+import * as NumberUtils from '~/common/utils/number';
+import type * as RendererUtils from '~/common/utils/renderer';
 
 import type Renderable from './renderable';
 

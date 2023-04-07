@@ -1,4 +1,4 @@
-import * as NumberUtils from 'common/utils/number';
+import * as NumberUtils from '~/common/utils/number';
 
 import type Color from '.';
 

@@ -1,8 +1,9 @@
-import { backgroundIsVisibleAtom } from 'common/atoms/background';
-import * as BackgroundHooks from 'common/hooks/background';
-import * as RendererManagerHooks from 'common/hooks/rendererManager';
 import { useAtomValue } from 'jotai';
 import { memo, useRef } from 'react';
+
+import { backgroundIsVisibleAtom } from '~/common/atoms/background';
+import * as BackgroundHooks from '~/common/hooks/background';
+import * as RendererManagerHooks from '~/common/hooks/rendererManager';
 
 import styles from './Background.module.css';
 

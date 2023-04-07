@@ -1,5 +1,5 @@
-import * as MiscellaneousUtils from 'common/utils/miscellaneous';
-import * as ShapeUtils from 'common/utils/shape';
+import * as MiscellaneousUtils from '~/common/utils/miscellaneous';
+import * as ShapeUtils from '~/common/utils/shape';
 
 import Shape, { ShapeConstructorParameter } from '.';
 

@@ -1,7 +1,8 @@
-import { shouldUseDarkModeAtom } from 'common/atoms/shouldUseDarkMode';
-import * as CookieUtils from 'common/utils/cookie';
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
+
+import { shouldUseDarkModeAtom } from '~/common/atoms/shouldUseDarkMode';
+import * as CookieUtils from '~/common/utils/cookie';
 
 export function useEffects() {
     const [shouldUseDarkMode, setShouldUseDarkMode] = useAtom(

@@ -1,5 +1,5 @@
-import App from 'common/components/App';
-import * as JotaiUtils from 'common/utils/jotai';
+import App from '~/common/components/App';
+import * as JotaiUtils from '~/common/utils/jotai';
 
 export type PageProps = {
     jotaiStoreSetParametersByName: JotaiUtils.JotaiStoreSetParametersByName;

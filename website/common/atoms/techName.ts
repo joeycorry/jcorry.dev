@@ -1,5 +1,6 @@
-import * as TechNameUtils from 'common/utils/techName';
 import { atom, WritableAtom } from 'jotai';
+
+import * as TechNameUtils from '~/common/utils/techName';
 
 export const techNameAtom = atom(
     TechNameUtils.getRandomTechName(),

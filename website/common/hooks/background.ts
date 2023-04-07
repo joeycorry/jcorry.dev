@@ -1,9 +1,10 @@
-import { backgroundIsVisibleAtom } from 'common/atoms/background';
-import { viewportAtom } from 'common/atoms/viewport';
-import * as BackgroundUtils from 'common/utils/background';
-import * as FunctionalUtils from 'common/utils/functional';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { RefObject, useEffect } from 'react';
+
+import { backgroundIsVisibleAtom } from '~/common/atoms/background';
+import { viewportAtom } from '~/common/atoms/viewport';
+import * as BackgroundUtils from '~/common/utils/background';
+import * as FunctionalUtils from '~/common/utils/functional';
 
 import * as ColorHooks from './color';
 

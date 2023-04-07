@@ -1,6 +1,7 @@
-import { shouldUseDarkModeAtom } from 'common/atoms/shouldUseDarkMode';
-import { techNameAtom } from 'common/atoms/techName';
 import { Atom, atom, createStore, WritableAtom } from 'jotai';
+
+import { shouldUseDarkModeAtom } from '~/common/atoms/shouldUseDarkMode';
+import { techNameAtom } from '~/common/atoms/techName';
 
 export function atomWithNoArgumentSetter<Value>(
     initialValue: Value,

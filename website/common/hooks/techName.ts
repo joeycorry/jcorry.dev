@@ -1,13 +1,14 @@
-import { backgroundIsVisibleAtom } from 'common/atoms/background';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useCallback, useEffect } from 'react';
+
+import { backgroundIsVisibleAtom } from '~/common/atoms/background';
 import {
     techNameAnimationDataAtom,
     techNameAnimationIsFinishedAtom,
     techNameAnimationShouldRepeatAtom,
     techNameAtom,
-} from 'common/atoms/techName';
-import * as TechNameUtils from 'common/utils/techName';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { useCallback, useEffect } from 'react';
+} from '~/common/atoms/techName';
+import * as TechNameUtils from '~/common/utils/techName';
 
 import * as JotaiHooks from './jotai';
 

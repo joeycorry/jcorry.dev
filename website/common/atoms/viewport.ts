@@ -1,4 +1,4 @@
-import * as JotaiUtils from 'common/utils/jotai';
+import * as JotaiUtils from '~/common/utils/jotai';
 
 const getViewportValue = import.meta.env.SSR
     ? () => ({ devicePixelRatio: 1, width: 0, height: 0 })

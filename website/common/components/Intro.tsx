@@ -1,6 +1,7 @@
-import { techNameDisplayDataAtom } from 'common/atoms/techName';
 import { useAtomValue } from 'jotai';
 import { memo } from 'react';
+
+import { techNameDisplayDataAtom } from '~/common/atoms/techName';
 
 import styles from './Intro.module.css';
 

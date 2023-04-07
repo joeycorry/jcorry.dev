@@ -1,13 +1,14 @@
-import { backgroundIsVisibleAtom } from 'common/atoms/background';
-import { shouldUseDarkModeAtom } from 'common/atoms/shouldUseDarkMode';
-import { techNameAnimationShouldRepeatAtom } from 'common/atoms/techName';
-import * as ColorHooks from 'common/hooks/color';
-import * as JotaiHooks from 'common/hooks/jotai';
-import * as TechNameHooks from 'common/hooks/techName';
-import * as AsyncUtils from 'common/utils/async';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback } from 'react';
 import { GitHub, Moon, Pause, Play, Sun } from 'react-feather';
+
+import { backgroundIsVisibleAtom } from '~/common/atoms/background';
+import { shouldUseDarkModeAtom } from '~/common/atoms/shouldUseDarkMode';
+import { techNameAnimationShouldRepeatAtom } from '~/common/atoms/techName';
+import * as ColorHooks from '~/common/hooks/color';
+import * as JotaiHooks from '~/common/hooks/jotai';
+import * as TechNameHooks from '~/common/hooks/techName';
+import * as AsyncUtils from '~/common/utils/async';
 
 import styles from './Header.module.css';
 

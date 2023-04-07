@@ -1,10 +1,13 @@
-import { colorAtom } from 'common/atoms/color';
-import { shouldUseDarkModeAtom } from 'common/atoms/shouldUseDarkMode';
-import * as ColorUtils from 'common/utils/color';
-import * as CookieUtils from 'common/utils/cookie';
-import * as JotaiUtils from 'common/utils/jotai';
-import * as TechNameUtils from 'common/utils/techName';
-import { ServerOnBeforeRenderResult, ServerPageContext } from 'renderer/types';
+import { colorAtom } from '~/common/atoms/color';
+import { shouldUseDarkModeAtom } from '~/common/atoms/shouldUseDarkMode';
+import * as ColorUtils from '~/common/utils/color';
+import * as CookieUtils from '~/common/utils/cookie';
+import * as JotaiUtils from '~/common/utils/jotai';
+import * as TechNameUtils from '~/common/utils/techName';
+import {
+    ServerOnBeforeRenderResult,
+    ServerPageContext,
+} from '~/renderer/types';
 
 import type { PageProps } from './index.page';
 import defaultStyle from './index.page.css?inline';

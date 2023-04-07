@@ -1,8 +1,9 @@
-import { colorAtom } from 'common/atoms/color';
-import { shouldUseDarkModeAtom } from 'common/atoms/shouldUseDarkMode';
-import * as ColorUtils from 'common/utils/color';
 import { useAtomValue } from 'jotai';
 import { useEffect, useMemo } from 'react';
+
+import { colorAtom } from '~/common/atoms/color';
+import { shouldUseDarkModeAtom } from '~/common/atoms/shouldUseDarkMode';
+import * as ColorUtils from '~/common/utils/color';
 
 export function useCurrentPrimaryColorString() {
     const color = useAtomValue(colorAtom);
