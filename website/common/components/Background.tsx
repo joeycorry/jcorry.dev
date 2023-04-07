@@ -1,6 +1,6 @@
 import { backgroundIsVisibleAtom } from 'common/atoms/background';
 import * as BackgroundHooks from 'common/hooks/background';
-import * as CanvasRendererManagerHooks from 'common/hooks/canvasRendererManager';
+import * as RendererManagerHooks from 'common/hooks/rendererManager';
 import { useAtomValue } from 'jotai';
 import { memo, useRef } from 'react';
 
@@ -10,12 +10,13 @@ function Background() {
     const isVisible = useAtomValue(backgroundIsVisibleAtom);
     const canvasElementRef = useRef<HTMLCanvasElement>(null);
 
-    CanvasRendererManagerHooks.useEffects({ canvasElementRef });
+    RendererManagerHooks.useEffects();
     BackgroundHooks.useEffects({ canvasElementRef });
 
     return (
         <canvas
             ref={canvasElementRef}
+            id="background"
             className={styles.background}
             data-is-visible={isVisible.toString()}
         />

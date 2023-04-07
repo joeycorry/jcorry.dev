@@ -1,25 +1,32 @@
-import CanvasRenderer from 'common/lib/canvasRenderer';
 import Color from 'common/lib/color';
+import Renderer from 'common/lib/renderer';
 import Trapezoid from 'common/lib/shape/trapezoid';
 
 import type { Tuple } from './miscellaneous';
 import * as ShapeUtils from './shape';
 
-export type AnimationDirection = 'backward' | 'forward';
+export type AnimationIterationCount = number | 'infinite';
+
+export type StartingAnimationDirection =
+    | 'alternate'
+    | 'alternate-reverse'
+    | 'backward'
+    | 'forward';
 
 export type AnimationOptions = {
     duration?: number;
-    startingDirection?: AnimationDirection;
+    iterationCount?: AnimationIterationCount;
+    startingDirection?: StartingAnimationDirection;
     startingPercentage?: number;
 };
 
 export type RendererOptions = {
     animation?: AnimationOptions;
-    onFinish?: () => void;
 };
 
-type CreateMovingTrapezoidCanvasRendererParameter = RendererOptions & {
+type CreateMovingTrapezoidRendererParameter = RendererOptions & {
     angle: number;
+    canvasContext: CanvasRenderingContext2D;
     counterClockwise?: boolean;
     fillColor: Color;
     lineWidth?: number;
@@ -33,15 +40,16 @@ type CreateMovingTrapezoidCanvasRendererParameter = RendererOptions & {
     strokeColor: Color;
 };
 
-export function createMovingTrapezoidCanvasRenderer({
+export function createMovingTrapezoidRenderer({
     angle,
+    canvasContext,
     counterClockwise,
     fillColor,
     lineWidth,
     parallelLineDataPair,
     strokeColor,
     ...rendererOptions
-}: CreateMovingTrapezoidCanvasRendererParameter) {
+}: CreateMovingTrapezoidRendererParameter) {
     const [firstStartingPosition, secondStartingPosition] =
         parallelLineDataPair.map(data => data.startingPosition);
     const maxLength = Math.max(
@@ -64,7 +72,7 @@ export function createMovingTrapezoidCanvasRenderer({
     const fillStyle = fillColor.toString();
     const strokeStyle = strokeColor.toString();
 
-    return new CanvasRenderer(elapsedDurationPercentage => {
+    return new Renderer(elapsedDurationPercentage => {
         const distancePercentage = 2 * elapsedDurationPercentage;
         const firstLineData =
             distancePercentage < 1
@@ -148,6 +156,7 @@ export function createMovingTrapezoidCanvasRenderer({
         return [
             new Trapezoid({
                 angle,
+                canvasContext,
                 counterClockwise,
                 fillStyle,
                 lineWidth,

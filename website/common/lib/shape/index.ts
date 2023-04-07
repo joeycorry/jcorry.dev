@@ -1,47 +1,58 @@
+import Renderable from 'common/lib/renderable';
 import * as NumberUtils from 'common/utils/number';
 
 export type ShapeConstructorParameter = {
+    canvasContext: CanvasRenderingContext2D;
     fillStyle?: string;
     lineWidth?: number;
     strokeStyle?: string;
 };
 
-export default abstract class Shape {
-    protected fillStyle?: string;
-    protected lineWidth?: number;
-    protected strokeStyle?: string;
+export default abstract class Shape implements Renderable {
+    protected _canvasContext: CanvasRenderingContext2D;
 
-    public constructor(parameter?: ShapeConstructorParameter) {
-        this.fillStyle = parameter?.fillStyle;
-        this.lineWidth =
-            parameter?.lineWidth &&
+    #fillStyle?: string;
+    #lineWidth?: number;
+    #strokeStyle?: string;
+
+    public constructor(parameter: ShapeConstructorParameter) {
+        this._canvasContext = parameter.canvasContext;
+        this.#fillStyle = parameter.fillStyle;
+        this.#lineWidth =
+            parameter.lineWidth &&
             NumberUtils.clamp({
                 minimum: Number.MIN_VALUE,
                 value: parameter?.lineWidth,
             });
-        this.strokeStyle = parameter?.strokeStyle;
+        this.#strokeStyle = parameter.strokeStyle;
     }
 
-    public render(context: CanvasRenderingContext2D) {
-        context.save();
-        this.setBaseContextAttributes(context);
-        this._performRender(context);
-        context.restore();
+    public onBeforeFrameRender() {
+        const { width, height } = this._canvasContext.canvas;
+
+        this._canvasContext.clearRect(0, 0, width, height);
     }
 
-    protected abstract _performRender(context: CanvasRenderingContext2D): void;
+    public render() {
+        this._canvasContext.save();
+        this.#setBaseContextAttributes();
+        this._performRender();
+        this._canvasContext.restore();
+    }
 
-    private setBaseContextAttributes(context: CanvasRenderingContext2D) {
-        if (this.fillStyle !== undefined) {
-            context.fillStyle = this.fillStyle;
+    protected abstract _performRender(): void;
+
+    #setBaseContextAttributes() {
+        if (this.#fillStyle !== undefined) {
+            this._canvasContext.fillStyle = this.#fillStyle;
         }
 
-        if (this.lineWidth !== undefined) {
-            context.lineWidth = this.lineWidth;
+        if (this.#lineWidth !== undefined) {
+            this._canvasContext.lineWidth = this.#lineWidth;
         }
 
-        if (this.strokeStyle !== undefined) {
-            context.strokeStyle = this.strokeStyle;
+        if (this.#strokeStyle !== undefined) {
+            this._canvasContext.strokeStyle = this.#strokeStyle;
         }
     }
 }

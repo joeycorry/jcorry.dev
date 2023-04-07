@@ -40,15 +40,16 @@ export function useEffects({ canvasElementRef }: UseEffectsParameter) {
         }
 
         const canvasElement = canvasElementRef.current;
+        const canvasContext = canvasElement.getContext('2d')!;
         const renderingStoppers = [
-            BackgroundUtils.setupRibbonCanvasRenderers({
-                canvasElement,
+            BackgroundUtils.setupRibbonRenderers({
+                canvasContext,
                 color: primaryColor,
                 ribbonWidthBounds: { minimum: 50, maximum: 80 },
                 viewport,
             }),
-            BackgroundUtils.setupRibbonCanvasRenderers({
-                canvasElement,
+            BackgroundUtils.setupRibbonRenderers({
+                canvasContext,
                 color: tertiaryColor,
                 ribbonWidthBounds: { minimum: 30, maximum: 60 },
                 viewport,

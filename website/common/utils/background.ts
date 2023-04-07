@@ -1,15 +1,15 @@
-import CanvasRenderer from 'common/lib/canvasRenderer';
-import CanvasRendererManager from 'common/lib/canvasRendererManager';
 import Color from 'common/lib/color';
+import type Renderer from 'common/lib/renderer';
+import RendererManager from 'common/lib/rendererManager';
 
 import * as ArrayUtils from './array';
-import * as CanvasRendererUtils from './canvasRenderer';
 import * as FunctionalUtils from './functional';
 import * as NumberUtils from './number';
+import * as RendererUtils from './renderer';
 import * as ShapeUtils from './shape';
 
 type GetContinuousMovingRibbonAnimationInitiatorParameter = {
-    canvasElement: HTMLCanvasElement;
+    canvasContext: CanvasRenderingContext2D;
     directionAngle: number;
     color: Color;
     firstRibbonLineStartingPosition: ShapeUtils.Position;
@@ -19,7 +19,7 @@ type GetContinuousMovingRibbonAnimationInitiatorParameter = {
 };
 
 function getContinuousMovingRibbonAnimationInitiator({
-    canvasElement,
+    canvasContext,
     directionAngle,
     color,
     firstRibbonLineStartingPosition,
@@ -27,11 +27,9 @@ function getContinuousMovingRibbonAnimationInitiator({
     secondRibbonLineStartingPosition,
     xAxisAdjacentAngle,
 }: GetContinuousMovingRibbonAnimationInitiatorParameter) {
-    const canvasRendererManager =
-        CanvasRendererManager.getForCanvasElement(canvasElement);
+    const rendererManager = RendererManager.getSharedInstance();
     const sinOfXAxisAdjacentAngle = NumberUtils.sin(xAxisAdjacentAngle);
-    let maybeCanvasRenderer: CanvasRenderer | undefined;
-    let shouldRepeat = true;
+    let maybeRenderer: Renderer | undefined;
     const initiateContinuousMovingRibbonAnimation = () => {
         const firstLength =
             getYLength(firstRibbonLineStartingPosition) /
@@ -39,54 +37,49 @@ function getContinuousMovingRibbonAnimationInitiator({
         const secondLength =
             getYLength(secondRibbonLineStartingPosition) /
             sinOfXAxisAdjacentAngle;
-        const onFinish = shouldRepeat
-            ? initiateContinuousMovingRibbonAnimation
-            : undefined;
-        maybeCanvasRenderer =
-            CanvasRendererUtils.createMovingTrapezoidCanvasRenderer({
-                angle: directionAngle,
-                animation: {
-                    duration:
-                        Math.max(firstLength, secondLength) *
-                        NumberUtils.boundedRandomInteger({
-                            minimum: 4,
-                            maximum: 10,
-                        }),
-                    startingDirection:
-                        Math.random() < 0.5 ? 'forward' : 'backward',
+        maybeRenderer = RendererUtils.createMovingTrapezoidRenderer({
+            angle: directionAngle,
+            animation: {
+                duration:
+                    Math.max(firstLength, secondLength) *
+                    NumberUtils.boundedRandomInteger({
+                        minimum: 4,
+                        maximum: 10,
+                    }),
+                iterationCount: 'infinite',
+                startingDirection:
+                    Math.random() < 0.5 ? 'alternate' : 'alternate-reverse',
+            },
+            canvasContext,
+            fillColor: color,
+            parallelLineDataPair: [
+                {
+                    length: firstLength,
+                    startingPosition: firstRibbonLineStartingPosition,
                 },
-                fillColor: color,
-                onFinish,
-                parallelLineDataPair: [
-                    {
-                        length: firstLength,
-                        startingPosition: firstRibbonLineStartingPosition,
-                    },
-                    {
-                        length: secondLength,
-                        startingPosition: secondRibbonLineStartingPosition,
-                    },
-                ],
-                strokeColor: color,
-            });
+                {
+                    length: secondLength,
+                    startingPosition: secondRibbonLineStartingPosition,
+                },
+            ],
+            strokeColor: color,
+        });
 
-        canvasRendererManager.addRenderer(maybeCanvasRenderer);
+        rendererManager.addRenderer(maybeRenderer);
     };
 
     return {
         initiateContinuousMovingRibbonAnimation,
         stopRendering: () => {
-            shouldRepeat = false;
-
-            if (maybeCanvasRenderer !== undefined) {
-                canvasRendererManager.finishRenderer(maybeCanvasRenderer);
+            if (maybeRenderer !== undefined) {
+                rendererManager.removeRenderer(maybeRenderer);
             }
         },
     };
 }
 
-type SetupRibbonCanvasRenderersParameter = {
-    canvasElement: HTMLCanvasElement;
+type SetupRibbonRenderersParameter = {
+    canvasContext: CanvasRenderingContext2D;
     color: Color;
     ribbonWidthBounds: NumberUtils.Bounds;
     viewport: {
@@ -95,12 +88,12 @@ type SetupRibbonCanvasRenderersParameter = {
     };
 };
 
-export function setupRibbonCanvasRenderers({
-    canvasElement,
+export function setupRibbonRenderers({
+    canvasContext,
     color,
     ribbonWidthBounds,
     viewport,
-}: SetupRibbonCanvasRenderersParameter) {
+}: SetupRibbonRenderersParameter) {
     const renderingStoppers = [] as Array<() => void>;
     const gutter = 5;
     const { maximum: maximumRibbonWidth, minimum: minimumRibbonWidth } =
@@ -130,7 +123,7 @@ export function setupRibbonCanvasRenderers({
     )) {
         const { initiateContinuousMovingRibbonAnimation, stopRendering } =
             getContinuousMovingRibbonAnimationInitiator({
-                canvasElement,
+                canvasContext,
                 color,
                 directionAngle: -xAxisAdjacentAngle,
                 firstRibbonLineStartingPosition: {
@@ -169,7 +162,7 @@ export function setupRibbonCanvasRenderers({
     )) {
         const { initiateContinuousMovingRibbonAnimation, stopRendering } =
             getContinuousMovingRibbonAnimationInitiator({
-                canvasElement,
+                canvasContext,
                 color,
                 directionAngle: Math.PI - xAxisAdjacentAngle,
                 firstRibbonLineStartingPosition: {

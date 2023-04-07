@@ -19,39 +19,40 @@ type TrapezoidConstructorParameter = ShapeConstructorParameter &
     TrapezoidGetPositionsParameter;
 
 export default class Trapezoid extends Shape {
-    private positions: MiscellaneousUtils.Tuple<ShapeUtils.Position, 4>;
+    #positions: MiscellaneousUtils.Tuple<ShapeUtils.Position, 4>;
 
     constructor({
         angle,
+        canvasContext,
         counterClockwise,
         fillStyle,
         lineWidth,
         parallelLineDataPair,
         strokeStyle,
     }: TrapezoidConstructorParameter) {
-        super({ lineWidth, fillStyle, strokeStyle });
+        super({ canvasContext, lineWidth, fillStyle, strokeStyle });
 
-        this.positions = Trapezoid._getPositions({
+        this.#positions = this.#getPositions({
             angle,
             counterClockwise,
             parallelLineDataPair,
         });
     }
 
-    protected _performRender(context: CanvasRenderingContext2D) {
-        context.beginPath();
-        context.moveTo(this.positions[0].x, this.positions[0].y);
+    protected _performRender() {
+        this._canvasContext.beginPath();
+        this._canvasContext.moveTo(this.#positions[0].x, this.#positions[0].y);
 
-        for (const position of this.positions.slice(1)) {
-            context.lineTo(position.x, position.y);
+        for (const position of this.#positions.slice(1)) {
+            this._canvasContext.lineTo(position.x, position.y);
         }
 
-        context.closePath();
-        context.stroke();
-        context.fill();
+        this._canvasContext.closePath();
+        this._canvasContext.stroke();
+        this._canvasContext.fill();
     }
 
-    private static _getPositions({
+    #getPositions({
         angle,
         counterClockwise,
         parallelLineDataPair,
