@@ -38,4 +38,5 @@ export type ServerOnBeforeRenderResult<
 
 export type ClientPageContext<
     PageProps extends Record<string, unknown> = Record<string, unknown>
-> = PageContextBuiltInClientWithServerRouting<Page<PageProps>> & CustomPageContext<PageProps>;
+> = PageContextBuiltInClientWithServerRouting<Page<PageProps>> &
+    CustomPageContext<PageProps>;
