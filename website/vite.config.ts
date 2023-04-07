@@ -5,32 +5,8 @@ import { fileURLToPath } from 'url';
 import { defineConfig } from 'vite';
 import ssr from 'vite-plugin-ssr/plugin';
 
-import packageJson from './package.json' assert { type: 'json' };
-
-const isProduction = process.env.NODE_ENV === 'production';
 const isViaDocker = process.env.JCORRY_DEV_IS_VIA_DOCKER === 'true';
 const port = parseInt(process.env.JCORRY_DEV_VITE_PORT || '3001');
-
-function getEsmUrl(importPath: string) {
-    const importPathSegments = importPath.split('/');
-    const [baseImportPath, subImportPath] = [
-        importPathSegments[0],
-        importPathSegments.slice(1).join('/'),
-    ];
-
-    const version =
-        packageJson.dependencies[
-            baseImportPath as keyof typeof packageJson.dependencies
-        ];
-
-    if (!version) {
-        throw new Error('Invalid import path');
-    }
-
-    return `https://esm.sh/${baseImportPath}@${version}${
-        subImportPath ? `/${subImportPath}` : ''
-    }`;
-}
 
 export default defineConfig({
     build: {
@@ -45,18 +21,6 @@ export default defineConfig({
     resolve: {
         alias: {
             '~': fileURLToPath(new URL('.', import.meta.url)),
-            ...(isProduction
-                ? Object.fromEntries(
-                      [
-                          'jotai',
-                          'react-dom/client',
-                          'react-dom/server.browser',
-                          'react-feather',
-                          'react/jsx-runtime',
-                          'react',
-                      ].map(importPath => [importPath, getEsmUrl(importPath)])
-                  )
-                : {}),
         },
     },
     ...(isViaDocker
