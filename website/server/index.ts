@@ -57,8 +57,8 @@ async function startServer() {
         app.use(viteDevMiddleware);
     }
 
-    app.get('/ok', async (_, res) => {
-        res.status(200).type('text/plain').write('jcorry.dev is OK!');
+    app.get('/ok', async (req, res) => {
+        res.status(200).type('text/plain').write(`${req.hostname} is OK!`);
         res.end();
     });
 
