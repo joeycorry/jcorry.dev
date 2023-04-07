@@ -2,7 +2,7 @@ import type { Request } from 'express';
 import type { ReactElement } from 'react';
 import type {
     PageContextBuiltIn,
-    PageContextBuiltInClient,
+    PageContextBuiltInClientWithServerRouting,
 } from 'vite-plugin-ssr/types';
 
 export type DocumentProps = {
@@ -38,4 +38,4 @@ export type ServerOnBeforeRenderResult<
 
 export type ClientPageContext<
     PageProps extends Record<string, unknown> = Record<string, unknown>
-> = PageContextBuiltInClient<Page<PageProps>> & CustomPageContext<PageProps>;
+> = PageContextBuiltInClientWithServerRouting<Page<PageProps>> & CustomPageContext<PageProps>;
