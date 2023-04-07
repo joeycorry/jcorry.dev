@@ -1,4 +1,4 @@
-import Color from 'common/lib/color';
+import type Color from 'common/lib/color';
 import Renderer from 'common/lib/renderer';
 import Trapezoid from 'common/lib/shape/trapezoid';
 

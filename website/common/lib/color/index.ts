@@ -1,6 +1,6 @@
-export default abstract class Color {
-    abstract darker(percentage?: number): Color;
-    abstract lighter(percentage?: number): Color;
-    abstract toString(): string;
-    abstract withAlpha(alpha: number): Color;
+export default interface Color {
+    darker(percentage?: number): Color;
+    lighter(percentage?: number): Color;
+    toString(): string;
+    withAlpha(alpha: number): Color;
 }

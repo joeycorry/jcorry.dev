@@ -1,26 +1,26 @@
 import * as NumberUtils from 'common/utils/number';
 
-import Color from '.';
+import type Color from '.';
 
-export default class HslColor extends Color {
-    private _hueDegrees: number;
-    private _saturationPercentage: number;
-    private _lightnessPercentage: number;
-    private _alpha: number;
+type HslColorConstructorParameter = {
+    alpha?: number;
+    hueDegrees: number;
+    lightnessPercentage: number;
+    saturationPercentage: number;
+};
+
+export default class HslColor implements Color {
+    #hueDegrees: number;
+    #saturationPercentage: number;
+    #lightnessPercentage: number;
+    #alpha: number;
 
     public constructor({
         alpha = 1,
         hueDegrees,
         lightnessPercentage,
         saturationPercentage,
-    }: {
-        alpha?: number;
-        hueDegrees: number;
-        lightnessPercentage: number;
-        saturationPercentage: number;
-    }) {
-        super();
-
+    }: HslColorConstructorParameter) {
         if (alpha !== undefined && (alpha < 0 || alpha > 1)) {
             throw new Error(
                 'Invalid alpha value. Alpha must be between 0 and 1.'
@@ -39,40 +39,42 @@ export default class HslColor extends Color {
             );
         }
 
-        this._alpha = alpha;
-        this._hueDegrees = hueDegrees;
-        this._lightnessPercentage = lightnessPercentage;
-        this._saturationPercentage = saturationPercentage;
+        this.#alpha = alpha;
+        this.#hueDegrees = hueDegrees;
+        this.#lightnessPercentage = lightnessPercentage;
+        this.#saturationPercentage = saturationPercentage;
     }
 
     public darker(percentage = 10) {
         return new HslColor({
-            alpha: this._alpha,
-            hueDegrees: this._hueDegrees,
+            alpha: this.#alpha,
+            hueDegrees: this.#hueDegrees,
             lightnessPercentage: NumberUtils.clamp({
                 maximum: 100,
                 minimum: 0,
-                value: this._lightnessPercentage * (1 - percentage / 100),
+                value: this.#lightnessPercentage * (1 - percentage / 100),
             }),
-            saturationPercentage: this._saturationPercentage,
+            saturationPercentage: this.#saturationPercentage,
         });
     }
 
     public lighter(percentage = 10) {
         return new HslColor({
-            alpha: this._alpha,
-            hueDegrees: this._hueDegrees,
+            alpha: this.#alpha,
+            hueDegrees: this.#hueDegrees,
             lightnessPercentage: NumberUtils.clamp({
                 maximum: 100,
                 minimum: 0,
-                value: this._lightnessPercentage * (1 + percentage / 100),
+                value: this.#lightnessPercentage * (1 + percentage / 100),
             }),
-            saturationPercentage: this._saturationPercentage,
+            saturationPercentage: this.#saturationPercentage,
         });
     }
 
     public toString() {
-        return `hsla(${this._hueDegrees}deg, ${this._saturationPercentage}%, ${this._lightnessPercentage}%, ${this._alpha})`;
+        return `hsla(${this.#hueDegrees}deg, ${this.#saturationPercentage}%, ${
+            this.#lightnessPercentage
+        }%, ${this.#alpha})`;
     }
 
     public withAlpha(alpha: number) {
@@ -82,9 +84,9 @@ export default class HslColor extends Color {
                 minimum: 0,
                 value: alpha,
             }),
-            hueDegrees: this._hueDegrees,
-            lightnessPercentage: this._lightnessPercentage,
-            saturationPercentage: this._saturationPercentage,
+            hueDegrees: this.#hueDegrees,
+            lightnessPercentage: this.#lightnessPercentage,
+            saturationPercentage: this.#saturationPercentage,
         });
     }
 }

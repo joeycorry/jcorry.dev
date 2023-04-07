@@ -1,4 +1,4 @@
-import Color from 'common/lib/color';
+import type Color from 'common/lib/color';
 
 type GetFaviconParameter = {
     color: Color;

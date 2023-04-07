@@ -1,4 +1,4 @@
-import Color from 'common/lib/color';
+import type Color from 'common/lib/color';
 import HslColor from 'common/lib/color/hslColor';
 
 import * as TechNameUtils from './techName';
