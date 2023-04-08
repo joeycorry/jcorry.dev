@@ -10,7 +10,7 @@ import type { Position } from './geometry';
 import { getSineOfRadians } from './geometry';
 import { createMovingTrapezoidRenderer } from './renderer';
 
-type GetbackgroundRendererControlsParameter = {
+type GetBackgroundRendererControlsParameter = {
     canvasContext: CanvasRenderingContext2D;
     directionAngle: number;
     color: Color;
@@ -28,7 +28,7 @@ function getBackgroundRendererControls({
     getYLength,
     secondRibbonLineStartingPosition,
     xAxisAdjacentAngle,
-}: GetbackgroundRendererControlsParameter) {
+}: GetBackgroundRendererControlsParameter) {
     const rendererManager = getRendererManager();
     const sineOfXAxisAdjacentAngle = getSineOfRadians(xAxisAdjacentAngle);
     let maybeRenderer: Renderer | undefined;
