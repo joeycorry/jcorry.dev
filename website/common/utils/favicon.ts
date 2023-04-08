@@ -1,20 +1,21 @@
-import type Color from '~/common/lib/color';
+import type { Color } from '~/common/lib/color';
 
-type GetFaviconParameter = {
+type SetFaviconParameter = {
     color: Color;
 };
 
-export function setFavicon({ color }: GetFaviconParameter) {
+export function setFavicon({ color }: SetFaviconParameter) {
     const canvasElement = document.createElement('canvas');
     const canvasContext = canvasElement.getContext('2d')!;
     canvasElement.width = 24;
     canvasElement.height = 24;
-
     canvasContext.fillStyle = color.toString();
+
     canvasContext.fill(new Path2D('M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z'));
 
-    const faviconElement = (document.head.querySelector('link[rel="icon"]') ||
-        document.createElement('link')) as HTMLLinkElement;
+    const faviconElement =
+        document.head.querySelector<HTMLLinkElement>('link[rel="icon"]') ||
+        document.createElement('link');
 
     if (!document.head.contains(faviconElement)) {
         faviconElement.rel = 'icon';

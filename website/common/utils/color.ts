@@ -1,21 +1,23 @@
-import type Color from '~/common/lib/color';
-import HslColor from '~/common/lib/color/hslColor';
+import type { Color } from '~/common/lib/color';
+import { HslColor } from '~/common/lib/color/hslColor';
 
-import * as TechNameUtils from './techName';
+import type { TechName } from './techName';
 
-type GetVariantsParameter = {
+type GetColorVariantsByNameParameter = {
     color: Color;
     shouldUseDarkMode?: boolean;
 };
 
-type ColorsByVariant = {
-    [K in `${'primary' | 'secondary' | 'tertiary'}Color`]: Color;
+type ColorVariantName = `${'primary' | 'secondary' | 'tertiary'}Color`;
+
+type ColorVariantsByName = {
+    [K in ColorVariantName]: Color;
 };
 
-export function getColorsByVariant({
+export function getColorVariantsByName({
     color,
     shouldUseDarkMode,
-}: GetVariantsParameter): ColorsByVariant {
+}: GetColorVariantsByNameParameter): ColorVariantsByName {
     if (shouldUseDarkMode === undefined) {
         return {
             primaryColor: color,
@@ -34,30 +36,32 @@ export function getColorsByVariant({
     };
 }
 
-type GetCssVariablesParameter = GetVariantsParameter;
+type GetColorVariantCssValuesByNameParameter = GetColorVariantsByNameParameter;
 
-export type CssVariablesByName = {
-    [K in `--${'primary' | 'secondary' | 'tertiary'}-color`]: string;
+type ColorVariantCssValueName = `--${
+    | 'primary'
+    | 'secondary'
+    | 'tertiary'}-color`;
+
+export type ColorVariantCssValuesByName = {
+    [K in ColorVariantCssValueName]: string;
 };
 
-export function getCssVariablesByName({
+export function getColorVariantCssValuesByName({
     color,
     shouldUseDarkMode,
-}: GetCssVariablesParameter): CssVariablesByName {
-    const variants = getColorsByVariant({ color, shouldUseDarkMode });
+}: GetColorVariantCssValuesByNameParameter): ColorVariantCssValuesByName {
+    const { primaryColor, secondaryColor, tertiaryColor } =
+        getColorVariantsByName({ color, shouldUseDarkMode });
 
     return {
-        '--primary-color': variants.primaryColor.toString(),
-        '--secondary-color': variants.secondaryColor.toString(),
-        '--tertiary-color': variants.tertiaryColor.toString(),
+        '--primary-color': primaryColor.toString(),
+        '--secondary-color': secondaryColor.toString(),
+        '--tertiary-color': tertiaryColor.toString(),
     };
 }
 
-export function getColorForTechName(techName: TechNameUtils.TechName) {
-    return presetColorsByTechName.get(techName)!;
-}
-
-const presetColorsByTechName = new Map(
+const presetColorsByTechName = new Map<TechName, Color>(
     (
         [
             ['JavaScript', [53.4, 93.1, 50]],
@@ -75,4 +79,12 @@ const presetColorsByTechName = new Map(
             saturationPercentage,
         }),
     ])
-) as unknown as Map<TechNameUtils.TechName, Color>;
+);
+
+export function getColorForTechName(techName: TechName) {
+    if (!presetColorsByTechName.has(techName)) {
+        throw new Error(`Invalid tech name: ${techName}`);
+    }
+
+    return presetColorsByTechName.get(techName)!;
+}

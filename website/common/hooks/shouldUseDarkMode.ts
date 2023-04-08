@@ -2,9 +2,9 @@ import { useAtom } from 'jotai';
 import { useEffect } from 'react';
 
 import { shouldUseDarkModeAtom } from '~/common/atoms/shouldUseDarkMode';
-import * as CookieUtils from '~/common/utils/cookie';
+import { removeCookie, setCookie } from '~/common/utils/cookie';
 
-export function useEffects() {
+export function useShouldUseDarkModeEffects() {
     const [shouldUseDarkMode, setShouldUseDarkMode] = useAtom(
         shouldUseDarkModeAtom
     );
@@ -32,16 +32,16 @@ export function useEffects() {
 
     useEffect(() => {
         if (shouldUseDarkMode === undefined) {
-            CookieUtils.removeItem({
+            removeCookie({
                 key: 'shouldUseDarkMode',
-                setCookie: cookie => {
+                setCookies: cookie => {
                     window.document.cookie = cookie;
                 },
             });
         } else {
-            CookieUtils.setItem({
+            setCookie({
                 key: 'shouldUseDarkMode',
-                setCookie: cookie => {
+                setCookies: cookie => {
                     window.document.cookie = cookie;
                 },
                 value: JSON.stringify(shouldUseDarkMode),

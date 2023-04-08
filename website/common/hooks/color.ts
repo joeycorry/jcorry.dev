@@ -3,26 +3,19 @@ import { useEffect, useMemo } from 'react';
 
 import { colorAtom } from '~/common/atoms/color';
 import { shouldUseDarkModeAtom } from '~/common/atoms/shouldUseDarkMode';
-import * as ColorUtils from '~/common/utils/color';
+import {
+    getColorVariantCssValuesByName,
+    getColorVariantsByName,
+} from '~/common/utils/color';
 
-export function useCurrentPrimaryColorString() {
-    const color = useAtomValue(colorAtom);
-    const shouldUseDarkMode = useAtomValue(shouldUseDarkModeAtom);
-
-    return ColorUtils.getCssVariablesByName({
-        color,
-        shouldUseDarkMode,
-    })['--primary-color'];
-}
-
-export function useEffects() {
+export function useColorEffects() {
     const color = useAtomValue(colorAtom);
     const shouldUseDarkMode = useAtomValue(shouldUseDarkModeAtom);
 
     useEffect(() => {
-        let themeColorMetaElement = document.querySelector(
+        let themeColorMetaElement = document.querySelector<HTMLMetaElement>(
             'head meta[name="theme-color"]'
-        ) as HTMLMetaElement | null;
+        );
 
         if (themeColorMetaElement === null) {
             themeColorMetaElement = document.createElement('meta');
@@ -35,23 +28,35 @@ export function useEffects() {
 
     useEffect(() => {
         const rootElement = window.document.documentElement;
-        const cssVariablesByName = ColorUtils.getCssVariablesByName({
+        const colorVariantCssValuesByName = getColorVariantCssValuesByName({
             color,
             shouldUseDarkMode,
         });
 
-        for (const [name, value] of Object.entries(cssVariablesByName)) {
+        for (const [name, value] of Object.entries(
+            colorVariantCssValuesByName
+        )) {
             rootElement.style.setProperty(name, value);
         }
     }, [color, shouldUseDarkMode]);
 }
 
-export function useVariants() {
+export function useColorVariantsByName() {
     const color = useAtomValue(colorAtom);
     const shouldUseDarkMode = useAtomValue(shouldUseDarkModeAtom);
 
     return useMemo(
-        () => ColorUtils.getColorsByVariant({ color, shouldUseDarkMode }),
+        () => getColorVariantsByName({ color, shouldUseDarkMode }),
         [color, shouldUseDarkMode]
     );
+}
+
+export function useColorVariantCssValuesByName() {
+    const color = useAtomValue(colorAtom);
+    const shouldUseDarkMode = useAtomValue(shouldUseDarkModeAtom);
+
+    return getColorVariantCssValuesByName({
+        color,
+        shouldUseDarkMode,
+    });
 }

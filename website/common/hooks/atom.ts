@@ -3,6 +3,6 @@ import { useSetAtom, WritableAtom } from 'jotai';
 export function useNoArgumentSetAtom<
     Value,
     Result extends void | Promise<void> = void
->(baseAtom: WritableAtom<Value, [undefined], Result>) {
+>(baseAtom: WritableAtom<Value, [undefined], Result>): () => void {
     return useSetAtom(baseAtom) as unknown as () => void;
 }

@@ -1,19 +1,17 @@
 import { Provider as JotaiProvider } from 'jotai';
-import { StrictMode } from 'react';
+import { memo, StrictMode } from 'react';
 
-import * as AppHooks from '~/common/hooks/app';
-import type * as JotaiUtils from '~/common/utils/jotai';
+import { useAppEffects } from '~/common/hooks/app';
+import type { JotaiStore } from '~/common/utils/jotaiStore';
 
-import AppContent from './AppContent';
+import { AppContent } from './AppContent';
 
-type CreateJotaiStoreParameter = {
-    jotaiStore: JotaiUtils.JotaiStore;
+type UnmemoizedAppProps = {
+    jotaiStore: JotaiStore;
 };
 
-export type AppProps = CreateJotaiStoreParameter;
-
-export default function App({ jotaiStore }: AppProps) {
-    AppHooks.useEffects();
+function UnmemoizedApp({ jotaiStore }: UnmemoizedAppProps) {
+    useAppEffects();
 
     return (
         <StrictMode>
@@ -23,3 +21,5 @@ export default function App({ jotaiStore }: AppProps) {
         </StrictMode>
     );
 }
+
+export const App = memo(UnmemoizedApp);

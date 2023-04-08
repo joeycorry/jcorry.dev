@@ -1,24 +1,32 @@
 import { atom, WritableAtom } from 'jotai';
 
-import * as TechNameUtils from '~/common/utils/techName';
+import type { TechName, TechNameAnimationData } from '~/common/utils/techName';
+import {
+    getNextTechName,
+    getRandomTechName,
+    techNameAnimationIsFinished,
+} from '~/common/utils/techName';
 
-export const techNameAtom = atom(
-    TechNameUtils.getRandomTechName(),
-    (get, set, techName) =>
-        set(
-            techNameAtom,
-            techName || TechNameUtils.getNextTechName(get(techNameAtom))
-        )
-) as WritableAtom<
-    TechNameUtils.TechName,
-    [TechNameUtils.TechName | undefined],
+import { WritableAtomWithInitialValue } from '../utils/atom';
+
+type TechNameAtom = WritableAtomWithInitialValue<
+    TechName,
+    [TechName | undefined],
     void
 >;
+
+export const techNameAtom: TechNameAtom = atom<
+    TechName,
+    [TechName | undefined],
+    void
+>(getRandomTechName(), (get, set, techName) =>
+    set(techNameAtom, techName || getNextTechName(get(techNameAtom)))
+);
 
 techNameAtom.debugLabel = 'techNameAtom';
 
 export const techNameAnimationDataAtom = atom<
-    TechNameUtils.AnimationData,
+    TechNameAnimationData,
     [undefined],
     void
 >(
@@ -29,8 +37,8 @@ export const techNameAnimationDataAtom = atom<
     (get, set) => {
         const techNameAnimationDataAtom_ =
             techNameAnimationDataAtom as unknown as WritableAtom<
-                TechNameUtils.AnimationData,
-                [TechNameUtils.AnimationData],
+                TechNameAnimationData,
+                [TechNameAnimationData],
                 void
             >;
         const techName = get(techNameAtom);
@@ -88,7 +96,7 @@ export const techNameAnimationDataAtom = atom<
 techNameAnimationDataAtom.debugLabel = 'techNameAnimationDataAtom';
 
 export const techNameAnimationIsFinishedAtom = atom(get =>
-    TechNameUtils.animationIsFinished({
+    techNameAnimationIsFinished({
         animationData: get(techNameAnimationDataAtom),
         techName: get(techNameAtom),
     })
@@ -96,7 +104,11 @@ export const techNameAnimationIsFinishedAtom = atom(get =>
 
 techNameAnimationIsFinishedAtom.debugLabel = 'techNameAnimationIsFinishedAtom';
 
-export const techNameAnimationShouldRepeatAtom = atom(true, (get, set) =>
+export const techNameAnimationShouldRepeatAtom: WritableAtomWithInitialValue<
+    boolean,
+    [undefined],
+    void
+> = atom(true, (get, set) =>
     set(
         techNameAnimationShouldRepeatAtom as unknown as WritableAtom<
             boolean,
@@ -105,7 +117,7 @@ export const techNameAnimationShouldRepeatAtom = atom(true, (get, set) =>
         >,
         !get(techNameAnimationShouldRepeatAtom)
     )
-) as WritableAtom<boolean, [undefined], void>;
+);
 
 export const techNameDisplayDataAtom = atom(get => {
     const techName = get(techNameAtom);

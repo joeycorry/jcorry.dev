@@ -1,7 +1,7 @@
 const defaultDelayMilliseconds = 50;
 
-export function debounce<T extends unknown[]>(
-    callback: (...args: T) => void,
+export function debounceFunction<T extends unknown[]>(
+    func: (...args: T) => void,
     options?: { milliseconds?: number }
 ) {
     const { milliseconds = defaultDelayMilliseconds } = options || {};
@@ -11,20 +11,17 @@ export function debounce<T extends unknown[]>(
         window.clearTimeout(timeout);
 
         timeout = window.setTimeout(() => {
-            callback(...args);
+            func(...args);
         }, milliseconds);
     };
 }
 
-export function evaluate<T>(callback: () => T) {
-    return callback();
+export function evaluateFunction<T>(func: () => T) {
+    return func();
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-export function noop() {}
-
-export function throttle<T extends unknown[]>(
-    callback: (...args: T) => void,
+export function throttleFunction<T extends unknown[]>(
+    func: (...args: T) => void,
     options?: { milliseconds?: number }
 ) {
     const { milliseconds = defaultDelayMilliseconds } = options || {};
@@ -38,7 +35,7 @@ export function throttle<T extends unknown[]>(
         throttlePause = true;
 
         window.setTimeout(() => {
-            callback(...args);
+            func(...args);
 
             throttlePause = false;
         }, milliseconds);

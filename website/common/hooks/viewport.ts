@@ -3,27 +3,26 @@ import { useCallback, useEffect } from 'react';
 
 import { backgroundIsVisibleAtom } from '~/common/atoms/background';
 import { viewportAtom } from '~/common/atoms/viewport';
-import * as FunctionalUtils from '~/common/utils/functional';
+import { debounceFunction, throttleFunction } from '~/common/utils/function';
 
-import * as JotaiHooks from './jotai';
+import { useNoArgumentSetAtom } from './atom';
 
 function useDebouncedSetViewport() {
-    const setViewport = JotaiHooks.useNoArgumentSetAtom(viewportAtom);
+    const setViewport = useNoArgumentSetAtom(viewportAtom);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    return useCallback(
-        FunctionalUtils.debounce(setViewport, { milliseconds: 400 }),
-        [setViewport]
-    );
+    return useCallback(debounceFunction(setViewport, { milliseconds: 400 }), [
+        setViewport,
+    ]);
 }
 
-function useViewportChangeListener() {
+function useViewportChangeHandler() {
     const debouncedSetViewport = useDebouncedSetViewport();
     const setBackgroundIsVisible = useSetAtom(backgroundIsVisibleAtom);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     return useCallback(
-        FunctionalUtils.throttle(() => {
+        throttleFunction(() => {
             setBackgroundIsVisible(false);
             debouncedSetViewport();
         }),
@@ -31,25 +30,25 @@ function useViewportChangeListener() {
     );
 }
 
-export function useEffects() {
-    const changeListener = useViewportChangeListener();
+export function useViewportEffects() {
+    const handleViewportChange = useViewportChangeHandler();
     const devicePixelRatio =
         typeof window !== 'undefined' ? window.devicePixelRatio : 1;
 
     useEffect(() => {
-        window.addEventListener('resize', changeListener);
+        window.addEventListener('resize', handleViewportChange);
 
-        return () => window.removeEventListener('resize', changeListener);
-    }, [changeListener]);
+        return () => window.removeEventListener('resize', handleViewportChange);
+    }, [handleViewportChange]);
 
     useEffect(() => {
         const mediaQueryList = window.matchMedia(
             `(resolution: ${devicePixelRatio}dppx)`
         );
 
-        mediaQueryList.addEventListener('change', changeListener);
+        mediaQueryList.addEventListener('change', handleViewportChange);
 
         return () =>
-            mediaQueryList.removeEventListener('change', changeListener);
-    }, [changeListener, devicePixelRatio]);
+            mediaQueryList.removeEventListener('change', handleViewportChange);
+    }, [handleViewportChange, devicePixelRatio]);
 }

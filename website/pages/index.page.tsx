@@ -1,14 +1,13 @@
-import App from '~/common/components/App';
-import * as JotaiUtils from '~/common/utils/jotai';
+import { App } from '~/common/components/App';
+import type { JotaiStoreAtomSetValueParametersByName } from '~/common/utils/jotaiStore';
+import { createJotaiStore } from '~/common/utils/jotaiStore';
 
 export type PageProps = {
-    jotaiStoreSetParametersByName: JotaiUtils.JotaiStoreSetParametersByName;
+    jotaiStoreAtomSetValueParametersByName: JotaiStoreAtomSetValueParametersByName;
 };
 
-export function Page({ jotaiStoreSetParametersByName }: PageProps) {
-    const jotaiStore = JotaiUtils.createJotaiStore(
-        jotaiStoreSetParametersByName
-    );
+export function Page({ jotaiStoreAtomSetValueParametersByName }: PageProps) {
+    const jotaiStore = createJotaiStore(jotaiStoreAtomSetValueParametersByName);
 
     return <App jotaiStore={jotaiStore} />;
 }

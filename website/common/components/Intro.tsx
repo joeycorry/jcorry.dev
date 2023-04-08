@@ -5,7 +5,7 @@ import { techNameDisplayDataAtom } from '~/common/atoms/techName';
 
 import styles from './Intro.module.css';
 
-function Intro() {
+function UnmemoizedIntro() {
     const { hiddenTechName, visibleTechName } = useAtomValue(
         techNameDisplayDataAtom
     );
@@ -26,4 +26,4 @@ function Intro() {
     );
 }
 
-export default memo(Intro);
+export const Intro = memo(UnmemoizedIntro);

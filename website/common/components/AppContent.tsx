@@ -1,22 +1,22 @@
 import { memo } from 'react';
 
-import * as ColorHooks from '~/common/hooks/color';
-import * as FaviconHooks from '~/common/hooks/favicon';
-import * as ShouldUseDarkModeHooks from '~/common/hooks/shouldUseDarkMode';
-import * as TechNameHooks from '~/common/hooks/techName';
-import * as ViewportHooks from '~/common/hooks/viewport';
+import { useColorEffects } from '~/common/hooks/color';
+import { useFaviconEffects } from '~/common/hooks/favicon';
+import { useShouldUseDarkModeEffects } from '~/common/hooks/shouldUseDarkMode';
+import { useTechNameEffects } from '~/common/hooks/techName';
+import { useViewportEffects } from '~/common/hooks/viewport';
 
 import styles from './AppContent.module.css';
-import Background from './Background';
-import Header from './Header';
-import Intro from './Intro';
+import { Background } from './Background';
+import { Header } from './Header';
+import { Intro } from './Intro';
 
-function App() {
-    ShouldUseDarkModeHooks.useEffects();
-    ColorHooks.useEffects();
-    FaviconHooks.useEffects();
-    TechNameHooks.useEffects();
-    ViewportHooks.useEffects();
+function UnmemoizedAppContent() {
+    useShouldUseDarkModeEffects();
+    useColorEffects();
+    useFaviconEffects();
+    useTechNameEffects();
+    useViewportEffects();
 
     return (
         <main className={styles['app-content']}>
@@ -27,4 +27,4 @@ function App() {
     );
 }
 
-export default memo(App);
+export const AppContent = memo(UnmemoizedAppContent);

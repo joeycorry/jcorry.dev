@@ -1,6 +1,9 @@
-import * as ArrayUtils from './array';
+import {
+    getArrayElementAtModuloReducedIndex,
+    getRandomArrayElement,
+} from './array';
 
-const techNames = [
+const presetTechNames = [
     'JavaScript',
     'Ruby',
     'TypeScript',
@@ -9,41 +12,41 @@ const techNames = [
     'Node',
 ] as const;
 
-export type AnimationData = {
+export type TechNameAnimationData = {
     animationStatus: 'backspacing' | 'paused' | 'typing';
     visibleLength: number;
 };
 
-export type TechName = (typeof techNames)[number];
+export type TechName = (typeof presetTechNames)[number];
 
-type AnimationIsFinishedParameter = {
-    animationData: AnimationData;
+type TechNameAnimationIsFinishedParameter = {
+    animationData: TechNameAnimationData;
     techName: TechName;
 };
 
-export function animationIsFinished({
+export function techNameAnimationIsFinished({
     animationData: { animationStatus, visibleLength },
     techName,
-}: AnimationIsFinishedParameter) {
+}: TechNameAnimationIsFinishedParameter) {
     return animationStatus === 'paused' && visibleLength === techName.length;
 }
 
-export function animationIsWaitingForNewTechName({
+export function techNameAnimationIsWaitingForNewTechName({
     animationStatus,
     visibleLength,
-}: AnimationData) {
+}: TechNameAnimationData) {
     return animationStatus === 'paused' && visibleLength === 0;
 }
 
-type GetAnimationStepTimeParameter = {
-    animationData: AnimationData;
+type GetTechNameAnimationStepTimeParameter = {
+    animationData: TechNameAnimationData;
     techName: TechName;
 };
 
-export function getAnimationStepTime({
+export function getTechNameAnimationStepTime({
     animationData: { animationStatus },
     techName,
-}: GetAnimationStepTimeParameter) {
+}: GetTechNameAnimationStepTimeParameter) {
     if (animationStatus === 'backspacing') {
         return 400 / techName.length;
     } else if (animationStatus === 'typing') {
@@ -54,12 +57,20 @@ export function getAnimationStepTime({
 }
 
 export function getNextTechName(techName: TechName) {
-    return ArrayUtils.moduloReducedAt(
-        techNames,
-        techNames.findIndex(techName_ => techName === techName_) + 1
+    const currentIndex = presetTechNames.findIndex(
+        techName_ => techName === techName_
+    );
+
+    if (currentIndex === -1) {
+        throw new Error(`Invalid tech name: ${techName}`);
+    }
+
+    return getArrayElementAtModuloReducedIndex(
+        presetTechNames,
+        currentIndex + 1
     )!;
 }
 
 export function getRandomTechName() {
-    return ArrayUtils.getRandomElement(techNames);
+    return getRandomArrayElement(presetTechNames);
 }

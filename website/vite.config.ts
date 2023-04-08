@@ -8,6 +8,7 @@ import ssr from 'vite-plugin-ssr/plugin';
 const isViaDocker = process.env.JCORRY_DEV_IS_VIA_DOCKER === 'true';
 const port = parseInt(process.env.JCORRY_DEV_VITE_PORT || '3001');
 
+// eslint-disable-next-line import/no-default-export
 export default defineConfig({
     build: {
         minify: 'terser',

@@ -1,5 +1,5 @@
-import Renderable from '~/common/lib/renderable';
-import * as NumberUtils from '~/common/utils/number';
+import { Renderable } from '~/common/lib/renderable';
+import { getClampedNumber } from '~/common/utils/bounded';
 
 export type ShapeConstructorParameter = {
     canvasContext: CanvasRenderingContext2D;
@@ -8,7 +8,7 @@ export type ShapeConstructorParameter = {
     strokeStyle?: string;
 };
 
-export default abstract class Shape implements Renderable {
+export abstract class Shape implements Renderable {
     protected _canvasContext: CanvasRenderingContext2D;
 
     #fillStyle?: string;
@@ -20,7 +20,7 @@ export default abstract class Shape implements Renderable {
         this.#fillStyle = parameter.fillStyle;
         this.#lineWidth =
             parameter.lineWidth &&
-            NumberUtils.clamp({
+            getClampedNumber({
                 minimum: Number.MIN_VALUE,
                 value: parameter?.lineWidth,
             });

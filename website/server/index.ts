@@ -40,9 +40,7 @@ async function startServer() {
         app.use(sirv(`${root}/dist/client`));
     } else {
         const vite = await import('vite');
-        const viteConfig = (await import(
-            `${root}/vite.config.js`
-        )) as UserConfig;
+        const viteConfig: UserConfig = await import(`${root}/vite.config.js`);
         const viteDevMiddleware = (
             await vite.createServer(
                 vite.mergeConfig(viteConfig, {

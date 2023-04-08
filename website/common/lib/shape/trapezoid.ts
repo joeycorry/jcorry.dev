@@ -1,14 +1,14 @@
-import * as MiscellaneousUtils from '~/common/utils/miscellaneous';
-import * as ShapeUtils from '~/common/utils/shape';
+import { getNewPosition, Position } from '~/common/utils/geometry';
+import type { Tuple } from '~/common/utils/tuple';
 
-import Shape, { ShapeConstructorParameter } from '.';
+import { Shape, ShapeConstructorParameter } from '.';
 
 type TrapezoidGetPositionsParameter = {
     angle: number;
     counterClockwise?: boolean;
-    parallelLineDataPair: MiscellaneousUtils.Tuple<
+    parallelLineDataPair: Tuple<
         {
-            startingPosition: ShapeUtils.Position;
+            startingPosition: Position;
             length: number;
         },
         2
@@ -18,8 +18,8 @@ type TrapezoidGetPositionsParameter = {
 type TrapezoidConstructorParameter = ShapeConstructorParameter &
     TrapezoidGetPositionsParameter;
 
-export default class Trapezoid extends Shape {
-    #positions: MiscellaneousUtils.Tuple<ShapeUtils.Position, 4>;
+export class Trapezoid extends Shape {
+    #positions: Tuple<Position, 4>;
 
     constructor({
         angle,
@@ -56,7 +56,7 @@ export default class Trapezoid extends Shape {
         angle,
         counterClockwise,
         parallelLineDataPair,
-    }: TrapezoidGetPositionsParameter) {
+    }: TrapezoidGetPositionsParameter): Tuple<Position, 4> {
         const [
             firstOriginalPosition,
             firstComputedPosition,
@@ -64,7 +64,7 @@ export default class Trapezoid extends Shape {
             secondComputedPosition,
         ] = parallelLineDataPair.flatMap(data => [
             data.startingPosition,
-            ShapeUtils.getNewPosition({
+            getNewPosition({
                 angle,
                 counterClockwise,
                 ...data,
@@ -76,6 +76,6 @@ export default class Trapezoid extends Shape {
             firstComputedPosition,
             secondComputedPosition,
             secondOriginalPosition,
-        ] as MiscellaneousUtils.Tuple<ShapeUtils.Position, 4>;
+        ];
     }
 }

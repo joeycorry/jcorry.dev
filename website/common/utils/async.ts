@@ -1,3 +1,3 @@
-export async function delay(milliseconds: number) {
+export async function getDelayedPromise(milliseconds: number) {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
 }

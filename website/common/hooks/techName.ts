@@ -8,32 +8,42 @@ import {
     techNameAnimationShouldRepeatAtom,
     techNameAtom,
 } from '~/common/atoms/techName';
-import * as TechNameUtils from '~/common/utils/techName';
+import {
+    getTechNameAnimationStepTime,
+    techNameAnimationIsFinished,
+    techNameAnimationIsWaitingForNewTechName,
+} from '~/common/utils/techName';
 
-import * as JotaiHooks from './jotai';
+import { useNoArgumentSetAtom } from './atom';
 
-export function useAnimationStarter() {
-    const animationIsFinished = useAtomValue(techNameAnimationIsFinishedAtom);
+export function useTechNameAnimationStarter() {
+    const techNameAnimationIsFinished = useAtomValue(
+        techNameAnimationIsFinishedAtom
+    );
     const setBackgroundIsVisible = useSetAtom(backgroundIsVisibleAtom);
-    const setNextAnimationData = JotaiHooks.useNoArgumentSetAtom(
+    const setNextTechNameAnimationData = useNoArgumentSetAtom(
         techNameAnimationDataAtom
     );
 
     return useCallback(() => {
-        if (!animationIsFinished) {
+        if (!techNameAnimationIsFinished) {
             return;
         }
 
         setBackgroundIsVisible(false);
-        setNextAnimationData();
-    }, [animationIsFinished, setBackgroundIsVisible, setNextAnimationData]);
+        setNextTechNameAnimationData();
+    }, [
+        techNameAnimationIsFinished,
+        setBackgroundIsVisible,
+        setNextTechNameAnimationData,
+    ]);
 }
 
-function useAnimationStepper() {
+function useTechNameAnimationStepper() {
     const techName = useAtomValue(techNameAtom);
-    const setNextTechName = JotaiHooks.useNoArgumentSetAtom(techNameAtom);
-    const animationData = useAtomValue(techNameAnimationDataAtom);
-    const setNextTechNameAnimationData = JotaiHooks.useNoArgumentSetAtom(
+    const setNextTechName = useNoArgumentSetAtom(techNameAtom);
+    const techNameAnimationData = useAtomValue(techNameAnimationDataAtom);
+    const setNextTechNameAnimationData = useNoArgumentSetAtom(
         techNameAnimationDataAtom
     );
 
@@ -41,51 +51,58 @@ function useAnimationStepper() {
         () =>
             window.setTimeout(() => {
                 if (
-                    TechNameUtils.animationIsWaitingForNewTechName(
-                        animationData
+                    techNameAnimationIsWaitingForNewTechName(
+                        techNameAnimationData
                     )
                 ) {
                     setNextTechName();
                 }
 
                 if (
-                    !TechNameUtils.animationIsFinished({
-                        animationData,
+                    !techNameAnimationIsFinished({
+                        animationData: techNameAnimationData,
                         techName,
                     })
                 ) {
                     setNextTechNameAnimationData();
                 }
-            }, TechNameUtils.getAnimationStepTime({ animationData, techName })),
-        [animationData, setNextTechName, setNextTechNameAnimationData, techName]
+            }, getTechNameAnimationStepTime({ animationData: techNameAnimationData, techName })),
+        [
+            techNameAnimationData,
+            setNextTechName,
+            setNextTechNameAnimationData,
+            techName,
+        ]
     );
 }
 
-export function useEffects() {
-    const animationIsFinished = useAtomValue(techNameAnimationIsFinishedAtom);
-    const animationShouldRepeat = useAtomValue(
+export function useTechNameEffects() {
+    const techNameAnimationIsFinished = useAtomValue(
+        techNameAnimationIsFinishedAtom
+    );
+    const techNameAnimationShouldRepeat = useAtomValue(
         techNameAnimationShouldRepeatAtom
     );
-    const startAnimation = useAnimationStarter();
-    const stepAnimation = useAnimationStepper();
+    const startTechNameAnimation = useTechNameAnimationStarter();
+    const stepTechNameAnimation = useTechNameAnimationStepper();
 
     useEffect(() => {
-        if (!animationShouldRepeat) {
+        if (!techNameAnimationShouldRepeat) {
             return;
         }
 
-        const timeoutId = window.setTimeout(startAnimation, 5000);
+        const timeoutId = window.setTimeout(startTechNameAnimation, 5000);
 
         return () => window.clearTimeout(timeoutId);
-    }, [animationShouldRepeat, startAnimation]);
+    }, [techNameAnimationShouldRepeat, startTechNameAnimation]);
 
     useEffect(() => {
-        if (animationIsFinished) {
+        if (techNameAnimationIsFinished) {
             return;
         }
 
-        const timeoutId = stepAnimation();
+        const timeoutId = stepTechNameAnimation();
 
         return () => window.clearTimeout(timeoutId);
-    }, [animationIsFinished, stepAnimation]);
+    }, [techNameAnimationIsFinished, stepTechNameAnimation]);
 }

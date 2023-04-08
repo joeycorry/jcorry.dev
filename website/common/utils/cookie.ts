@@ -1,24 +1,27 @@
-type CreateCookieAccessorsParameter = {
-    getCookie: () => string | undefined;
-    setCookie: (cookie: string) => void;
+type CreateCookiesAccessorsParameter = {
+    getCookies: () => string | undefined;
+    setCookies: (cookies: string) => void;
 };
 
-export function createCookieItemAccessors({
-    getCookie,
-    setCookie,
-}: CreateCookieAccessorsParameter) {
+export function createCookiesValueAccessors({
+    getCookies,
+    setCookies,
+}: CreateCookiesAccessorsParameter) {
     return {
-        getItem: (key: string) => getItem({ getCookie, key }),
-        setItem: (key: string, value: string) =>
-            setItem({ key, setCookie, value }),
-        removeItem: (key: string) => removeItem({ key, setCookie }),
+        get: (key: string) => getCookie({ getCookies, key }),
+        set: (key: string, value: string) =>
+            setCookie({ key, setCookies, value }),
+        remove: (key: string) => removeCookie({ key, setCookies }),
     };
 }
 
-type GetItemParameter = { getCookie: () => string | undefined; key: string };
+type GetCookieParameter = {
+    getCookies: () => string | undefined;
+    key: string;
+};
 
-export function getItem({ getCookie, key }: GetItemParameter) {
-    const serializedValue = getCookie()
+export function getCookie({ getCookies, key }: GetCookieParameter) {
+    const serializedValue = getCookies()
         ?.split(/;\s*/)
         ?.find(keyValue => keyValue.startsWith(key))
         ?.substring(key.length + 1);
@@ -30,18 +33,21 @@ export function getItem({ getCookie, key }: GetItemParameter) {
     return null;
 }
 
-type SetItemParameter = {
+type SetCookieParameter = {
     key: string;
     value: string;
-    setCookie: (cookie: string) => void;
+    setCookies: (cookie: string) => void;
 };
 
-export function setItem({ key, setCookie, value }: SetItemParameter) {
-    setCookie(`${key}=${value}; max-age=31536000`);
+export function setCookie({ key, setCookies, value }: SetCookieParameter) {
+    setCookies(`${key}=${value}; max-age=31536000`);
 }
 
-type RemoveItemParameter = { key: string; setCookie: (cookie: string) => void };
+type RemoveCookieParameter = {
+    key: string;
+    setCookies: (cookie: string) => void;
+};
 
-export function removeItem({ key, setCookie }: RemoveItemParameter) {
-    setCookie(`${key}=; max-age=0`);
+export function removeCookie({ key, setCookies }: RemoveCookieParameter) {
+    setCookies(`${key}=; max-age=0`);
 }

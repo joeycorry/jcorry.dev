@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 
-import RendererManager from '~/common/lib/rendererManager';
+import { getRendererManager } from '~/common/lib/rendererManager';
 
-export function useEffects() {
+export function useRendererManagerEffects() {
+    const rendererManager = getRendererManager();
+
     useEffect(() => {
-        RendererManager.getSharedInstance().startAnimation();
-    }, []);
+        rendererManager.startAnimation();
+    }, [rendererManager]);
 }

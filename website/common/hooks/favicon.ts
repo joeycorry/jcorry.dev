@@ -2,10 +2,12 @@ import { useAtomValue } from 'jotai';
 import { useEffect } from 'react';
 
 import { colorAtom } from '~/common/atoms/color';
-import * as FaviconUtils from '~/common/utils/favicon';
+import { setFavicon } from '~/common/utils/favicon';
 
-export function useEffects() {
+export function useFaviconEffects() {
     const color = useAtomValue(colorAtom);
 
-    useEffect(() => FaviconUtils.setFavicon({ color }), [color]);
+    useEffect(() => {
+        setFavicon({ color });
+    }, [color]);
 }

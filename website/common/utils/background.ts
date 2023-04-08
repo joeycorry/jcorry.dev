@@ -1,24 +1,26 @@
-import type Color from '~/common/lib/color';
-import type Renderer from '~/common/lib/renderer';
-import RendererManager from '~/common/lib/rendererManager';
+import type { Color } from '~/common/lib/color';
+import type { Renderer } from '~/common/lib/renderer';
+import { getRendererManager } from '~/common/lib/rendererManager';
 
-import * as ArrayUtils from './array';
-import * as FunctionalUtils from './functional';
-import * as NumberUtils from './number';
-import * as RendererUtils from './renderer';
-import * as ShapeUtils from './shape';
+import { getArrayElementAtIndex } from './array';
+import type { Bounds } from './bounded';
+import { getBoundedRandomInteger } from './bounded';
+import { evaluateFunction } from './function';
+import type { Position } from './geometry';
+import { getSineOfRadians } from './geometry';
+import { createMovingTrapezoidRenderer } from './renderer';
 
-type GetContinuousMovingRibbonAnimationInitiatorParameter = {
+type GetbackgroundRendererControlsParameter = {
     canvasContext: CanvasRenderingContext2D;
     directionAngle: number;
     color: Color;
-    firstRibbonLineStartingPosition: ShapeUtils.Position;
-    getYLength: (position: ShapeUtils.Position) => number;
-    secondRibbonLineStartingPosition: ShapeUtils.Position;
+    firstRibbonLineStartingPosition: Position;
+    getYLength: (position: Position) => number;
+    secondRibbonLineStartingPosition: Position;
     xAxisAdjacentAngle: number;
 };
 
-function getContinuousMovingRibbonAnimationInitiator({
+function getBackgroundRendererControls({
     canvasContext,
     directionAngle,
     color,
@@ -26,23 +28,25 @@ function getContinuousMovingRibbonAnimationInitiator({
     getYLength,
     secondRibbonLineStartingPosition,
     xAxisAdjacentAngle,
-}: GetContinuousMovingRibbonAnimationInitiatorParameter) {
-    const rendererManager = RendererManager.getSharedInstance();
-    const sinOfXAxisAdjacentAngle = NumberUtils.sin(xAxisAdjacentAngle);
+}: GetbackgroundRendererControlsParameter) {
+    const rendererManager = getRendererManager();
+    const sineOfXAxisAdjacentAngle = getSineOfRadians(xAxisAdjacentAngle);
     let maybeRenderer: Renderer | undefined;
-    const initiateContinuousMovingRibbonAnimation = () => {
+
+    const addToManager = () => {
         const firstLength =
             getYLength(firstRibbonLineStartingPosition) /
-            sinOfXAxisAdjacentAngle;
+            sineOfXAxisAdjacentAngle;
         const secondLength =
             getYLength(secondRibbonLineStartingPosition) /
-            sinOfXAxisAdjacentAngle;
-        maybeRenderer = RendererUtils.createMovingTrapezoidRenderer({
+            sineOfXAxisAdjacentAngle;
+
+        maybeRenderer = createMovingTrapezoidRenderer({
             angle: directionAngle,
             animation: {
                 duration:
                     Math.max(firstLength, secondLength) *
-                    NumberUtils.boundedRandomInteger({
+                    getBoundedRandomInteger({
                         minimum: 4,
                         maximum: 10,
                     }),
@@ -68,36 +72,36 @@ function getContinuousMovingRibbonAnimationInitiator({
         rendererManager.addRenderer(maybeRenderer);
     };
 
+    const removeFromManager = () => {
+        if (maybeRenderer !== undefined) {
+            rendererManager.removeRenderer(maybeRenderer);
+        }
+    };
+
     return {
-        initiateContinuousMovingRibbonAnimation,
-        stopRendering: () => {
-            if (maybeRenderer !== undefined) {
-                rendererManager.removeRenderer(maybeRenderer);
-            }
-        },
+        addToManager,
+        removeFromManager,
     };
 }
 
-type SetupRibbonRenderersParameter = {
+type SetupBackgroundRenderersParameter = {
     canvasContext: CanvasRenderingContext2D;
     color: Color;
-    ribbonWidthBounds: NumberUtils.Bounds;
+    ribbonWidthBounds: Bounds;
     viewport: {
         height: number;
         width: number;
     };
 };
 
-export function setupRibbonRenderers({
+export function setupBackgroundRenderers({
     canvasContext,
     color,
     ribbonWidthBounds,
     viewport,
-}: SetupRibbonRenderersParameter) {
-    const renderingStoppers = [] as Array<() => void>;
+}: SetupBackgroundRenderersParameter) {
+    const rendererRemovers: Array<() => void> = [];
     const gutter = 5;
-    const { maximum: maximumRibbonWidth, minimum: minimumRibbonWidth } =
-        ribbonWidthBounds;
     const xAxisAdjacentAngle = 0.35 * Math.PI;
     const ribbonsHeight =
         (viewport.width >= 1500 ? 0.8 : viewport.width >= 750 ? 0.6 : 0.4) *
@@ -106,23 +110,17 @@ export function setupRibbonRenderers({
     const leftStartingYs = [0];
     const leftYLimit = ribbonsHeight;
 
-    while (gutter + ArrayUtils.at(leftStartingYs, -1)! <= leftYLimit) {
+    while (gutter + getArrayElementAtIndex(leftStartingYs, -1)! <= leftYLimit) {
         leftStartingYs.push(
             gutter +
-                ArrayUtils.at(leftStartingYs, -1)! +
-                NumberUtils.boundedRandomInteger({
-                    minimum: minimumRibbonWidth,
-                    maximum: maximumRibbonWidth,
-                })
+                getArrayElementAtIndex(leftStartingYs, -1)! +
+                getBoundedRandomInteger(ribbonWidthBounds)
         );
     }
 
-    for (const [index, startingY] of [...leftStartingYs.entries()].slice(
-        0,
-        -1
-    )) {
-        const { initiateContinuousMovingRibbonAnimation, stopRendering } =
-            getContinuousMovingRibbonAnimationInitiator({
+    for (const [index, startingY] of leftStartingYs.slice(0, -1).entries()) {
+        const { addToManager, removeFromManager } =
+            getBackgroundRendererControls({
                 canvasContext,
                 color,
                 directionAngle: -xAxisAdjacentAngle,
@@ -138,30 +136,27 @@ export function setupRibbonRenderers({
                 xAxisAdjacentAngle,
             });
 
-        initiateContinuousMovingRibbonAnimation();
-        renderingStoppers.push(stopRendering);
+        addToManager();
+        rendererRemovers.push(removeFromManager);
     }
 
     const rightStartingYs = [viewport.height - ribbonsHeight];
     const rightYLimit = viewport.height;
 
-    while (gutter + ArrayUtils.at(rightStartingYs, -1)! <= rightYLimit) {
+    while (
+        gutter + getArrayElementAtIndex(rightStartingYs, -1)! <=
+        rightYLimit
+    ) {
         rightStartingYs.push(
             gutter +
-                ArrayUtils.at(rightStartingYs, -1)! +
-                NumberUtils.boundedRandomInteger({
-                    minimum: minimumRibbonWidth,
-                    maximum: maximumRibbonWidth,
-                })
+                getArrayElementAtIndex(rightStartingYs, -1)! +
+                getBoundedRandomInteger(ribbonWidthBounds)
         );
     }
 
-    for (const [index, startingY] of [...rightStartingYs.entries()].slice(
-        0,
-        -1
-    )) {
-        const { initiateContinuousMovingRibbonAnimation, stopRendering } =
-            getContinuousMovingRibbonAnimationInitiator({
+    for (const [index, startingY] of rightStartingYs.slice(0, -1).entries()) {
+        const { addToManager, removeFromManager } =
+            getBackgroundRendererControls({
                 canvasContext,
                 color,
                 directionAngle: Math.PI - xAxisAdjacentAngle,
@@ -177,9 +172,9 @@ export function setupRibbonRenderers({
                 xAxisAdjacentAngle,
             });
 
-        initiateContinuousMovingRibbonAnimation();
-        renderingStoppers.push(stopRendering);
+        addToManager();
+        rendererRemovers.push(removeFromManager);
     }
 
-    return () => renderingStoppers.forEach(FunctionalUtils.evaluate);
+    return () => rendererRemovers.forEach(evaluateFunction);
 }

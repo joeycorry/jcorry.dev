@@ -3,17 +3,19 @@ import { RefObject, useEffect } from 'react';
 
 import { backgroundIsVisibleAtom } from '~/common/atoms/background';
 import { viewportAtom } from '~/common/atoms/viewport';
-import * as BackgroundUtils from '~/common/utils/background';
-import * as FunctionalUtils from '~/common/utils/functional';
+import { setupBackgroundRenderers } from '~/common/utils/background';
+import { evaluateFunction } from '~/common/utils/function';
 
-import * as ColorHooks from './color';
+import { useColorVariantsByName } from './color';
 
 type UseEffectsParameter = {
     canvasElementRef: RefObject<HTMLCanvasElement>;
 };
 
-export function useEffects({ canvasElementRef }: UseEffectsParameter) {
-    const { primaryColor, tertiaryColor } = ColorHooks.useVariants();
+export function useBackgroundEffects({
+    canvasElementRef,
+}: UseEffectsParameter) {
+    const { primaryColor, tertiaryColor } = useColorVariantsByName();
     const setBackgroundIsVisible = useSetAtom(backgroundIsVisibleAtom);
     const viewport = useAtomValue(viewportAtom);
 
@@ -42,14 +44,14 @@ export function useEffects({ canvasElementRef }: UseEffectsParameter) {
 
         const canvasElement = canvasElementRef.current;
         const canvasContext = canvasElement.getContext('2d')!;
-        const renderingStoppers = [
-            BackgroundUtils.setupRibbonRenderers({
+        const backgroundRenderersRemovers = [
+            setupBackgroundRenderers({
                 canvasContext,
                 color: primaryColor,
                 ribbonWidthBounds: { minimum: 50, maximum: 80 },
                 viewport,
             }),
-            BackgroundUtils.setupRibbonRenderers({
+            setupBackgroundRenderers({
                 canvasContext,
                 color: tertiaryColor,
                 ribbonWidthBounds: { minimum: 30, maximum: 60 },
@@ -59,7 +61,7 @@ export function useEffects({ canvasElementRef }: UseEffectsParameter) {
 
         setBackgroundIsVisible(true);
 
-        return () => renderingStoppers.forEach(FunctionalUtils.evaluate);
+        return () => backgroundRenderersRemovers.forEach(evaluateFunction);
     }, [
         canvasElementRef,
         primaryColor,

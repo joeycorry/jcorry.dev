@@ -1,19 +1,20 @@
-import type Renderer from './renderer';
+import type { Renderer } from './renderer';
 
 const rendererManagerConstructorSymbol = Symbol('renderingManagerConstructor');
-let maybeRenderingManager: RendererManager | undefined;
 
-export default class RendererManager {
+class RendererManager {
     #animationFrameRequestId?: number;
     #isRunning = false;
-    #renderers = [] as Renderer[];
+    #renderers: Renderer[] = [];
 
-    public static getSharedInstance(): RendererManager {
-        maybeRenderingManager ??= new RendererManager(
-            rendererManagerConstructorSymbol
-        );
-
-        return maybeRenderingManager;
+    public constructor(
+        constructorSymbol: typeof rendererManagerConstructorSymbol
+    ) {
+        if (constructorSymbol !== rendererManagerConstructorSymbol) {
+            throw new Error(
+                `Instances of \`${RendererManager.name}\` can only be constructed indirectly via \`getRenderingManagerInstance()\`.`
+            );
+        }
     }
 
     public addRenderer(renderer: Renderer) {
@@ -28,8 +29,7 @@ export default class RendererManager {
             return;
         }
 
-        const previousRenderers = this.#renderers;
-        this.#renderers = previousRenderers.filter(
+        this.#renderers = this.#renderers.filter(
             renderer_ => renderer !== renderer_
         );
     }
@@ -62,16 +62,6 @@ export default class RendererManager {
     public toggleAnimationDirection() {
         for (const renderer of this.#renderers) {
             renderer.toggleAnimationDirection();
-        }
-    }
-
-    private constructor(
-        constructorSymbol: typeof rendererManagerConstructorSymbol
-    ) {
-        if (constructorSymbol !== rendererManagerConstructorSymbol) {
-            throw new Error(
-                `Instances of \`${RendererManager.name}\` can only be constructed indirectly via \`getRenderingManagerInstance()\`.`
-            );
         }
     }
 
@@ -116,4 +106,14 @@ export default class RendererManager {
             this.#stepAnimation
         );
     };
+}
+
+let maybeRendererManager: RendererManager | undefined;
+
+export function getRendererManager(): RendererManager {
+    maybeRendererManager ??= new RendererManager(
+        rendererManagerConstructorSymbol
+    );
+
+    return maybeRendererManager;
 }

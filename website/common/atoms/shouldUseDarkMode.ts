@@ -1,6 +1,14 @@
-import { atom, WritableAtom } from 'jotai';
+import { atom } from 'jotai';
 
-export const shouldUseDarkModeAtom = atom(
+import type { WritableAtomWithInitialValue } from '~/common/utils/atom';
+
+type ShouldUseDarkModeAtom = WritableAtomWithInitialValue<
+    boolean | undefined,
+    [boolean | undefined],
+    void
+>;
+
+export const shouldUseDarkModeAtom: ShouldUseDarkModeAtom = atom(
     undefined,
     (get, set, shouldUseDarkMode) =>
         set(
@@ -9,6 +17,6 @@ export const shouldUseDarkModeAtom = atom(
                 ? !get(shouldUseDarkModeAtom)
                 : shouldUseDarkMode
         )
-) as WritableAtom<boolean | undefined, [boolean | undefined], void>;
+);
 
 shouldUseDarkModeAtom.debugLabel = 'shouldUseDarkModeAtom';

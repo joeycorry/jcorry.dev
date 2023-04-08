@@ -1,6 +1,6 @@
-import * as NumberUtils from '~/common/utils/number';
+import { getClampedNumber } from '~/common/utils/bounded';
 
-import type Color from '.';
+import type { Color } from '.';
 
 type HslColorConstructorParameter = {
     alpha?: number;
@@ -9,7 +9,7 @@ type HslColorConstructorParameter = {
     saturationPercentage: number;
 };
 
-export default class HslColor implements Color {
+export class HslColor implements Color {
     #hueDegrees: number;
     #saturationPercentage: number;
     #lightnessPercentage: number;
@@ -49,7 +49,7 @@ export default class HslColor implements Color {
         return new HslColor({
             alpha: this.#alpha,
             hueDegrees: this.#hueDegrees,
-            lightnessPercentage: NumberUtils.clamp({
+            lightnessPercentage: getClampedNumber({
                 maximum: 100,
                 minimum: 0,
                 value: this.#lightnessPercentage * (1 - percentage / 100),
@@ -62,7 +62,7 @@ export default class HslColor implements Color {
         return new HslColor({
             alpha: this.#alpha,
             hueDegrees: this.#hueDegrees,
-            lightnessPercentage: NumberUtils.clamp({
+            lightnessPercentage: getClampedNumber({
                 maximum: 100,
                 minimum: 0,
                 value: this.#lightnessPercentage * (1 + percentage / 100),
@@ -79,7 +79,7 @@ export default class HslColor implements Color {
 
     public withAlpha(alpha: number) {
         return new HslColor({
-            alpha: NumberUtils.clamp({
+            alpha: getClampedNumber({
                 maximum: 1,
                 minimum: 0,
                 value: alpha,

@@ -1,4 +1,4 @@
-import * as JotaiUtils from '~/common/utils/jotai';
+import { atomWithNoArgumentSetter } from '~/common/utils/atom';
 
 const getViewportValue = import.meta.env.SSR
     ? () => ({ devicePixelRatio: 1, width: 0, height: 0 })
@@ -8,7 +8,7 @@ const getViewportValue = import.meta.env.SSR
           height: window.innerHeight,
       });
 
-export const viewportAtom = JotaiUtils.atomWithNoArgumentSetter(
+export const viewportAtom = atomWithNoArgumentSetter(
     getViewportValue(),
     getViewportValue
 );

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-export function useEffects() {
+export function useAppEffects() {
     useEffect(() => {
         document.body.classList.remove('no-transition');
     }, []);

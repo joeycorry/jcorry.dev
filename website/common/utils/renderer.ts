@@ -1,27 +1,27 @@
-import type Color from '~/common/lib/color';
-import Renderer from '~/common/lib/renderer';
-import Trapezoid from '~/common/lib/shape/trapezoid';
+import type { Color } from '~/common/lib/color';
+import { Renderer } from '~/common/lib/renderer';
+import { Trapezoid } from '~/common/lib/shape/trapezoid';
 
-import type { Tuple } from './miscellaneous';
-import * as ShapeUtils from './shape';
+import { getDistance, getNewPosition, Position } from './geometry';
+import type { Tuple } from './tuple';
 
-export type AnimationIterationCount = number | 'infinite';
+export type RendererAnimationIterationCount = number | 'infinite';
 
-export type StartingAnimationDirection =
+export type RendererStartingAnimationDirection =
     | 'alternate'
     | 'alternate-reverse'
     | 'backward'
     | 'forward';
 
-export type AnimationOptions = {
+export type RendererAnimationOptions = {
     duration?: number;
-    iterationCount?: AnimationIterationCount;
-    startingDirection?: StartingAnimationDirection;
+    iterationCount?: RendererAnimationIterationCount;
+    startingDirection?: RendererStartingAnimationDirection;
     startingPercentage?: number;
 };
 
 export type RendererOptions = {
-    animation?: AnimationOptions;
+    animation?: RendererAnimationOptions;
 };
 
 type CreateMovingTrapezoidRendererParameter = RendererOptions & {
@@ -32,7 +32,7 @@ type CreateMovingTrapezoidRendererParameter = RendererOptions & {
     lineWidth?: number;
     parallelLineDataPair: Tuple<
         {
-            startingPosition: ShapeUtils.Position;
+            startingPosition: Position;
             length: number;
         },
         2
@@ -58,7 +58,7 @@ export function createMovingTrapezoidRenderer({
     const [firstLength, secondLength] = Array(2).fill(maxLength);
     const [firstEndPosition, secondEndPosition] = parallelLineDataPair.map(
         data =>
-            ShapeUtils.getNewPosition({
+            getNewPosition({
                 angle,
                 counterClockwise,
                 length: maxLength,
@@ -77,7 +77,7 @@ export function createMovingTrapezoidRenderer({
         const firstLineData =
             distancePercentage < 1
                 ? {
-                      length: ShapeUtils.getDistance(firstStartingPosition, {
+                      length: getDistance(firstStartingPosition, {
                           x:
                               firstStartingPosition.x +
                               distancePercentage * firstXDistance,
@@ -89,7 +89,7 @@ export function createMovingTrapezoidRenderer({
                   }
                 : distancePercentage > 1
                 ? {
-                      length: ShapeUtils.getDistance(
+                      length: getDistance(
                           {
                               x:
                                   firstEndPosition.x -
@@ -116,7 +116,7 @@ export function createMovingTrapezoidRenderer({
         const secondLineData =
             distancePercentage < 1
                 ? {
-                      length: ShapeUtils.getDistance(secondStartingPosition, {
+                      length: getDistance(secondStartingPosition, {
                           x:
                               secondStartingPosition.x +
                               distancePercentage * secondXDistance,
@@ -128,7 +128,7 @@ export function createMovingTrapezoidRenderer({
                   }
                 : distancePercentage > 1
                 ? {
-                      length: ShapeUtils.getDistance(
+                      length: getDistance(
                           {
                               x:
                                   secondEndPosition.x -

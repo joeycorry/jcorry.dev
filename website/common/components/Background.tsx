@@ -2,26 +2,26 @@ import { useAtomValue } from 'jotai';
 import { memo, useRef } from 'react';
 
 import { backgroundIsVisibleAtom } from '~/common/atoms/background';
-import * as BackgroundHooks from '~/common/hooks/background';
-import * as RendererManagerHooks from '~/common/hooks/rendererManager';
+import { useBackgroundEffects } from '~/common/hooks/background';
+import { useRendererManagerEffects } from '~/common/hooks/rendererManager';
 
 import styles from './Background.module.css';
 
-function Background() {
-    const isVisible = useAtomValue(backgroundIsVisibleAtom);
+function UnmemoizedBackground() {
+    const backgroundIsVisible = useAtomValue(backgroundIsVisibleAtom);
     const canvasElementRef = useRef<HTMLCanvasElement>(null);
 
-    RendererManagerHooks.useEffects();
-    BackgroundHooks.useEffects({ canvasElementRef });
+    useRendererManagerEffects();
+    useBackgroundEffects({ canvasElementRef });
 
     return (
         <canvas
             ref={canvasElementRef}
             id="background"
             className={styles.background}
-            data-is-visible={isVisible.toString()}
+            data-is-visible={backgroundIsVisible.toString()}
         />
     );
 }
 
-export default memo(Background);
+export const Background = memo(UnmemoizedBackground);
