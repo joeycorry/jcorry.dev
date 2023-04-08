@@ -2,7 +2,7 @@ import compression from 'compression';
 import express, { Response } from 'express';
 import { URL } from 'url';
 import type { UserConfig } from 'vite';
-import { renderPage } from 'vite-plugin-ssr';
+import { renderPage } from 'vite-plugin-ssr/server';
 
 const __dirname = new URL('.', import.meta.url).pathname.slice(0, -1);
 const root = `${__dirname}/..`;

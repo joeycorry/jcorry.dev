@@ -1,5 +1,5 @@
 import { renderToReadableStream } from 'react-dom/server.browser';
-import { dangerouslySkipEscape, escapeInject } from 'vite-plugin-ssr';
+import { dangerouslySkipEscape, escapeInject } from 'vite-plugin-ssr/server';
 
 import {
     getDefaultStyleString,
