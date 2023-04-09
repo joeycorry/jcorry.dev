@@ -9,7 +9,6 @@
         "renderer",
         "server",
         "globals.d.ts",
-        "jest.setup.ts",
         "vite.config.ts"
     ],
     "exclude": ["dist", "node_modules"]

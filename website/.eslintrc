@@ -82,40 +82,5 @@
                 "alwaysTryTypes": true
             }
         }
-    },
-    "overrides": [
-        {
-            "files": [
-                "./common/**/*.spec.ts?(x)",
-                "./renderer/**/*.spec.ts?(x)",
-                "./pages/**/*.spec.ts?(x)",
-                "./server/**/*.spec.ts?(x)"
-            ],
-            "extends": [
-                "plugin:jest/recommended",
-                "plugin:jest/style",
-                "plugin:jest-dom/recommended",
-                "plugin:testing-library/react"
-            ],
-            "plugins": ["jest", "jest-dom", "testing-library"],
-            "rules": {
-                "jest/no-disabled-tests": "error",
-                "jest/no-focused-tests": "error",
-                "jest/no-identical-title": "error",
-                "jest/prefer-to-have-length": "error",
-                "jest/valid-expect": "error",
-                "jest-dom/prefer-checked": "error",
-                "jest-dom/prefer-enabled-disabled": "error",
-                "jest-dom/prefer-required": "error",
-                "jest-dom/prefer-to-have-attribute": "error",
-                "testing-library/await-async-query": "error",
-                "testing-library/no-await-sync-query": "error",
-                "testing-library/no-debugging-utils": "error",
-                "testing-library/no-dom-import": "off"
-            },
-            "env": {
-                "jest/globals": true
-            }
-        }
-    ]
+    }
 }

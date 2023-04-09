@@ -1,5 +1,3 @@
-__mocks__
 dist/
-jest*
 node_modules/
 .eslintcache
