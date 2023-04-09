@@ -1,13 +1,12 @@
 import { atom, WritableAtom } from 'jotai';
 
+import { WritableAtomWithInitialValue } from '~/common/utils/atom';
 import type { TechName, TechNameAnimationData } from '~/common/utils/techName';
 import {
     getNextTechName,
     getRandomTechName,
     techNameAnimationIsFinished,
 } from '~/common/utils/techName';
-
-import { WritableAtomWithInitialValue } from '../utils/atom';
 
 type TechNameAtom = WritableAtomWithInitialValue<
     TechName,

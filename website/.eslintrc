@@ -10,11 +10,12 @@
         "plugin:prettier/recommended"
     ],
     "plugins": [
-        "react",
-        "react-hooks",
-        "jsx-a11y",
         "@typescript-eslint",
         "import",
+        "jsx-a11y",
+        "no-relative-import-paths",
+        "react",
+        "react-hooks",
         "simple-import-sort"
     ],
     "rules": {
@@ -25,6 +26,10 @@
         "import/no-default-export": "error",
         "import/no-duplicates": "error",
         "import/no-namespace": "error",
+        "no-relative-import-paths/no-relative-import-paths": [
+            "error",
+            { "allowSameFolder": true, "prefix": "~" }
+        ],
         "prettier/prettier": [
             "error",
             {

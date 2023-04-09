@@ -1,10 +1,10 @@
+import { getClampedNumber } from '~/common/utils/bounded';
 import type {
     RendererAnimationIterationCount,
     RendererOptions,
     RendererStartingAnimationDirection,
 } from '~/common/utils/renderer';
 
-import { getClampedNumber } from '../utils/bounded';
 import type { Renderable } from './renderable';
 
 type GetNextRenderables = (elapsedDurationPercentage: number) => Renderable[];
