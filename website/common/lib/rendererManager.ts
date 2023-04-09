@@ -4,7 +4,7 @@ const rendererManagerConstructorSymbol = Symbol('renderingManagerConstructor');
 
 class RendererManager {
     #animationFrameRequestId?: number;
-    #isRunning = false;
+    #isAnimating = false;
     #renderers: Renderer[] = [];
 
     public constructor(
@@ -34,19 +34,23 @@ class RendererManager {
         );
     }
 
+    public isAnimating() {
+        return this.#isAnimating;
+    }
+
     public startAnimation() {
-        if (this.#isRunning) {
+        if (this.#isAnimating) {
             return;
         }
 
-        this.#isRunning = true;
+        this.#isAnimating = true;
         this.#animationFrameRequestId = window.requestAnimationFrame(
             this.#stepAnimation
         );
     }
 
     public stopAnimation() {
-        if (!this.#isRunning) {
+        if (!this.#isAnimating) {
             return;
         }
 
@@ -56,7 +60,7 @@ class RendererManager {
 
         this.#onBeforeFrameRender();
 
-        this.#isRunning = false;
+        this.#isAnimating = false;
     }
 
     public toggleAnimationDirection() {
@@ -94,7 +98,7 @@ class RendererManager {
     }
 
     #stepAnimation = (timestamp: number) => {
-        if (!this.#isRunning) {
+        if (!this.#isAnimating) {
             return;
         }
 
