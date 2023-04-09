@@ -4,6 +4,7 @@ import { RefObject, useEffect } from 'react';
 import { backgroundIsVisibleAtom } from '~/common/atoms/background';
 import { viewportAtom } from '~/common/atoms/viewport';
 import { setupBackgroundRenderers } from '~/common/utils/background';
+import { linear } from '~/common/utils/easing';
 import { evaluateFunction } from '~/common/utils/function';
 
 import { useColorVariantsByName } from './color';
@@ -44,16 +45,19 @@ export function useBackgroundEffects({
 
         const canvasElement = canvasElementRef.current;
         const canvasContext = canvasElement.getContext('2d')!;
+        const easingFunction = linear;
         const backgroundRenderersRemovers = [
             setupBackgroundRenderers({
                 canvasContext,
                 color: primaryColor,
+                easingFunction,
                 ribbonWidthBounds: { minimum: 50, maximum: 80 },
                 viewport,
             }),
             setupBackgroundRenderers({
                 canvasContext,
                 color: tertiaryColor,
+                easingFunction,
                 ribbonWidthBounds: { minimum: 30, maximum: 60 },
                 viewport,
             }),

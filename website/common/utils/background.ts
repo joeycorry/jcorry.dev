@@ -5,6 +5,7 @@ import { getRendererManager } from '~/common/lib/rendererManager';
 import { getArrayElementAtIndex } from './array';
 import type { Bounds } from './bounded';
 import { getBoundedRandomInteger } from './bounded';
+import { EasingFunction } from './easing';
 import { evaluateFunction } from './function';
 import type { Position } from './geometry';
 import { getSineOfRadians } from './geometry';
@@ -12,8 +13,9 @@ import { createMovingTrapezoidRenderer } from './renderer';
 
 type GetBackgroundRendererControlsParameter = {
     canvasContext: CanvasRenderingContext2D;
-    directionAngle: number;
     color: Color;
+    directionAngle: number;
+    easingFunction: EasingFunction;
     firstRibbonLineStartingPosition: Position;
     getYLength: (position: Position) => number;
     secondRibbonLineStartingPosition: Position;
@@ -22,8 +24,9 @@ type GetBackgroundRendererControlsParameter = {
 
 function getBackgroundRendererControls({
     canvasContext,
-    directionAngle,
     color,
+    directionAngle,
+    easingFunction,
     firstRibbonLineStartingPosition,
     getYLength,
     secondRibbonLineStartingPosition,
@@ -46,15 +49,13 @@ function getBackgroundRendererControls({
             animation: {
                 duration:
                     Math.max(firstLength, secondLength) *
-                    getBoundedRandomInteger({
-                        minimum: 4,
-                        maximum: 10,
-                    }),
+                    getBoundedRandomInteger({ minimum: 8, maximum: 12 }),
                 iterationCount: 'infinite',
                 startingDirection:
                     Math.random() < 0.5 ? 'alternate' : 'alternate-reverse',
             },
             canvasContext,
+            easingFunction,
             fillColor: color,
             parallelLineDataPair: [
                 {
@@ -87,6 +88,7 @@ function getBackgroundRendererControls({
 type SetupBackgroundRenderersParameter = {
     canvasContext: CanvasRenderingContext2D;
     color: Color;
+    easingFunction: EasingFunction;
     ribbonWidthBounds: Bounds;
     viewport: {
         height: number;
@@ -97,10 +99,11 @@ type SetupBackgroundRenderersParameter = {
 export function setupBackgroundRenderers({
     canvasContext,
     color,
+    easingFunction,
     ribbonWidthBounds,
     viewport,
 }: SetupBackgroundRenderersParameter) {
-    const rendererRemovers: Array<() => void> = [];
+    const backgroundRendererRemovers: Array<() => void> = [];
     const gutter = 5;
     const xAxisAdjacentAngle = 0.35 * Math.PI;
     const ribbonsHeight =
@@ -124,6 +127,7 @@ export function setupBackgroundRenderers({
                 canvasContext,
                 color,
                 directionAngle: -xAxisAdjacentAngle,
+                easingFunction,
                 firstRibbonLineStartingPosition: {
                     x: 0,
                     y: (index > 0 ? gutter : 0) + startingY,
@@ -137,7 +141,7 @@ export function setupBackgroundRenderers({
             });
 
         addToManager();
-        rendererRemovers.push(removeFromManager);
+        backgroundRendererRemovers.push(removeFromManager);
     }
 
     const rightStartingYs = [viewport.height - ribbonsHeight];
@@ -160,6 +164,7 @@ export function setupBackgroundRenderers({
                 canvasContext,
                 color,
                 directionAngle: Math.PI - xAxisAdjacentAngle,
+                easingFunction,
                 firstRibbonLineStartingPosition: {
                     x: viewport.width,
                     y: (index > 0 ? gutter : 0) + startingY,
@@ -173,8 +178,8 @@ export function setupBackgroundRenderers({
             });
 
         addToManager();
-        rendererRemovers.push(removeFromManager);
+        backgroundRendererRemovers.push(removeFromManager);
     }
 
-    return () => rendererRemovers.forEach(evaluateFunction);
+    return () => backgroundRendererRemovers.forEach(evaluateFunction);
 }

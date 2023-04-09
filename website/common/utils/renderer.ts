@@ -2,6 +2,7 @@ import type { Color } from '~/common/lib/color';
 import { Renderer } from '~/common/lib/renderer';
 import { Trapezoid } from '~/common/lib/shape/trapezoid';
 
+import type { EasingFunction } from './easing';
 import { getDistance, getNewPosition, Position } from './geometry';
 import type { Tuple } from './tuple';
 
@@ -28,6 +29,7 @@ type CreateMovingTrapezoidRendererParameter = RendererOptions & {
     angle: number;
     canvasContext: CanvasRenderingContext2D;
     counterClockwise?: boolean;
+    easingFunction: EasingFunction;
     fillColor: Color;
     lineWidth?: number;
     parallelLineDataPair: Tuple<
@@ -44,6 +46,7 @@ export function createMovingTrapezoidRenderer({
     angle,
     canvasContext,
     counterClockwise,
+    easingFunction,
     fillColor,
     lineWidth,
     parallelLineDataPair,
@@ -73,7 +76,8 @@ export function createMovingTrapezoidRenderer({
     const strokeStyle = strokeColor.toString();
 
     return new Renderer(elapsedDurationPercentage => {
-        const distancePercentage = 2 * elapsedDurationPercentage;
+        const distancePercentage =
+            2 * easingFunction(elapsedDurationPercentage);
         const firstLineData =
             distancePercentage < 1
                 ? {
