@@ -5,7 +5,7 @@ import type {
     RendererStartingAnimationDirection,
 } from '~/common/utils/renderer';
 
-import type { Renderable } from './renderable';
+import { Renderable } from './renderable';
 
 type GetNextRenderables = (elapsedDurationPercentage: number) => Renderable[];
 
@@ -54,7 +54,9 @@ export class Renderer {
 
     public onBeforeFrameRender() {
         for (const renderable of this.#lastRenderables) {
-            renderable.onBeforeFrameRender();
+            if ('onBeforeFrameRender' in renderable) {
+                renderable.onBeforeFrameRender();
+            }
         }
     }
 
@@ -67,7 +69,11 @@ export class Renderer {
         );
 
         for (const renderable of nextRenderables) {
-            renderable.render();
+            if ('render' in renderable) {
+                renderable.render();
+            } else {
+                renderable();
+            }
         }
 
         this.#lastRenderables = nextRenderables;

@@ -1,4 +1,4 @@
-import { Renderable } from '~/common/lib/renderable';
+import type { RenderableObject } from '~/common/lib/renderable';
 import { getClampedNumber } from '~/common/utils/bounded';
 
 export type ShapeConstructorParameter = {
@@ -8,7 +8,7 @@ export type ShapeConstructorParameter = {
     strokeStyle?: string;
 };
 
-export abstract class Shape implements Renderable {
+export abstract class Shape implements RenderableObject {
     protected _canvasContext: CanvasRenderingContext2D;
 
     #fillStyle?: string;

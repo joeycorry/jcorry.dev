@@ -1,4 +1,8 @@
-export interface Renderable {
+export type RenderableFunction = () => void;
+
+export type RenderableObject = {
     onBeforeFrameRender(): void;
-    render(): void;
-}
+    render: RenderableFunction;
+};
+
+export type Renderable = RenderableFunction | RenderableObject;
