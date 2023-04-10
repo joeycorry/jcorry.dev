@@ -1,13 +1,25 @@
-import { useAtom } from 'jotai';
-import { useEffect } from 'react';
+import { useAtom, useSetAtom } from 'jotai';
+import { useCallback, useEffect } from 'react';
 
 import { shouldUseDarkModeAtom } from '~/common/atoms/shouldUseDarkMode';
 import { removeCookie, setCookie } from '~/common/utils/cookie';
+
+export function useMediaQueryListChangeHandler() {
+    const setShouldUseDarkMode = useSetAtom(shouldUseDarkModeAtom);
+
+    return useCallback(
+        ({ matches }: MediaQueryListEvent) => {
+            setShouldUseDarkMode(matches);
+        },
+        [setShouldUseDarkMode]
+    );
+}
 
 export function useShouldUseDarkModeEffects() {
     const [shouldUseDarkMode, setShouldUseDarkMode] = useAtom(
         shouldUseDarkModeAtom
     );
+    const handleMediaQueryListChange = useMediaQueryListChangeHandler();
 
     useEffect(() => {
         if (shouldUseDarkMode === undefined) {
@@ -21,14 +33,16 @@ export function useShouldUseDarkModeEffects() {
         const mediaQueryList = window.matchMedia(
             '(prefers-color-scheme: dark)'
         );
-        const changeListener = (event: MediaQueryListEvent) =>
-            setShouldUseDarkMode(event.matches);
 
-        mediaQueryList.addEventListener('change', changeListener);
+        mediaQueryList.addEventListener('change', handleMediaQueryListChange);
 
-        return () =>
-            mediaQueryList.removeEventListener('change', changeListener);
-    }, [setShouldUseDarkMode]);
+        return () => {
+            mediaQueryList.removeEventListener(
+                'change',
+                handleMediaQueryListChange
+            );
+        };
+    }, [setShouldUseDarkMode, handleMediaQueryListChange]);
 
     useEffect(() => {
         if (shouldUseDarkMode === undefined) {

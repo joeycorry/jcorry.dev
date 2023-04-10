@@ -16,7 +16,7 @@ function useDebouncedSetViewport() {
     ]);
 }
 
-function useViewportChangeHandler() {
+function useWindowResizeHandler() {
     const debouncedSetViewport = useDebouncedSetViewport();
     const setBackgroundIsVisible = useSetAtom(backgroundIsVisibleAtom);
 
@@ -31,24 +31,24 @@ function useViewportChangeHandler() {
 }
 
 export function useViewportEffects() {
-    const handleViewportChange = useViewportChangeHandler();
+    const handleWindowResize = useWindowResizeHandler();
     const devicePixelRatio =
         typeof window !== 'undefined' ? window.devicePixelRatio : 1;
 
     useEffect(() => {
-        window.addEventListener('resize', handleViewportChange);
+        window.addEventListener('resize', handleWindowResize);
 
-        return () => window.removeEventListener('resize', handleViewportChange);
-    }, [handleViewportChange]);
+        return () => window.removeEventListener('resize', handleWindowResize);
+    }, [handleWindowResize]);
 
     useEffect(() => {
         const mediaQueryList = window.matchMedia(
             `(resolution: ${devicePixelRatio}dppx)`
         );
 
-        mediaQueryList.addEventListener('change', handleViewportChange);
+        mediaQueryList.addEventListener('change', handleWindowResize);
 
         return () =>
-            mediaQueryList.removeEventListener('change', handleViewportChange);
-    }, [handleViewportChange, devicePixelRatio]);
+            mediaQueryList.removeEventListener('change', handleWindowResize);
+    }, [handleWindowResize, devicePixelRatio]);
 }

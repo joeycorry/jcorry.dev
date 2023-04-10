@@ -5,7 +5,7 @@ type SetFaviconParameter = {
 };
 
 export function setFavicon({ color }: SetFaviconParameter) {
-    const canvasElement = document.createElement('canvas');
+    const canvasElement = window.document.createElement('canvas');
     const canvasContext = canvasElement.getContext('2d')!;
     canvasElement.width = 24;
     canvasElement.height = 24;
@@ -14,14 +14,15 @@ export function setFavicon({ color }: SetFaviconParameter) {
     canvasContext.fill(new Path2D('M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z'));
 
     const faviconElement =
-        document.head.querySelector<HTMLLinkElement>('link[rel="icon"]') ||
-        document.createElement('link');
+        window.document.head.querySelector<HTMLLinkElement>(
+            'link[rel="icon"]'
+        ) || window.document.createElement('link');
 
-    if (!document.head.contains(faviconElement)) {
+    if (!window.document.head.contains(faviconElement)) {
         faviconElement.rel = 'icon';
         faviconElement.type = 'image/png';
 
-        document.head.appendChild(faviconElement);
+        window.document.head.appendChild(faviconElement);
     }
 
     faviconElement.href = canvasElement.toDataURL(faviconElement.type);

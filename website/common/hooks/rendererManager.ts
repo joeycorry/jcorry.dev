@@ -4,27 +4,23 @@ import { getRendererManager } from '~/common/lib/rendererManager';
 import type { RendererManager } from '~/common/utils/rendererManager';
 
 function useVisibilityChangeHandler(rendererManager: RendererManager) {
-    const wasAnimatingWhenVisible = useRef<boolean | null>(null);
+    const wasAnimatingWhenVisibleRef = useRef<boolean | null>(null);
 
     return useCallback(() => {
-        if (
-            window.document.visibilityState === 'hidden' &&
-            rendererManager.isAnimating()
-        ) {
-            wasAnimatingWhenVisible.current = true;
+        const { visibilityState } = window.document;
+
+        if (visibilityState === 'hidden' && rendererManager.isAnimating()) {
+            wasAnimatingWhenVisibleRef.current = true;
 
             rendererManager.stopAnimation();
-        } else if (
-            window.document.visibilityState === 'visible' &&
-            wasAnimatingWhenVisible.current
-        ) {
-            if (wasAnimatingWhenVisible.current) {
+        } else if (visibilityState === 'visible') {
+            if (wasAnimatingWhenVisibleRef.current) {
                 rendererManager.startAnimation();
             }
 
-            wasAnimatingWhenVisible.current = null;
+            wasAnimatingWhenVisibleRef.current = null;
         }
-    }, [rendererManager, wasAnimatingWhenVisible]);
+    }, [rendererManager, wasAnimatingWhenVisibleRef]);
 }
 
 export function useRendererManagerEffects() {

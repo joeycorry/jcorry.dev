@@ -1,4 +1,8 @@
-import { getClampedFloat, getClampedInteger } from '~/common/utils/bounded';
+import {
+    getClampedFloat,
+    getClampedInteger,
+    getClampedPercentage,
+} from '~/common/utils/bounded';
 import type {
     RendererAnimationIterationCount,
     RendererOptions,
@@ -93,14 +97,9 @@ export class Renderer {
     }
 
     #getElapsedDurationPercentage() {
-        if (this.#animationDuration === 0) {
-            return 1;
-        }
-
-        return getClampedFloat({
-            maximum: 1,
-            value: this.#elapsedAnimationTime / this.#animationDuration,
-        });
+        return getClampedPercentage(
+            this.#elapsedAnimationTime / this.#animationDuration
+        );
     }
 
     #getTimeDelta(timestamp: number) {

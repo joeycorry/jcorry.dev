@@ -13,14 +13,15 @@ export function useColorEffects() {
     const shouldUseDarkMode = useAtomValue(shouldUseDarkModeAtom);
 
     useEffect(() => {
-        let themeColorMetaElement = document.querySelector<HTMLMetaElement>(
-            'head meta[name="theme-color"]'
-        );
+        let themeColorMetaElement =
+            window.document.querySelector<HTMLMetaElement>(
+                'head meta[name="theme-color"]'
+            );
 
         if (themeColorMetaElement === null) {
-            themeColorMetaElement = document.createElement('meta');
+            themeColorMetaElement = window.document.createElement('meta');
             themeColorMetaElement.name = 'theme-color';
-            document.head.appendChild(themeColorMetaElement);
+            window.document.head.appendChild(themeColorMetaElement);
         }
 
         themeColorMetaElement.content = color.toString();
