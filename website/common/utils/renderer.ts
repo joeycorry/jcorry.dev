@@ -6,7 +6,7 @@ import type { EasingFunction } from './easing';
 import { getDistance, getNewPosition, Position } from './geometry';
 import type { Tuple } from './tuple';
 
-export type RendererAnimationIterationCount = number | 'infinite';
+export type RendererAnimationIterationCount = number;
 
 export type RendererStartingAnimationDirection =
     | 'alternate'
@@ -18,7 +18,6 @@ export type RendererAnimationOptions = {
     duration?: number;
     iterationCount?: RendererAnimationIterationCount;
     startingDirection?: RendererStartingAnimationDirection;
-    startingPercentage?: number;
 };
 
 export type RendererOptions = {

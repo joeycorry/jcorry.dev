@@ -1,5 +1,5 @@
 import type { RenderableObject } from '~/common/lib/renderable';
-import { getClampedNumber } from '~/common/utils/bounded';
+import { getClampedFloat } from '~/common/utils/bounded';
 
 export type ShapeConstructorParameter = {
     canvasContext: CanvasRenderingContext2D;
@@ -20,9 +20,9 @@ export abstract class Shape implements RenderableObject {
         this.#fillStyle = parameter.fillStyle;
         this.#lineWidth =
             parameter.lineWidth &&
-            getClampedNumber({
-                minimum: Number.MIN_VALUE,
-                value: parameter?.lineWidth,
+            getClampedFloat({
+                minimum: Number.EPSILON,
+                value: parameter.lineWidth,
             });
         this.#strokeStyle = parameter.strokeStyle;
     }

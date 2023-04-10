@@ -1,92 +1,67 @@
-import { getClampedNumber } from '~/common/utils/bounded';
+import { getClampedFloat, getClampedPercentage } from '~/common/utils/bounded';
 
 import type { Color } from '.';
 
 type HslColorConstructorParameter = {
-    alpha?: number;
+    alphaPercentage?: number;
     hueDegrees: number;
     lightnessPercentage: number;
     saturationPercentage: number;
 };
 
 export class HslColor implements Color {
+    #alphaPercentage: number;
     #hueDegrees: number;
     #saturationPercentage: number;
     #lightnessPercentage: number;
-    #alpha: number;
 
     public constructor({
-        alpha = 1,
+        alphaPercentage = 1,
         hueDegrees,
         lightnessPercentage,
         saturationPercentage,
     }: HslColorConstructorParameter) {
-        if (alpha !== undefined && (alpha < 0 || alpha > 1)) {
-            throw new Error(
-                'Invalid alpha value. Alpha must be between 0 and 1.'
-            );
-        }
-
-        if (lightnessPercentage < 0 || lightnessPercentage > 100) {
-            throw new Error(
-                'Invalid lightness percentage. Lightness must be between 0% and 100%.'
-            );
-        }
-
-        if (saturationPercentage < 0 || saturationPercentage > 100) {
-            throw new Error(
-                'Invalid saturation percentage. Saturation must be between 0% and 100%.'
-            );
-        }
-
-        this.#alpha = alpha;
+        this.#alphaPercentage = getClampedPercentage(alphaPercentage);
         this.#hueDegrees = hueDegrees;
-        this.#lightnessPercentage = lightnessPercentage;
-        this.#saturationPercentage = saturationPercentage;
+        this.#lightnessPercentage = getClampedPercentage(lightnessPercentage);
+        this.#saturationPercentage = getClampedPercentage(saturationPercentage);
     }
 
-    public darker(percentage = 10) {
+    public darker(rawPercentage = 0.1) {
+        const percentage = getClampedFloat({
+            maximum: 1,
+            value: rawPercentage,
+        });
+
         return new HslColor({
-            alpha: this.#alpha,
+            alphaPercentage: this.#alphaPercentage,
             hueDegrees: this.#hueDegrees,
-            lightnessPercentage: getClampedNumber({
-                maximum: 100,
-                minimum: 0,
-                value: this.#lightnessPercentage * (1 - percentage / 100),
-            }),
+            lightnessPercentage: getClampedPercentage(
+                this.#lightnessPercentage * (1 - percentage)
+            ),
             saturationPercentage: this.#saturationPercentage,
         });
     }
 
-    public lighter(percentage = 10) {
+    public lighter(rawPercentage = 0.1) {
+        const percentage = getClampedFloat({
+            minimum: -1,
+            value: rawPercentage,
+        });
+
         return new HslColor({
-            alpha: this.#alpha,
+            alphaPercentage: this.#alphaPercentage,
             hueDegrees: this.#hueDegrees,
-            lightnessPercentage: getClampedNumber({
-                maximum: 100,
-                minimum: 0,
-                value: this.#lightnessPercentage * (1 + percentage / 100),
-            }),
+            lightnessPercentage: getClampedPercentage(
+                this.#lightnessPercentage * (1 + percentage)
+            ),
             saturationPercentage: this.#saturationPercentage,
         });
     }
 
     public toString() {
-        return `hsla(${this.#hueDegrees}deg, ${this.#saturationPercentage}%, ${
-            this.#lightnessPercentage
-        }%, ${this.#alpha})`;
-    }
-
-    public withAlpha(alpha: number) {
-        return new HslColor({
-            alpha: getClampedNumber({
-                maximum: 1,
-                minimum: 0,
-                value: alpha,
-            }),
-            hueDegrees: this.#hueDegrees,
-            lightnessPercentage: this.#lightnessPercentage,
-            saturationPercentage: this.#saturationPercentage,
-        });
+        return `hsla(${this.#hueDegrees}deg, ${
+            this.#saturationPercentage * 100
+        }%, ${this.#lightnessPercentage * 100}%, ${this.#alphaPercentage})`;
     }
 }

@@ -1,4 +1,3 @@
-import { getClampedNumber } from './bounded';
 import { modulo } from './math';
 
 const cosineValuesByRadians = new Map<number, number>();
@@ -24,13 +23,6 @@ export type Position<DimensionType = number> = {
     x: DimensionType;
     y: DimensionType;
 };
-
-export function clampPosition(position: Position) {
-    return {
-        x: getClampedNumber({ minimum: 0, value: position.x }),
-        y: getClampedNumber({ minimum: 0, value: position.y }),
-    };
-}
 
 export function getDistance(first: Position, second: Position) {
     return ((second.x - first.x) ** 2 + (second.y - first.y) ** 2) ** 0.5;

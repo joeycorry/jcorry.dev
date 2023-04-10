@@ -1,6 +1,10 @@
+import { getClampedPercentage } from './bounded';
+
 export type EasingFunction = (percentage: number) => number;
 
-export function easeOutBounce(percentage: number): number {
+export function easeOutBounce(rawPercentage: number): number {
+    let percentage = getClampedPercentage(rawPercentage);
+
     const n1 = 7.5625;
     const d1 = 2.75;
 
@@ -15,18 +19,22 @@ export function easeOutBounce(percentage: number): number {
     }
 }
 
-export function easeInOutBounce(percentage: number): number {
+export function easeInOutBounce(rawPercentage: number): number {
+    const percentage = getClampedPercentage(rawPercentage);
+
     return percentage < 0.5
         ? (1 - easeOutBounce(1 - 2 * percentage)) / 2
         : (1 + easeOutBounce(2 * percentage - 1)) / 2;
 }
 
-export function easeInOutCubic(percentage: number): number {
+export function easeInOutCubic(rawPercentage: number): number {
+    const percentage = getClampedPercentage(rawPercentage);
+
     return percentage < 0.5
         ? 4 * Math.pow(percentage, 3)
         : 1 - Math.pow(-2 * percentage + 2, 3) / 2;
 }
 
 export function linear(percentage: number): number {
-    return percentage;
+    return getClampedPercentage(percentage);
 }

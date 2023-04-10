@@ -1,4 +1,4 @@
-import { getClampedNumber } from '~/common/utils/bounded';
+import { getClampedFloat, getClampedInteger } from '~/common/utils/bounded';
 import type {
     RendererAnimationIterationCount,
     RendererOptions,
@@ -31,21 +31,17 @@ export class Renderer {
             this.#startingAnimationDirection === 'alternate'
                 ? 'forward'
                 : 'backward';
-        const animationStartingPercentage = getClampedNumber({
-            minimum: 0,
-            maximum: 1,
-            value:
-                options?.animation?.startingPercentage ??
-                (this.#animationDirection === 'forward' ? 0 : 1),
-        });
-        this.#animationDuration = getClampedNumber({
-            minimum: 0,
-            value: options?.animation?.duration ?? 0,
+        this.#animationDuration = getClampedFloat({
+            minimum: 1,
+            value: options?.animation?.duration ?? 400,
         });
         this.#elapsedAnimationTime =
-            animationStartingPercentage * this.#animationDuration;
-        this.#remainingAnimationIterationCount =
-            options?.animation?.iterationCount ?? 1;
+            (this.#animationDirection === 'forward' ? 0 : 1) *
+            this.#animationDuration;
+        this.#remainingAnimationIterationCount = getClampedInteger({
+            minimum: 1,
+            value: options?.animation?.iterationCount ?? 1,
+        });
     }
 
     public isFinished() {
@@ -80,9 +76,7 @@ export class Renderer {
         this.#lastTimestamp = timestamp;
 
         if (this.#hasFinishedCurrentIteration()) {
-            if (this.#remainingAnimationIterationCount !== 'infinite') {
-                this.#remainingAnimationIterationCount -= 1;
-            }
+            this.#remainingAnimationIterationCount -= 1;
 
             if (
                 this.#startingAnimationDirection === 'alternate' ||
@@ -103,7 +97,7 @@ export class Renderer {
             return 1;
         }
 
-        return getClampedNumber({
+        return getClampedFloat({
             maximum: 1,
             value: this.#elapsedAnimationTime / this.#animationDuration,
         });

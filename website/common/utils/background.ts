@@ -50,7 +50,7 @@ function getBackgroundRendererControls({
                 duration:
                     Math.max(firstLength, secondLength) *
                     getBoundedRandomInteger({ minimum: 8, maximum: 12 }),
-                iterationCount: 'infinite',
+                iterationCount: Number.POSITIVE_INFINITY,
                 startingDirection:
                     Math.random() < 0.5 ? 'alternate' : 'alternate-reverse',
             },

@@ -26,8 +26,8 @@ export function getColorVariantsByName({
         };
     }
 
-    const darkerColor = color.darker(50);
-    const lighterColor = color.lighter(66);
+    const darkerColor = color.darker(0.5);
+    const lighterColor = color.lighter(0.66);
 
     return {
         primaryColor: shouldUseDarkMode ? lighterColor : darkerColor,
@@ -64,12 +64,12 @@ export function getColorVariantCssValuesByName({
 const presetColorsByTechName = new Map<TechName, Color>(
     (
         [
-            ['JavaScript', [53.4, 93.1, 50]],
-            ['Ruby', [0, 100, 50]],
-            ['TypeScript', [218, 50, 50]],
-            ['React', [198.4, 90.2, 50]],
-            ['Rails', [10, 82, 50]],
-            ['Node', [118.4, 39.9, 50]],
+            ['JavaScript', [53.4, 0.931, 0.5]],
+            ['Ruby', [0, 1, 0.5]],
+            ['TypeScript', [218, 0.5, 0.5]],
+            ['React', [198.4, 0.902, 0.5]],
+            ['Rails', [10, 0.82, 0.5]],
+            ['Node', [118.4, 0.399, 0.5]],
         ] as const
     ).map(([name, [hueDegrees, saturationPercentage, lightnessPercentage]]) => [
         name,
