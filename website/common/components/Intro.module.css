@@ -33,9 +33,3 @@
 .job-title {
     font-weight: 100;
 }
-
-h1,
-.tech-name,
-.job-title {
-    transition: color 0.4s;
-}

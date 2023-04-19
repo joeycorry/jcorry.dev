@@ -1,7 +1,6 @@
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { useCallback, useEffect } from 'react';
 
-import { backgroundIsVisibleAtom } from '~/common/atoms/background';
 import {
     techNameAnimationDataAtom,
     techNameAnimationIsFinishedAtom,
@@ -20,7 +19,6 @@ export function useTechNameAnimationStarter() {
     const techNameAnimationIsFinished = useAtomValue(
         techNameAnimationIsFinishedAtom
     );
-    const setBackgroundIsVisible = useSetAtom(backgroundIsVisibleAtom);
     const setNextTechNameAnimationData = useNoArgumentSetAtom(
         techNameAnimationDataAtom
     );
@@ -30,13 +28,8 @@ export function useTechNameAnimationStarter() {
             return;
         }
 
-        setBackgroundIsVisible(false);
         setNextTechNameAnimationData();
-    }, [
-        techNameAnimationIsFinished,
-        setBackgroundIsVisible,
-        setNextTechNameAnimationData,
-    ]);
+    }, [techNameAnimationIsFinished, setNextTechNameAnimationData]);
 }
 
 function useTechNameAnimationStepper() {

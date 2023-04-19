@@ -24,8 +24,6 @@
     -webkit-font-smoothing: antialiased;
 
     background-color: var(--secondary-color);
-
-    transition: background-color 0.4s;
 }
 
 @media (min-width: 300px) {

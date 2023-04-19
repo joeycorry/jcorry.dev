@@ -1,10 +1,10 @@
-import type { Color } from '~/common/lib/color';
 import type { Renderer } from '~/common/lib/renderer';
 import { getRendererManager } from '~/common/lib/rendererManager';
 
 import { getArrayElementAtIndex } from './array';
 import type { Bounds } from './bounded';
 import { getBoundedRandomInteger } from './bounded';
+import type { ColorVariantCssName } from './color';
 import { EasingFunction } from './easing';
 import { evaluateFunction } from './function';
 import type { Position } from './geometry';
@@ -13,7 +13,7 @@ import { createMovingTrapezoidRenderer } from './renderer';
 
 type GetBackgroundRendererControlsParameter = {
     canvasContext: CanvasRenderingContext2D;
-    color: Color;
+    colorVariantCssName: ColorVariantCssName;
     directionAngle: number;
     easingFunction: EasingFunction;
     firstRibbonLineStartingPosition: Position;
@@ -24,7 +24,7 @@ type GetBackgroundRendererControlsParameter = {
 
 function getBackgroundRendererControls({
     canvasContext,
-    color,
+    colorVariantCssName,
     directionAngle,
     easingFunction,
     firstRibbonLineStartingPosition,
@@ -56,7 +56,7 @@ function getBackgroundRendererControls({
             },
             canvasContext,
             easingFunction,
-            fillColor: color,
+            colorVariantCssName,
             parallelLineDataPair: [
                 {
                     length: firstLength,
@@ -67,7 +67,6 @@ function getBackgroundRendererControls({
                     startingPosition: secondRibbonLineStartingPosition,
                 },
             ],
-            strokeColor: color,
         });
 
         rendererManager.addRenderer(maybeRenderer);
@@ -87,7 +86,7 @@ function getBackgroundRendererControls({
 
 type SetupBackgroundRenderersParameter = {
     canvasContext: CanvasRenderingContext2D;
-    color: Color;
+    colorVariantCssName: ColorVariantCssName;
     easingFunction: EasingFunction;
     ribbonWidthBounds: Bounds;
     viewport: {
@@ -98,7 +97,7 @@ type SetupBackgroundRenderersParameter = {
 
 export function setupBackgroundRenderers({
     canvasContext,
-    color,
+    colorVariantCssName,
     easingFunction,
     ribbonWidthBounds,
     viewport,
@@ -125,7 +124,7 @@ export function setupBackgroundRenderers({
         const { addToManager, removeFromManager } =
             getBackgroundRendererControls({
                 canvasContext,
-                color,
+                colorVariantCssName,
                 directionAngle: -xAxisAdjacentAngle,
                 easingFunction,
                 firstRibbonLineStartingPosition: {
@@ -162,7 +161,7 @@ export function setupBackgroundRenderers({
         const { addToManager, removeFromManager } =
             getBackgroundRendererControls({
                 canvasContext,
-                color,
+                colorVariantCssName,
                 directionAngle: Math.PI - xAxisAdjacentAngle,
                 easingFunction,
                 firstRibbonLineStartingPosition: {

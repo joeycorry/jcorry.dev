@@ -7,8 +7,6 @@ import { setupBackgroundRenderers } from '~/common/utils/background';
 import { linear } from '~/common/utils/easing';
 import { evaluateFunction } from '~/common/utils/function';
 
-import { useColorVariantsByName } from './color';
-
 type UseEffectsParameter = {
     canvasElementRef: RefObject<HTMLCanvasElement>;
 };
@@ -16,7 +14,6 @@ type UseEffectsParameter = {
 export function useBackgroundEffects({
     canvasElementRef,
 }: UseEffectsParameter) {
-    const { primaryColor, tertiaryColor } = useColorVariantsByName();
     const setBackgroundIsVisible = useSetAtom(backgroundIsVisibleAtom);
     const viewport = useAtomValue(viewportAtom);
 
@@ -49,14 +46,14 @@ export function useBackgroundEffects({
         const backgroundRenderersRemovers = [
             setupBackgroundRenderers({
                 canvasContext,
-                color: primaryColor,
+                colorVariantCssName: '--primary-color',
                 easingFunction,
                 ribbonWidthBounds: { minimum: 50, maximum: 80 },
                 viewport,
             }),
             setupBackgroundRenderers({
                 canvasContext,
-                color: tertiaryColor,
+                colorVariantCssName: '--tertiary-color',
                 easingFunction,
                 ribbonWidthBounds: { minimum: 30, maximum: 60 },
                 viewport,
@@ -66,11 +63,5 @@ export function useBackgroundEffects({
         setBackgroundIsVisible(true);
 
         return () => backgroundRenderersRemovers.forEach(evaluateFunction);
-    }, [
-        canvasElementRef,
-        primaryColor,
-        setBackgroundIsVisible,
-        tertiaryColor,
-        viewport,
-    ]);
+    }, [canvasElementRef, setBackgroundIsVisible, viewport]);
 }

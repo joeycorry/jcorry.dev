@@ -33,7 +33,7 @@
     height: 5em;
     width: 5em;
 
-    transition: stroke 0.4s, fill 0.4s;
+    stroke: var(--primary-color);
 }
 
 @media (min-width: 300px) {

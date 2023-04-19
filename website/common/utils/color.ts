@@ -14,7 +14,7 @@ type ColorVariantsByName = {
     [K in ColorVariantName]: Color;
 };
 
-export function getColorVariantsByName({
+function getColorVariantsByName({
     color,
     shouldUseDarkMode,
 }: GetColorVariantsByNameParameter): ColorVariantsByName {
@@ -38,13 +38,13 @@ export function getColorVariantsByName({
 
 type GetColorVariantCssValuesByNameParameter = GetColorVariantsByNameParameter;
 
-type ColorVariantCssValueName = `--${
+export type ColorVariantCssName = `--${
     | 'primary'
     | 'secondary'
     | 'tertiary'}-color`;
 
 export type ColorVariantCssValuesByName = {
-    [K in ColorVariantCssValueName]: string;
+    [K in ColorVariantCssName]: string;
 };
 
 export function getColorVariantCssValuesByName({

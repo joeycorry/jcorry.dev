@@ -4,7 +4,6 @@ import { Pause, Play } from 'react-feather';
 
 import { techNameAnimationShouldRepeatAtom } from '~/common/atoms/techName';
 import { useNoArgumentSetAtom } from '~/common/hooks/atom';
-import { useColorVariantCssValuesByName } from '~/common/hooks/color';
 import { useTechNameAnimationStarter } from '~/common/hooks/techName';
 
 function usePlayPauseButtonClickHandler() {
@@ -33,8 +32,6 @@ function UnmemoizedPlayPauseButton() {
     const techNameAnimationShouldRepeat = useAtomValue(
         techNameAnimationShouldRepeatAtom
     );
-    const primaryColorCssValue =
-        useColorVariantCssValuesByName()['--primary-color'];
     const handlePlayPauseButtonClick = usePlayPauseButtonClickHandler();
     const [title, Icon] = techNameAnimationShouldRepeat
         ? ['Pause Color Changes', Pause]
@@ -42,7 +39,7 @@ function UnmemoizedPlayPauseButton() {
 
     return (
         <button title={title} onClick={handlePlayPauseButtonClick}>
-            <Icon stroke={primaryColorCssValue} />
+            <Icon />
         </button>
     );
 }

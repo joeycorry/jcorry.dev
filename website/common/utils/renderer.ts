@@ -1,7 +1,7 @@
-import type { Color } from '~/common/lib/color';
 import { Renderer } from '~/common/lib/renderer';
 import { Trapezoid } from '~/common/lib/shape/trapezoid';
 
+import type { ColorVariantCssName } from './color';
 import type { EasingFunction } from './easing';
 import { getDistance, getNewPosition, Position } from './geometry';
 import type { Tuple } from './tuple';
@@ -27,9 +27,9 @@ export type RendererOptions = {
 type CreateMovingTrapezoidRendererParameter = RendererOptions & {
     angle: number;
     canvasContext: CanvasRenderingContext2D;
+    colorVariantCssName: ColorVariantCssName;
     counterClockwise?: boolean;
     easingFunction: EasingFunction;
-    fillColor: Color;
     lineWidth?: number;
     parallelLineDataPair: Tuple<
         {
@@ -38,18 +38,16 @@ type CreateMovingTrapezoidRendererParameter = RendererOptions & {
         },
         2
     >;
-    strokeColor: Color;
 };
 
 export function createMovingTrapezoidRenderer({
     angle,
     canvasContext,
+    colorVariantCssName,
     counterClockwise,
     easingFunction,
-    fillColor,
     lineWidth,
     parallelLineDataPair,
-    strokeColor,
     ...rendererOptions
 }: CreateMovingTrapezoidRendererParameter) {
     const [firstStartingPosition, secondStartingPosition] =
@@ -71,10 +69,13 @@ export function createMovingTrapezoidRenderer({
     const firstYDistance = firstEndPosition.y - firstStartingPosition.y;
     const secondXDistance = secondEndPosition.x - secondStartingPosition.x;
     const secondYDistance = secondEndPosition.y - secondStartingPosition.y;
-    const fillStyle = fillColor.toString();
-    const strokeStyle = strokeColor.toString();
+    const rootElement = window.document.documentElement;
 
     return new Renderer(elapsedDurationPercentage => {
+        const fillStyle =
+            rootElement.style.getPropertyValue(colorVariantCssName);
+        const strokeStyle =
+            rootElement.style.getPropertyValue(colorVariantCssName);
         const distancePercentage =
             2 * easingFunction(elapsedDurationPercentage);
         const firstLineData =

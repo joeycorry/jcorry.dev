@@ -1,12 +1,9 @@
 import { useAtomValue } from 'jotai';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 
 import { colorAtom } from '~/common/atoms/color';
 import { shouldUseDarkModeAtom } from '~/common/atoms/shouldUseDarkMode';
-import {
-    getColorVariantCssValuesByName,
-    getColorVariantsByName,
-} from '~/common/utils/color';
+import { getColorVariantCssValuesByName } from '~/common/utils/color';
 
 export function useColorEffects() {
     const color = useAtomValue(colorAtom);
@@ -40,24 +37,4 @@ export function useColorEffects() {
             rootElement.style.setProperty(name, value);
         }
     }, [color, shouldUseDarkMode]);
-}
-
-export function useColorVariantsByName() {
-    const color = useAtomValue(colorAtom);
-    const shouldUseDarkMode = useAtomValue(shouldUseDarkModeAtom);
-
-    return useMemo(
-        () => getColorVariantsByName({ color, shouldUseDarkMode }),
-        [color, shouldUseDarkMode]
-    );
-}
-
-export function useColorVariantCssValuesByName() {
-    const color = useAtomValue(colorAtom);
-    const shouldUseDarkMode = useAtomValue(shouldUseDarkModeAtom);
-
-    return getColorVariantCssValuesByName({
-        color,
-        shouldUseDarkMode,
-    });
 }
