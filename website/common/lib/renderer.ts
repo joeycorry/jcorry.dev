@@ -18,8 +18,8 @@ type SetAnimationPercentageOptions = {
 };
 
 export class Renderer implements RenderableObject {
-    #animationDirection: 'forward' | 'backward';
     #animationDuration: number;
+    #currentAnimationDirection: 'forward' | 'backward';
     #currentAnimationTime: number;
     #getNextRenderables: GetNextRenderables;
     #lastRenderables: Renderable[] = [];
@@ -34,7 +34,7 @@ export class Renderer implements RenderableObject {
         this.#getNextRenderables = getNextRenderables;
         this.#startingAnimationDirection =
             options?.animation?.startingDirection ?? 'forward';
-        this.#animationDirection =
+        this.#currentAnimationDirection =
             this.#startingAnimationDirection === 'forward' ||
             this.#startingAnimationDirection === 'alternate'
                 ? 'forward'
@@ -44,7 +44,7 @@ export class Renderer implements RenderableObject {
             value: options?.animation?.duration ?? 400,
         });
         this.#currentAnimationTime =
-            (this.#animationDirection === 'forward' ? 0 : 1) *
+            (this.#currentAnimationDirection === 'forward' ? 0 : 1) *
             this.#animationDuration;
         this.#remainingAnimationIterationCount = getClampedInteger({
             minimum: 1,
@@ -102,7 +102,7 @@ export class Renderer implements RenderableObject {
         );
         this.#currentAnimationTime =
             (!shouldConvertPercentageForDirection ||
-            this.#animationDirection === 'forward'
+            this.#currentAnimationDirection === 'forward'
                 ? animationPercentage
                 : 1 - animationPercentage) * this.#animationDuration;
         this.#lastTimestamp = performance.now();
@@ -111,13 +111,17 @@ export class Renderer implements RenderableObject {
     public setTimestamp(timestamp: number) {
         const timeDelta = this.#getTimeDelta(timestamp);
         this.#currentAnimationTime +=
-            this.#animationDirection === 'forward' ? timeDelta : -timeDelta;
+            this.#currentAnimationDirection === 'forward'
+                ? timeDelta
+                : -timeDelta;
         this.#lastTimestamp = timestamp;
     }
 
     public toggleAnimationDirection() {
-        this.#animationDirection =
-            this.#animationDirection === 'forward' ? 'backward' : 'forward';
+        this.#currentAnimationDirection =
+            this.#currentAnimationDirection === 'forward'
+                ? 'backward'
+                : 'forward';
     }
 
     #getCurrentAnimationPercentage() {
@@ -133,7 +137,7 @@ export class Renderer implements RenderableObject {
     }
 
     #hasFinishedCurrentIteration() {
-        return this.#animationDirection === 'forward'
+        return this.#currentAnimationDirection === 'forward'
             ? this.#animationDuration <= this.#currentAnimationTime
             : this.#currentAnimationTime <= 0;
     }
