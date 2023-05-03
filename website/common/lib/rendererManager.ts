@@ -93,7 +93,8 @@ class RendererManager {
 
     #renderFrame(timestamp: number) {
         for (const renderer of this.#renderers) {
-            renderer.render(timestamp);
+            renderer.setTimestamp(timestamp);
+            renderer.render();
         }
     }
 

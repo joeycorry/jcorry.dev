@@ -9,11 +9,11 @@ import type {
     RendererStartingAnimationDirection,
 } from '~/common/utils/renderer';
 
-import { Renderable } from './renderable';
+import type { Renderable, RenderableObject } from './renderable';
 
 type GetNextRenderables = (elapsedDurationPercentage: number) => Renderable[];
 
-export class Renderer {
+export class Renderer implements RenderableObject {
     #animationDirection: 'forward' | 'backward';
     #animationDuration: number;
     #elapsedAnimationTime: number;
@@ -60,10 +60,7 @@ export class Renderer {
         }
     }
 
-    public render(timestamp: number) {
-        const timeDelta = this.#getTimeDelta(timestamp);
-        this.#elapsedAnimationTime +=
-            this.#animationDirection === 'forward' ? timeDelta : -timeDelta;
+    public render() {
         const nextRenderables = this.#getNextRenderables(
             this.#getElapsedDurationPercentage()
         );
@@ -77,7 +74,6 @@ export class Renderer {
         }
 
         this.#lastRenderables = nextRenderables;
-        this.#lastTimestamp = timestamp;
 
         if (this.#hasFinishedCurrentIteration()) {
             this.#remainingAnimationIterationCount -= 1;
@@ -89,6 +85,13 @@ export class Renderer {
                 this.toggleAnimationDirection();
             }
         }
+    }
+
+    public setTimestamp(timestamp: number) {
+        const timeDelta = this.#getTimeDelta(timestamp);
+        this.#elapsedAnimationTime +=
+            this.#animationDirection === 'forward' ? timeDelta : -timeDelta;
+        this.#lastTimestamp = timestamp;
     }
 
     public toggleAnimationDirection() {
