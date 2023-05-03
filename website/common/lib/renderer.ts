@@ -11,12 +11,16 @@ import type {
 
 import type { Renderable, RenderableObject } from './renderable';
 
-type GetNextRenderables = (elapsedDurationPercentage: number) => Renderable[];
+type GetNextRenderables = (currentAnimationPercentage: number) => Renderable[];
+
+type SetAnimationPercentageOptions = {
+    shouldConvertPercentageForDirection?: boolean;
+};
 
 export class Renderer implements RenderableObject {
     #animationDirection: 'forward' | 'backward';
     #animationDuration: number;
-    #elapsedAnimationTime: number;
+    #currentAnimationTime: number;
     #getNextRenderables: GetNextRenderables;
     #lastRenderables: Renderable[] = [];
     #lastTimestamp?: number;
@@ -39,7 +43,7 @@ export class Renderer implements RenderableObject {
             minimum: 1,
             value: options?.animation?.duration ?? 400,
         });
-        this.#elapsedAnimationTime =
+        this.#currentAnimationTime =
             (this.#animationDirection === 'forward' ? 0 : 1) *
             this.#animationDuration;
         this.#remainingAnimationIterationCount = getClampedInteger({
@@ -62,7 +66,7 @@ export class Renderer implements RenderableObject {
 
     public render() {
         const nextRenderables = this.#getNextRenderables(
-            this.#getElapsedDurationPercentage()
+            this.#getCurrentAnimationPercentage()
         );
 
         for (const renderable of nextRenderables) {
@@ -87,9 +91,26 @@ export class Renderer implements RenderableObject {
         }
     }
 
+    public setAnimationPercentage(
+        rawAnimationPercentage: number,
+        {
+            shouldConvertPercentageForDirection = true,
+        }: SetAnimationPercentageOptions = {}
+    ) {
+        const animationPercentage = getClampedPercentage(
+            rawAnimationPercentage
+        );
+        this.#currentAnimationTime =
+            (!shouldConvertPercentageForDirection ||
+            this.#animationDirection === 'forward'
+                ? animationPercentage
+                : 1 - animationPercentage) * this.#animationDuration;
+        this.#lastTimestamp = performance.now();
+    }
+
     public setTimestamp(timestamp: number) {
         const timeDelta = this.#getTimeDelta(timestamp);
-        this.#elapsedAnimationTime +=
+        this.#currentAnimationTime +=
             this.#animationDirection === 'forward' ? timeDelta : -timeDelta;
         this.#lastTimestamp = timestamp;
     }
@@ -99,9 +120,9 @@ export class Renderer implements RenderableObject {
             this.#animationDirection === 'forward' ? 'backward' : 'forward';
     }
 
-    #getElapsedDurationPercentage() {
+    #getCurrentAnimationPercentage() {
         return getClampedPercentage(
-            this.#elapsedAnimationTime / this.#animationDuration
+            this.#currentAnimationTime / this.#animationDuration
         );
     }
 
@@ -113,7 +134,7 @@ export class Renderer implements RenderableObject {
 
     #hasFinishedCurrentIteration() {
         return this.#animationDirection === 'forward'
-            ? this.#animationDuration <= this.#elapsedAnimationTime
-            : this.#elapsedAnimationTime <= 0;
+            ? this.#animationDuration <= this.#currentAnimationTime
+            : this.#currentAnimationTime <= 0;
     }
 }

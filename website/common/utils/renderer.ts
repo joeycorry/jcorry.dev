@@ -72,13 +72,13 @@ export function createMovingTrapezoidRenderer({
     const secondYDistance = secondEndPosition.y - secondStartingPosition.y;
     const rootElement = window.document.documentElement;
 
-    return new Renderer(elapsedDurationPercentage => {
+    return new Renderer(currentAnimationPercentage => {
         const fillStyle =
             rootElement.style.getPropertyValue(colorVariantCssName);
         const strokeStyle =
             rootElement.style.getPropertyValue(colorVariantCssName);
         const distancePercentage =
-            2 * easingFunction(elapsedDurationPercentage);
+            2 * easingFunction(currentAnimationPercentage);
         const firstLineData =
             distancePercentage < 1
                 ? {
