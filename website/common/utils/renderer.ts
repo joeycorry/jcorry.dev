@@ -3,7 +3,8 @@ import { Trapezoid } from '~/common/lib/shape/trapezoid';
 
 import type { ColorVariantCssName } from './color';
 import type { EasingFunction } from './easing';
-import { getDistance, getNewPosition, Position } from './geometry';
+import type { Position } from './geometry';
+import { getDistance, getNewPosition } from './geometry';
 import type { Tuple } from './tuple';
 
 export type RendererAnimationIterationCount = number;

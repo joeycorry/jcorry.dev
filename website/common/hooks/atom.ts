@@ -1,4 +1,5 @@
-import { useSetAtom, WritableAtom } from 'jotai';
+import type { WritableAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 
 export function useNoArgumentSetAtom<
     Value,

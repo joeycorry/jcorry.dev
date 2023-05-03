@@ -1,5 +1,6 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { RefObject, useEffect } from 'react';
+import type { RefObject } from 'react';
+import { useEffect } from 'react';
 
 import { backgroundIsVisibleAtom } from '~/common/atoms/background';
 import { viewportAtom } from '~/common/atoms/viewport';

@@ -1,7 +1,9 @@
-import { getNewPosition, Position } from '~/common/utils/geometry';
+import type { Position } from '~/common/utils/geometry';
+import { getNewPosition } from '~/common/utils/geometry';
 import type { Tuple } from '~/common/utils/tuple';
 
-import { Shape, ShapeConstructorParameter } from '.';
+import type { ShapeConstructorParameter } from '.';
+import { Shape } from '.';
 
 type TrapezoidGetPositionsParameter = {
     angle: number;

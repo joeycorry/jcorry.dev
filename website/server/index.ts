@@ -1,5 +1,6 @@
 import compression from 'compression';
-import express, { Response } from 'express';
+import type { Response } from 'express';
+import express from 'express';
 import { URL } from 'url';
 import type { UserConfig } from 'vite';
 import { renderPage } from 'vite-plugin-ssr/server';

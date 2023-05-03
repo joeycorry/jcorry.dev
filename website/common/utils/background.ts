@@ -5,7 +5,7 @@ import { getArrayElementAtIndex } from './array';
 import type { Bounds } from './bounded';
 import { getBoundedRandomInteger } from './bounded';
 import type { ColorVariantCssName } from './color';
-import { EasingFunction } from './easing';
+import type { EasingFunction } from './easing';
 import { evaluateFunction } from './function';
 import type { Position } from './geometry';
 import { getSineOfRadians } from './geometry';

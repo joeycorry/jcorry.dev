@@ -5,7 +5,7 @@ import { getCookie } from '~/common/utils/cookie';
 import type { JotaiStoreAtomSetValueParametersByName } from '~/common/utils/jotaiStore';
 import { createJotaiStore } from '~/common/utils/jotaiStore';
 import { getRandomTechName } from '~/common/utils/techName';
-import {
+import type {
     ServerOnBeforeRenderResult,
     ServerPageContext,
 } from '~/renderer/types';
