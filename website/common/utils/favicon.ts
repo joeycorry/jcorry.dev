@@ -1,4 +1,4 @@
-import type { Color } from '~/common/lib/color';
+import type { Color } from '~/common/lib/colors/color';
 
 type SetFaviconParameter = {
     color: Color;

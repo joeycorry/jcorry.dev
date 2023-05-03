@@ -1,5 +1,5 @@
 import { Renderer } from '~/common/lib/renderer';
-import { Trapezoid } from '~/common/lib/shape/trapezoid';
+import { Trapezoid } from '~/common/lib/shapes/trapezoid';
 
 import type { ColorVariantCssName } from './color';
 import type { EasingFunction } from './easing';

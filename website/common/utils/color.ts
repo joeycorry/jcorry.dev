@@ -1,5 +1,5 @@
-import type { Color } from '~/common/lib/color';
-import { HslColor } from '~/common/lib/color/hslColor';
+import type { Color } from '~/common/lib/colors/color';
+import { HslColor } from '~/common/lib/colors/hslColor';
 
 import type { TechName } from './techName';
 

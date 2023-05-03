@@ -1,6 +1,6 @@
 import { getClampedFloat, getClampedPercentage } from '~/common/utils/bounded';
 
-import type { Color } from '.';
+import type { Color } from './color';
 
 type HslColorConstructorParameter = {
     alphaPercentage?: number;
