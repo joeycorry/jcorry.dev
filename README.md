@@ -60,21 +60,3 @@ docker compose up --build -d
 
 # The website will now be available at https://jcorry-dev.local
 ```
-
-#### Optional
-
-- Yarn v1.22.19 or later (or NPM v8.19.3 or later)
-
-##### Yarn
-
-```
-# Install dev dependencies
-yarn --dev
-```
-
-##### NPM
-
-```
-# Install dev dependencies
-npm install
-```
