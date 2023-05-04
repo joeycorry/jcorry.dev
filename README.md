@@ -1,23 +1,23 @@
-# <a href="https://jcorry.dev" target="_blank">jcorry.dev</a>
+# [jcorry.dev](https://jcorry.dev)
 
 ## Tech Stack
 
-- <a href="https://typescriptlang.org" target="_blank">TypeScript</a>
-- <a href="https://react.dev" target="_blank">React</a>
-- <a href="https://jotai.org" target="_blank">Jotai</a>
-- <a href="https://nodejs.org" target="_blank">Node.js</a>
-- <a href="https://expressjs.com" target="_blank">Express</a>
-- <a href="https://vitejs.dev" target="_blank">Vite</a>
-- <a href="https://vite-plugin-ssr.com" target="_blank">vite-plugin-ssr</a>
-- <a href="https://www.docker.com" target="_blank">Docker</a>
-- <a href="https://caddyserver.com" target="_blank">Caddy</a>
+- [TypeScript](https://typescriptlang.org)
+- [React](https://reactjs.org)
+- [Node.js](https://nodejs.org/)
+- [Jotai](https://jotai.org)
+- [Express](https://expressjs.com)
+- [Vite](https://vitejs.dev)
+- [vite-plugin-ssr](https://vite-plugin-ssr.com)
+- [Docker](https://www.docker.com/)
+- [Caddy](https://caddyserver.com/)
 
 ## Setup for local environment
 
 ### Prerequisites (HTTP)
 
 - Node.js v18.13.0 or later
-- <a href="https://classic.yarnpkg.com" target="_blank">Yarn</a> v1.22.19 or later (or <a href="https://www.npmjs.com" target="_blank">NPM</a> v8.19.3 or later)
+- [Yarn](https://yarnpkg.com/) v1.22.19 or later (or [NPM](https://www.npmjs.com) v8.19.3 or later)
 
 #### Yarn
 
@@ -41,9 +41,9 @@ popd
 
 Lower versions of the prerequisites listed below may work. For a given prerequisite, the provided base version is a version that has been explicitly verified to work for this repository.
 
-- <a href="https://mkcert.dev" target="_blank">mkcert</a> v1.4.4 or later
-- Docker v20.10.22 or later
-- <a href="https://docs.docker.com/compose" target="_blank">Docker Compose<a> v2.15.1 or later
+- [mkcert](https://mkcert.dev/) v1.4.4 or later
+- [Docker](https://www.docker.com/) v20.10.22 or later
+- [Docker Compose](https://docs.docker.com/compose/) v2.15.1 or later
 
 ```
 # Add jcorry-dev.local to your Hosts file
