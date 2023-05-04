@@ -15,15 +15,71 @@ export type RendererStartingAnimationDirection =
     | 'backward'
     | 'forward';
 
-export type RendererAnimationOptions = {
-    duration?: number;
-    iterationCount?: RendererAnimationIterationCount;
-    startingDirection?: RendererStartingAnimationDirection;
+export type RendererOptions = {
+    animationDuration?: number;
+    animationIterationCount?: RendererAnimationIterationCount;
+    animationStartingDirection?: RendererStartingAnimationDirection;
 };
 
-export type RendererOptions = {
-    animation?: RendererAnimationOptions;
+type CreateCompositeRendererParameter = Pick<
+    RendererOptions,
+    'animationIterationCount'
+> & {
+    renderersByStartingTime: Map<number, Renderer>;
 };
+
+export function createCompositeRenderer({
+    renderersByStartingTime,
+    ...rendererOptions
+}: CreateCompositeRendererParameter) {
+    const compositeRendererTotalDuration = [
+        ...renderersByStartingTime.values(),
+    ].reduce(
+        (compositeRendererTotalDuration_, renderer) =>
+            compositeRendererTotalDuration_ + renderer.getTotalDuration(),
+        0
+    );
+
+    return new Renderer(
+        ({ totalElapsedTime: compositeRendererTotalElapsedTime }) => {
+            const currentlyAnimatingRenderers: Renderer[] = [];
+
+            for (const [startingTime, renderer] of renderersByStartingTime) {
+                if (
+                    compositeRendererTotalElapsedTime < startingTime ||
+                    startingTime + renderer.getTotalDuration() <
+                        compositeRendererTotalElapsedTime
+                ) {
+                    continue;
+                }
+
+                const elapsedAnimationIterationCount =
+                    renderer.getElapsedAnimationIterationCount();
+                const animationDuration = renderer.getAnimationDuration();
+                const totalElapsedTime =
+                    compositeRendererTotalElapsedTime - startingTime;
+                let rawAnimationPercentage =
+                    totalElapsedTime / animationDuration -
+                    elapsedAnimationIterationCount;
+
+                while (rawAnimationPercentage >= 1) {
+                    rawAnimationPercentage--;
+
+                    renderer.onIterationFinish();
+                }
+
+                renderer.setAnimationPercentage(rawAnimationPercentage);
+                currentlyAnimatingRenderers.push(renderer);
+            }
+
+            return currentlyAnimatingRenderers;
+        },
+        {
+            ...rendererOptions,
+            animationDuration: compositeRendererTotalDuration,
+        }
+    );
+}
 
 type CreateMovingTrapezoidRendererParameter = RendererOptions & {
     angle: number;
@@ -72,7 +128,7 @@ export function createMovingTrapezoidRenderer({
     const secondYDistance = secondEndPosition.y - secondStartingPosition.y;
     const rootElement = window.document.documentElement;
 
-    return new Renderer(currentAnimationPercentage => {
+    return new Renderer(({ currentAnimationPercentage }) => {
         const fillStyle =
             rootElement.style.getPropertyValue(colorVariantCssName);
         const strokeStyle =

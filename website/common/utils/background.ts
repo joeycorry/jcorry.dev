@@ -6,12 +6,17 @@ import type { Bounds } from './bounded';
 import { getBoundedRandomInteger } from './bounded';
 import type { ColorVariantCssName } from './color';
 import type { EasingFunction } from './easing';
-import { evaluateFunction } from './function';
 import type { Position } from './geometry';
 import { getSineOfRadians } from './geometry';
-import { createMovingTrapezoidRenderer } from './renderer';
+import {
+    createCompositeRenderer,
+    createMovingTrapezoidRenderer,
+} from './renderer';
+import type { Viewport } from './viewport';
 
-type GetBackgroundRendererControlsParameter = {
+type GetBackgroundRendererParameter = {
+    animationDurationScalar: number;
+    animationStartingDirection: 'alternate' | 'alternate-reverse';
     canvasContext: CanvasRenderingContext2D;
     colorVariantCssName: ColorVariantCssName;
     directionAngle: number;
@@ -22,7 +27,9 @@ type GetBackgroundRendererControlsParameter = {
     xAxisAdjacentAngle: number;
 };
 
-function getBackgroundRendererControls({
+function getBackgroundRenderer({
+    animationDurationScalar,
+    animationStartingDirection,
     canvasContext,
     colorVariantCssName,
     directionAngle,
@@ -31,57 +38,59 @@ function getBackgroundRendererControls({
     getYLength,
     secondRibbonLineStartingPosition,
     xAxisAdjacentAngle,
-}: GetBackgroundRendererControlsParameter) {
-    const rendererManager = getRendererManager();
+}: GetBackgroundRendererParameter) {
     const sineOfXAxisAdjacentAngle = getSineOfRadians(xAxisAdjacentAngle);
-    let maybeRenderer: Renderer | undefined;
+    const firstLength =
+        getYLength(firstRibbonLineStartingPosition) / sineOfXAxisAdjacentAngle;
+    const secondLength =
+        getYLength(secondRibbonLineStartingPosition) / sineOfXAxisAdjacentAngle;
 
-    const addToManager = () => {
-        const firstLength =
-            getYLength(firstRibbonLineStartingPosition) /
-            sineOfXAxisAdjacentAngle;
-        const secondLength =
-            getYLength(secondRibbonLineStartingPosition) /
-            sineOfXAxisAdjacentAngle;
-
-        maybeRenderer = createMovingTrapezoidRenderer({
-            angle: directionAngle,
-            animation: {
-                duration:
-                    Math.max(firstLength, secondLength) *
-                    getBoundedRandomInteger({ minimum: 8, maximum: 12 }),
-                iterationCount: Number.POSITIVE_INFINITY,
-                startingDirection:
-                    Math.random() < 0.5 ? 'alternate' : 'alternate-reverse',
+    return createMovingTrapezoidRenderer({
+        angle: directionAngle,
+        animationDuration:
+            Math.max(firstLength, secondLength) * animationDurationScalar,
+        animationIterationCount: Number.POSITIVE_INFINITY,
+        animationStartingDirection,
+        canvasContext,
+        easingFunction,
+        colorVariantCssName,
+        parallelLineDataPair: [
+            {
+                length: firstLength,
+                startingPosition: firstRibbonLineStartingPosition,
             },
-            canvasContext,
-            easingFunction,
-            colorVariantCssName,
-            parallelLineDataPair: [
-                {
-                    length: firstLength,
-                    startingPosition: firstRibbonLineStartingPosition,
-                },
-                {
-                    length: secondLength,
-                    startingPosition: secondRibbonLineStartingPosition,
-                },
-            ],
-        });
+            {
+                length: secondLength,
+                startingPosition: secondRibbonLineStartingPosition,
+            },
+        ],
+    });
+}
 
-        rendererManager.addRenderer(maybeRenderer);
-    };
+const xAxisAdjacentAngle = 0.35 * Math.PI;
+const ribbonsInterstitialGutter = 5;
 
-    const removeFromManager = () => {
-        if (maybeRenderer !== undefined) {
-            rendererManager.removeRenderer(maybeRenderer);
-        }
-    };
+function getRibbonsEdgeGutterForViewport({ width }: Viewport) {
+    return width >= 1500 ? 200 : width >= 750 ? 150 : 100;
+}
 
-    return {
-        addToManager,
-        removeFromManager,
-    };
+function getRibbonsHeightForViewport({ width, height }: Viewport) {
+    return (width >= 1500 ? 0.8 : width >= 750 ? 0.6 : 0.4) * height;
+}
+
+type GetAnimationDurationScalarParameter = {
+    colorVariantCssName: ColorVariantCssName;
+    viewport: Viewport;
+};
+
+function getAnimationDurationScalar({
+    colorVariantCssName,
+    viewport: { width },
+}: GetAnimationDurationScalarParameter) {
+    return (
+        (width >= 1500 ? 0.8 : width >= 750 ? 0.9 : 1) *
+        (colorVariantCssName === '--primary-color' ? 18 : 7)
+    );
 }
 
 type SetupBackgroundRenderersParameter = {
@@ -89,10 +98,7 @@ type SetupBackgroundRenderersParameter = {
     colorVariantCssName: ColorVariantCssName;
     easingFunction: EasingFunction;
     ribbonWidthBounds: Bounds;
-    viewport: {
-        height: number;
-        width: number;
-    };
+    viewport: Viewport;
 };
 
 export function setupBackgroundRenderers({
@@ -102,83 +108,106 @@ export function setupBackgroundRenderers({
     ribbonWidthBounds,
     viewport,
 }: SetupBackgroundRenderersParameter) {
-    const backgroundRendererRemovers: Array<() => void> = [];
-    const gutter = 5;
-    const xAxisAdjacentAngle = 0.35 * Math.PI;
-    const ribbonsHeight =
-        (viewport.width >= 1500 ? 0.8 : viewport.width >= 750 ? 0.6 : 0.4) *
-        viewport.height;
+    const rendererManager = getRendererManager();
+    const renderersByStartingTime = new Map<number, Renderer>();
+    const ribbonsHeight = getRibbonsHeightForViewport(viewport);
+    const animationDurationScalar = getAnimationDurationScalar({
+        colorVariantCssName,
+        viewport,
+    });
+    const ribbonsEdgeGutter = getRibbonsEdgeGutterForViewport(viewport);
 
-    const leftStartingYs = [0];
+    const leftStartingYs = [ribbonsEdgeGutter];
     const leftYLimit = ribbonsHeight;
 
-    while (gutter + getArrayElementAtIndex(leftStartingYs, -1)! <= leftYLimit) {
+    while (
+        ribbonsInterstitialGutter +
+            getArrayElementAtIndex(leftStartingYs, -1)! <=
+        leftYLimit
+    ) {
         leftStartingYs.push(
-            gutter +
+            ribbonsInterstitialGutter +
                 getArrayElementAtIndex(leftStartingYs, -1)! +
                 getBoundedRandomInteger(ribbonWidthBounds)
         );
     }
 
     for (const [index, startingY] of leftStartingYs.slice(0, -1).entries()) {
-        const { addToManager, removeFromManager } =
-            getBackgroundRendererControls({
-                canvasContext,
-                colorVariantCssName,
-                directionAngle: -xAxisAdjacentAngle,
-                easingFunction,
-                firstRibbonLineStartingPosition: {
-                    x: 0,
-                    y: (index > 0 ? gutter : 0) + startingY,
-                },
-                getYLength: position => position.y,
-                secondRibbonLineStartingPosition: {
-                    x: 0,
-                    y: leftStartingYs[index + 1] - gutter,
-                },
-                xAxisAdjacentAngle,
-            });
+        const renderer = getBackgroundRenderer({
+            animationDurationScalar,
+            animationStartingDirection: 'alternate',
+            canvasContext,
+            colorVariantCssName,
+            directionAngle: -xAxisAdjacentAngle,
+            easingFunction,
+            firstRibbonLineStartingPosition: {
+                x: 0,
+                y: (index > 0 ? ribbonsInterstitialGutter : 0) + startingY,
+            },
+            getYLength: position => position.y,
+            secondRibbonLineStartingPosition: {
+                x: 0,
+                y: leftStartingYs[index + 1] - ribbonsInterstitialGutter,
+            },
+            xAxisAdjacentAngle,
+        });
 
-        addToManager();
-        backgroundRendererRemovers.push(removeFromManager);
+        renderersByStartingTime.set(
+            renderersByStartingTime.size * 250,
+            renderer
+        );
     }
 
+    const leftRenderersCount = renderersByStartingTime.size;
+
     const rightStartingYs = [viewport.height - ribbonsHeight];
-    const rightYLimit = viewport.height;
+    const rightYLimit = viewport.height - ribbonsEdgeGutter;
 
     while (
-        gutter + getArrayElementAtIndex(rightStartingYs, -1)! <=
+        ribbonsInterstitialGutter +
+            getArrayElementAtIndex(rightStartingYs, -1)! <=
         rightYLimit
     ) {
         rightStartingYs.push(
-            gutter +
+            ribbonsInterstitialGutter +
                 getArrayElementAtIndex(rightStartingYs, -1)! +
                 getBoundedRandomInteger(ribbonWidthBounds)
         );
     }
 
-    for (const [index, startingY] of rightStartingYs.slice(0, -1).entries()) {
-        const { addToManager, removeFromManager } =
-            getBackgroundRendererControls({
-                canvasContext,
-                colorVariantCssName,
-                directionAngle: Math.PI - xAxisAdjacentAngle,
-                easingFunction,
-                firstRibbonLineStartingPosition: {
-                    x: viewport.width,
-                    y: (index > 0 ? gutter : 0) + startingY,
-                },
-                getYLength: position => viewport.height - position.y,
-                secondRibbonLineStartingPosition: {
-                    x: viewport.width,
-                    y: rightStartingYs[index + 1] - gutter,
-                },
-                xAxisAdjacentAngle,
-            });
+    for (const [index, startingY] of [
+        ...rightStartingYs.slice(0, -1).entries(),
+    ].reverse()) {
+        const renderer = getBackgroundRenderer({
+            animationDurationScalar,
+            animationStartingDirection: 'alternate-reverse',
+            canvasContext,
+            colorVariantCssName,
+            directionAngle: Math.PI - xAxisAdjacentAngle,
+            easingFunction,
+            firstRibbonLineStartingPosition: {
+                x: viewport.width,
+                y: (index > 0 ? ribbonsInterstitialGutter : 0) + startingY,
+            },
+            getYLength: position => viewport.height - position.y,
+            secondRibbonLineStartingPosition: {
+                x: viewport.width,
+                y: rightStartingYs[index + 1] - ribbonsInterstitialGutter,
+            },
+            xAxisAdjacentAngle,
+        });
 
-        addToManager();
-        backgroundRendererRemovers.push(removeFromManager);
+        renderersByStartingTime.set(
+            125 + (renderersByStartingTime.size - leftRenderersCount) * 250,
+            renderer
+        );
     }
 
-    return () => backgroundRendererRemovers.forEach(evaluateFunction);
+    const compositeRenderer = createCompositeRenderer({
+        renderersByStartingTime,
+    });
+
+    rendererManager.addRenderer(compositeRenderer);
+
+    return () => rendererManager.removeRenderer(compositeRenderer);
 }

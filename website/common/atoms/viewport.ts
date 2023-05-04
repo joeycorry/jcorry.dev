@@ -1,4 +1,5 @@
 import { atomWithNoArgumentSetter } from '~/common/utils/atom';
+import type { Viewport } from '~/common/utils/viewport';
 
 const getViewportValue = import.meta.env.SSR
     ? () => ({ devicePixelRatio: 1, width: 0, height: 0 })
@@ -8,7 +9,7 @@ const getViewportValue = import.meta.env.SSR
           height: window.innerHeight,
       });
 
-export const viewportAtom = atomWithNoArgumentSetter(
+export const viewportAtom = atomWithNoArgumentSetter<Viewport>(
     getViewportValue(),
     getViewportValue
 );

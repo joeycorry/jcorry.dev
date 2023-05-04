@@ -63,12 +63,6 @@ class RendererManager {
         this.#isAnimating = false;
     }
 
-    public toggleAnimationDirection() {
-        for (const renderer of this.#renderers) {
-            renderer.toggleAnimationDirection();
-        }
-    }
-
     #onBeforeFrameRender() {
         for (const renderer of this.#renderers) {
             renderer.onBeforeFrameRender();
@@ -79,7 +73,7 @@ class RendererManager {
         const newRenderers = [];
 
         for (const renderer of this.#renderers) {
-            if (renderer.isFinished()) {
+            if (renderer.hasFinished()) {
                 this.removeRenderer(renderer);
 
                 continue;

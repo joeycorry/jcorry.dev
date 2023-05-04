@@ -49,7 +49,7 @@ export function useBackgroundEffects({
                 canvasContext,
                 colorVariantCssName: '--primary-color',
                 easingFunction,
-                ribbonWidthBounds: { minimum: 50, maximum: 80 },
+                ribbonWidthBounds: { minimum: 30, maximum: 60 },
                 viewport,
             }),
             setupBackgroundRenderers({
