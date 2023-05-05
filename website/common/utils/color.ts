@@ -8,8 +8,8 @@ export type RgbChannelName = 'blue' | 'green' | 'red';
 export type RgbChannelOrAlphaName = 'alpha' | RgbChannelName;
 
 type GetColorVariantsByNameParameter = {
-    color: Color;
-    shouldUseDarkMode?: boolean;
+    shouldUseDarkMode: boolean | undefined;
+    techName: TechName;
 };
 
 type ColorVariantName = `${'primary' | 'secondary' | 'tertiary'}Color`;
@@ -19,9 +19,11 @@ type ColorVariantsByName = {
 };
 
 function getColorVariantsByName({
-    color,
     shouldUseDarkMode,
+    techName,
 }: GetColorVariantsByNameParameter): ColorVariantsByName {
+    const color = getColorForTechName(techName);
+
     if (shouldUseDarkMode === undefined) {
         return {
             primaryColor: color,
@@ -52,11 +54,11 @@ export type ColorVariantCssValuesByName = {
 };
 
 export function getColorVariantCssValuesByName({
-    color,
     shouldUseDarkMode,
+    techName,
 }: GetColorVariantCssValuesByNameParameter): ColorVariantCssValuesByName {
     const { primaryColor, secondaryColor, tertiaryColor } =
-        getColorVariantsByName({ color, shouldUseDarkMode });
+        getColorVariantsByName({ techName, shouldUseDarkMode });
 
     return {
         '--primary-color': primaryColor.toString(),

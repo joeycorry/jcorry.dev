@@ -1,13 +1,17 @@
 import { useAtomValue } from 'jotai';
 import { useEffect } from 'react';
 
-import { colorAtom } from '~/common/atoms/color';
 import { shouldUseDarkModeAtom } from '~/common/atoms/shouldUseDarkMode';
-import { getColorVariantCssValuesByName } from '~/common/utils/color';
+import { techNameAtom } from '~/common/atoms/techName';
+import {
+    getColorForTechName,
+    getColorVariantCssValuesByName,
+} from '~/common/utils/color';
 
 export function useColorEffects() {
-    const color = useAtomValue(colorAtom);
     const shouldUseDarkMode = useAtomValue(shouldUseDarkModeAtom);
+    const techName = useAtomValue(techNameAtom);
+    const color = getColorForTechName(techName);
 
     useEffect(() => {
         let themeColorMetaElement =
@@ -27,8 +31,8 @@ export function useColorEffects() {
     useEffect(() => {
         const rootElement = window.document.documentElement;
         const colorVariantCssValuesByName = getColorVariantCssValuesByName({
-            color,
             shouldUseDarkMode,
+            techName,
         });
 
         for (const [name, value] of Object.entries(
@@ -36,5 +40,5 @@ export function useColorEffects() {
         )) {
             rootElement.style.setProperty(name, value);
         }
-    }, [color, shouldUseDarkMode]);
+    }, [shouldUseDarkMode, techName]);
 }

@@ -1,10 +1,12 @@
-import type { Color } from '~/common/lib/colors/color';
+import { getColorForTechName } from './color';
+import type { TechName } from './techName';
 
 type SetFaviconParameter = {
-    color: Color;
+    techName: TechName;
 };
 
-export function setFavicon({ color }: SetFaviconParameter) {
+export function setFavicon({ techName }: SetFaviconParameter) {
+    const color = getColorForTechName(techName);
     const canvasElement = window.document.createElement('canvas');
     const canvasContext = canvasElement.getContext('2d')!;
     canvasElement.width = 24;

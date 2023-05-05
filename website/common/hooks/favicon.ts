@@ -1,13 +1,13 @@
 import { useAtomValue } from 'jotai';
 import { useEffect } from 'react';
 
-import { colorAtom } from '~/common/atoms/color';
+import { techNameAtom } from '~/common/atoms/techName';
 import { setFavicon } from '~/common/utils/favicon';
 
 export function useFaviconEffects() {
-    const color = useAtomValue(colorAtom);
+    const techName = useAtomValue(techNameAtom);
 
     useEffect(() => {
-        setFavicon({ color });
-    }, [color]);
+        setFavicon({ techName });
+    }, [techName]);
 }
