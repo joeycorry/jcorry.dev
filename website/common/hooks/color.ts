@@ -6,7 +6,6 @@ import { techNameAtom } from '~/common/atoms/techName';
 import { getRendererManager } from '~/common/lib/rendererManager';
 import { colorVariantsByNameSubject } from '~/common/subjects/colorVariantsByName';
 import {
-    getColorVariantsByName,
     setColorVariantCssVariables,
     setFaviconColor,
     setThemeColor,
