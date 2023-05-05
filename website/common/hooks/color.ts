@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { shouldUseDarkModeAtom } from '~/common/atoms/shouldUseDarkMode';
 import { techNameAtom } from '~/common/atoms/techName';
 import { getRendererManager } from '~/common/lib/rendererManager';
-import { colorVariantsByNameObservable } from '~/common/observables/colorVariantsByName';
+import { colorVariantsByNameSubject } from '~/common/subjects/colorVariantsByName';
 import {
     getColorVariantsByName,
     setColorVariantCssVariables,
@@ -41,16 +41,14 @@ export function useColorEffects() {
     }, [rendererManager, shouldUseDarkMode, techName]);
 
     useEffect(() => {
-        colorVariantsByNameObservable.subscribe(setColorVariantCssVariables);
-        colorVariantsByNameObservable.subscribe(setFaviconColor);
-        colorVariantsByNameObservable.subscribe(setThemeColor);
+        colorVariantsByNameSubject.register(setColorVariantCssVariables);
+        colorVariantsByNameSubject.register(setFaviconColor);
+        colorVariantsByNameSubject.register(setThemeColor);
 
         return () => {
-            colorVariantsByNameObservable.unsubscribe(
-                setColorVariantCssVariables
-            );
-            colorVariantsByNameObservable.unsubscribe(setFaviconColor);
-            colorVariantsByNameObservable.unsubscribe(setThemeColor);
+            colorVariantsByNameSubject.unregister(setColorVariantCssVariables);
+            colorVariantsByNameSubject.unregister(setFaviconColor);
+            colorVariantsByNameSubject.unregister(setThemeColor);
         };
     }, []);
 }

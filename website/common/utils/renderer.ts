@@ -1,6 +1,6 @@
 import { Renderer } from '~/common/lib/renderer';
 import { Trapezoid } from '~/common/lib/shapes/trapezoid';
-import { colorVariantsByNameObservable } from '~/common/observables/colorVariantsByName';
+import { colorVariantsByNameSubject } from '~/common/subjects/colorVariantsByName';
 
 import type { ColorVariantCssName } from './color';
 import { getColorVariantsByName } from './color';
@@ -63,7 +63,7 @@ export function createColorTransitionRenderer({
 
         return [
             () => {
-                colorVariantsByNameObservable.set({
+                colorVariantsByNameSubject.set({
                     primaryColor: previousPrimaryColor.interpolate(
                         newPrimaryColor,
                         percentage
