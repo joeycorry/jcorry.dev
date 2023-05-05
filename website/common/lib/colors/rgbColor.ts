@@ -170,8 +170,8 @@ export class RgbColor implements Color<RgbColor> {
         );
 
         return (
-            thisColorComponent * (1 - percentage) +
-            otherColorComponent * percentage
+            (otherColorComponent - thisColorComponent) * percentage +
+            thisColorComponent
         );
     }
 }
