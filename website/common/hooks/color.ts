@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { shouldUseDarkModeAtom } from '~/common/atoms/shouldUseDarkMode';
 import { techNameAtom } from '~/common/atoms/techName';
 import { getRendererManager } from '~/common/lib/rendererManager';
-import { colorVariantsByNameSubject } from '~/common/subjects/colorVariantsByName';
+import { colorVariantsByNameSubject } from '~/common/subjects/color';
 import {
     setColorVariantCssVariables,
     setFaviconColor,

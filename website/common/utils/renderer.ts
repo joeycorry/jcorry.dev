@@ -1,6 +1,6 @@
 import { Renderer } from '~/common/lib/renderer';
 import { Trapezoid } from '~/common/lib/shapes/trapezoid';
-import { colorVariantsByNameSubject } from '~/common/subjects/colorVariantsByName';
+import { colorVariantsByNameSubject } from '~/common/subjects/color';
 
 import type { ColorVariantCssName } from './color';
 import { getColorVariantsByName } from './color';
