@@ -4,7 +4,7 @@ import { colorVariantsByNameObservable } from '~/common/observables/colorVariant
 
 import type { ColorVariantCssName } from './color';
 import { getColorVariantsByName } from './color';
-import type { EasingFunction } from './easing';
+import { easeLinear, easeOutQuint } from './easing';
 import type { Position } from './geometry';
 import { getDistance, getNewPosition } from './geometry';
 import type { TechName } from './techName';
@@ -58,27 +58,28 @@ export function createColorTransitionRenderer({
         techName: newTechName,
     });
 
-    return new Renderer(
-        ({ currentAnimationPercentage }) => [
+    return new Renderer(({ currentAnimationPercentage }) => {
+        const percentage = easeOutQuint(currentAnimationPercentage);
+
+        return [
             () => {
                 colorVariantsByNameObservable.set({
                     primaryColor: previousPrimaryColor.interpolate(
                         newPrimaryColor,
-                        currentAnimationPercentage
+                        percentage
                     ),
                     secondaryColor: previousSecondaryColor.interpolate(
                         newSecondaryColor,
-                        currentAnimationPercentage
+                        percentage
                     ),
                     tertiaryColor: previousTertiaryColor.interpolate(
                         newTertiaryColor,
-                        currentAnimationPercentage
+                        percentage
                     ),
                 });
             },
-        ],
-        rendererOptions
-    );
+        ];
+    }, rendererOptions);
 }
 
 type CreateCompositeRendererParameter = Pick<
@@ -146,7 +147,6 @@ type CreateMovingTrapezoidRendererParameter = RendererOptions & {
     canvasContext: CanvasRenderingContext2D;
     colorVariantCssName: ColorVariantCssName;
     counterClockwise?: boolean;
-    easingFunction: EasingFunction;
     lineWidth?: number;
     parallelLineDataPair: Tuple<
         {
@@ -162,7 +162,6 @@ export function createMovingTrapezoidRenderer({
     canvasContext,
     colorVariantCssName,
     counterClockwise,
-    easingFunction,
     lineWidth,
     parallelLineDataPair,
     ...rendererOptions
@@ -193,8 +192,7 @@ export function createMovingTrapezoidRenderer({
             rootElement.style.getPropertyValue(colorVariantCssName);
         const strokeStyle =
             rootElement.style.getPropertyValue(colorVariantCssName);
-        const distancePercentage =
-            2 * easingFunction(currentAnimationPercentage);
+        const distancePercentage = 2 * easeLinear(currentAnimationPercentage);
         const firstLineData =
             distancePercentage < 1
                 ? {

@@ -9,6 +9,7 @@ export function getCosineOfRadians(radians: number) {
 
     return cosineValuesByRadians.get(radians)!;
 }
+
 const sineValuesByRadians = new Map<number, number>();
 
 export function getSineOfRadians(radians: number) {

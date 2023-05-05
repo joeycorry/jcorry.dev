@@ -1,4 +1,5 @@
 import { getClampedPercentage } from './bounded';
+import { getCosineOfRadians } from './geometry';
 
 export type EasingFunction = (percentage: number) => number;
 
@@ -35,6 +36,26 @@ export function easeInOutCubic(rawPercentage: number): number {
         : 1 - Math.pow(-2 * percentage + 2, 3) / 2;
 }
 
-export function linear(percentage: number): number {
+export function easeInOutSine(rawPercentage: number): number {
+    const percentage = getClampedPercentage(rawPercentage);
+
+    return -(getCosineOfRadians(Math.PI * percentage) - 1) / 2;
+}
+
+export function easeInOutQuad(rawPercentage: number): number {
+    const percentage = getClampedPercentage(rawPercentage);
+
+    return percentage < 0.5
+        ? 2 * percentage * percentage
+        : 1 - Math.pow(-2 * percentage + 2, 2) / 2;
+}
+
+export function easeOutQuint(rawPercentage: number): number {
+    const percentage = getClampedPercentage(rawPercentage);
+
+    return 1 - Math.pow(1 - percentage, 5);
+}
+
+export function easeLinear(percentage: number): number {
     return getClampedPercentage(percentage);
 }

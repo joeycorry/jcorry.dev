@@ -5,7 +5,6 @@ import { getArrayElementAtIndex } from './array';
 import type { Bounds } from './bounded';
 import { getBoundedRandomInteger } from './bounded';
 import type { ColorVariantCssName } from './color';
-import type { EasingFunction } from './easing';
 import type { Position } from './geometry';
 import { getSineOfRadians } from './geometry';
 import {
@@ -20,7 +19,6 @@ type GetBackgroundRendererParameter = {
     canvasContext: CanvasRenderingContext2D;
     colorVariantCssName: ColorVariantCssName;
     directionAngle: number;
-    easingFunction: EasingFunction;
     firstRibbonLineStartingPosition: Position;
     getYLength: (position: Position) => number;
     secondRibbonLineStartingPosition: Position;
@@ -33,7 +31,6 @@ function getBackgroundRenderer({
     canvasContext,
     colorVariantCssName,
     directionAngle,
-    easingFunction,
     firstRibbonLineStartingPosition,
     getYLength,
     secondRibbonLineStartingPosition,
@@ -52,7 +49,6 @@ function getBackgroundRenderer({
         animationIterationCount: Number.POSITIVE_INFINITY,
         animationStartingDirection,
         canvasContext,
-        easingFunction,
         colorVariantCssName,
         parallelLineDataPair: [
             {
@@ -96,7 +92,6 @@ function getAnimationDurationScalar({
 type SetupBackgroundRenderersParameter = {
     canvasContext: CanvasRenderingContext2D;
     colorVariantCssName: ColorVariantCssName;
-    easingFunction: EasingFunction;
     ribbonWidthBounds: Bounds;
     viewport: Viewport;
 };
@@ -104,7 +99,6 @@ type SetupBackgroundRenderersParameter = {
 export function setupBackgroundRenderers({
     canvasContext,
     colorVariantCssName,
-    easingFunction,
     ribbonWidthBounds,
     viewport,
 }: SetupBackgroundRenderersParameter) {
@@ -139,7 +133,6 @@ export function setupBackgroundRenderers({
             canvasContext,
             colorVariantCssName,
             directionAngle: -xAxisAdjacentAngle,
-            easingFunction,
             firstRibbonLineStartingPosition: {
                 x: 0,
                 y: (index > 0 ? ribbonsInterstitialGutter : 0) + startingY,
@@ -184,7 +177,6 @@ export function setupBackgroundRenderers({
             canvasContext,
             colorVariantCssName,
             directionAngle: Math.PI - xAxisAdjacentAngle,
-            easingFunction,
             firstRibbonLineStartingPosition: {
                 x: viewport.width,
                 y: (index > 0 ? ribbonsInterstitialGutter : 0) + startingY,
