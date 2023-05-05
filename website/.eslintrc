@@ -16,7 +16,8 @@
         "no-relative-import-paths",
         "react",
         "react-hooks",
-        "simple-import-sort"
+        "simple-import-sort",
+        "unused-imports"
     ],
     "rules": {
         "@typescript-eslint/no-non-null-assertion": "off",
@@ -54,7 +55,8 @@
         "react/prop-types": "off",
         "react/react-in-jsx-scope": "off",
         "simple-import-sort/imports": "error",
-        "simple-import-sort/exports": "error"
+        "simple-import-sort/exports": "error",
+        "unused-imports/no-unused-imports": "error"
     },
     "env": {
         "es6": true,
