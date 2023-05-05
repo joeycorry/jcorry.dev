@@ -1,5 +1,6 @@
 import type { Renderer } from '~/common/lib/renderer';
 import { getRendererManager } from '~/common/lib/rendererManager';
+import { createMovingTrapezoidRenderer } from '~/common/renderers/shape';
 
 import { getArrayElementAtIndex } from './array';
 import type { Bounds } from './bounded';
@@ -7,10 +8,7 @@ import { getBoundedRandomInteger } from './bounded';
 import type { ColorVariantCssName } from './color';
 import type { Position } from './geometry';
 import { getSineOfRadians } from './geometry';
-import {
-    createCompositeRenderer,
-    createMovingTrapezoidRenderer,
-} from './renderer';
+import { createCompositeRenderer } from './renderer';
 import type { Viewport } from './viewport';
 
 type GetBackgroundRendererParameter = {

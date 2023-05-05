@@ -4,13 +4,13 @@ import { useEffect, useRef } from 'react';
 import { shouldUseDarkModeAtom } from '~/common/atoms/shouldUseDarkMode';
 import { techNameAtom } from '~/common/atoms/techName';
 import { getRendererManager } from '~/common/lib/rendererManager';
+import { createColorTransitionRenderer } from '~/common/renderers/color';
 import { colorVariantsByNameSubject } from '~/common/subjects/color';
 import {
     setColorVariantCssVariables,
     setFaviconColor,
     setThemeColor,
 } from '~/common/utils/color';
-import { createColorTransitionRenderer } from '~/common/utils/renderer';
 
 export function useColorEffects() {
     const rendererManager = getRendererManager();
