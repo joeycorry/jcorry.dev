@@ -20,7 +20,7 @@
     justify-content: space-between;
     flex-direction: column-reverse;
 
-    height: 25em;
+    height: 13em;
 }
 
 .header ul li a,
@@ -30,8 +30,8 @@
 
 .header ul li a svg,
 .header ul li button svg {
-    height: 5em;
-    width: 5em;
+    height: 4.5em;
+    width: 4.5em;
 
     stroke: var(--primary-color);
 }
@@ -51,24 +51,32 @@
         flex-direction: row;
 
         height: initial;
-        width: 15em;
+        width: 6em;
     }
 
-    .header ul li a svg,
-    .header ul li button svg {
-        height: 2.5em;
-        width: 2.5em;
-    }
-}
-
-@media (min-width: 1500px) {
-    .header ul {
-        width: 10em;
+    .header ul :global(.color-scheme) {
+        margin-top: -1px;
     }
 
     .header ul li a svg,
     .header ul li button svg {
         height: 2em;
         width: 2em;
+    }
+}
+
+@media (min-width: 1500px) {
+    .header ul {
+        width: 4.5em;
+    }
+
+    .header ul :global(.color-scheme) {
+        margin-top: -2px;
+    }
+
+    .header ul li a svg,
+    .header ul li button svg {
+        height: 1.5em;
+        width: 1.5em;
     }
 }
