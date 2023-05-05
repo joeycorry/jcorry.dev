@@ -14,11 +14,11 @@ type GetColorVariantsByNameParameter = {
 
 type ColorVariantName = `${'primary' | 'secondary' | 'tertiary'}Color`;
 
-type ColorVariantsByName = {
+export type ColorVariantsByName = {
     [K in ColorVariantName]: Color;
 };
 
-function getColorVariantsByName({
+export function getColorVariantsByName({
     shouldUseDarkMode,
     techName,
 }: GetColorVariantsByNameParameter): ColorVariantsByName {
@@ -42,8 +42,6 @@ function getColorVariantsByName({
     };
 }
 
-type GetColorVariantCssValuesByNameParameter = GetColorVariantsByNameParameter;
-
 export type ColorVariantCssName = `--${
     | 'primary'
     | 'secondary'
@@ -54,17 +52,65 @@ export type ColorVariantCssValuesByName = {
 };
 
 export function getColorVariantCssValuesByName({
-    shouldUseDarkMode,
-    techName,
-}: GetColorVariantCssValuesByNameParameter): ColorVariantCssValuesByName {
-    const { primaryColor, secondaryColor, tertiaryColor } =
-        getColorVariantsByName({ techName, shouldUseDarkMode });
-
+    primaryColor,
+    secondaryColor,
+    tertiaryColor,
+}: ColorVariantsByName): ColorVariantCssValuesByName {
     return {
         '--primary-color': primaryColor.toString(),
         '--secondary-color': secondaryColor.toString(),
         '--tertiary-color': tertiaryColor.toString(),
     };
+}
+
+export function setColorVariantCssVariables(
+    colorVariantsByName: ColorVariantsByName
+) {
+    const rootElement = window.document.documentElement;
+    const colorVariantCssValuesByName =
+        getColorVariantCssValuesByName(colorVariantsByName);
+
+    for (const [name, value] of Object.entries(colorVariantCssValuesByName)) {
+        rootElement.style.setProperty(name, value);
+    }
+}
+
+export function setFaviconColor({ tertiaryColor }: ColorVariantsByName) {
+    const canvasElement = window.document.createElement('canvas');
+    const canvasContext = canvasElement.getContext('2d')!;
+    canvasElement.width = 24;
+    canvasElement.height = 24;
+    canvasContext.fillStyle = tertiaryColor.toString();
+
+    canvasContext.fill(new Path2D('M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z'));
+
+    const faviconElement =
+        window.document.head.querySelector<HTMLLinkElement>(
+            'link[rel="icon"]'
+        ) || window.document.createElement('link');
+
+    if (!window.document.head.contains(faviconElement)) {
+        faviconElement.rel = 'icon';
+        faviconElement.type = 'image/png';
+
+        window.document.head.appendChild(faviconElement);
+    }
+
+    faviconElement.href = canvasElement.toDataURL(faviconElement.type);
+}
+
+export function setThemeColor({ primaryColor }: ColorVariantsByName) {
+    let themeColorMetaElement = window.document.querySelector<HTMLMetaElement>(
+        'head meta[name="theme-color"]'
+    );
+
+    if (themeColorMetaElement === null) {
+        themeColorMetaElement = window.document.createElement('meta');
+        themeColorMetaElement.name = 'theme-color';
+        window.document.head.appendChild(themeColorMetaElement);
+    }
+
+    themeColorMetaElement.content = primaryColor.toString();
 }
 
 const presetColorsByTechName = new Map<TechName, Color>(

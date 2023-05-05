@@ -1,6 +1,9 @@
 import { shouldUseDarkModeAtom } from '~/common/atoms/shouldUseDarkMode';
 import { techNameAtom } from '~/common/atoms/techName';
-import { getColorVariantCssValuesByName } from '~/common/utils/color';
+import {
+    getColorVariantCssValuesByName,
+    getColorVariantsByName,
+} from '~/common/utils/color';
 import { getCookie } from '~/common/utils/cookie';
 import type { JotaiStoreAtomSetValueParametersByName } from '~/common/utils/jotaiStore';
 import { createJotaiStore } from '~/common/utils/jotaiStore';
@@ -33,10 +36,12 @@ export async function onBeforeRender({
             techName: [getRandomTechName()],
         };
     const jotaiStore = createJotaiStore(jotaiStoreAtomSetValueParametersByName);
-    const colorVariantCssValuesByName = getColorVariantCssValuesByName({
+    const colorVariantsByName = getColorVariantsByName({
         shouldUseDarkMode: jotaiStore.get(shouldUseDarkModeAtom),
         techName: jotaiStore.get(techNameAtom),
     });
+    const colorVariantCssValuesByName =
+        getColorVariantCssValuesByName(colorVariantsByName);
     const htmlStyle = `${Object.entries(colorVariantCssValuesByName)
         .map(([name, value]) => `${name}:${value}`)
         .join('; ')};`;
