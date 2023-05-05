@@ -75,12 +75,12 @@ export function setColorVariantCssVariables(
     }
 }
 
-export function setFaviconColor({ tertiaryColor }: ColorVariantsByName) {
+export function setFaviconColor({ secondaryColor }: ColorVariantsByName) {
     const canvasElement = window.document.createElement('canvas');
     const canvasContext = canvasElement.getContext('2d')!;
     canvasElement.width = 24;
     canvasElement.height = 24;
-    canvasContext.fillStyle = tertiaryColor.toString();
+    canvasContext.fillStyle = secondaryColor.toString();
 
     canvasContext.fill(new Path2D('M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z'));
 
@@ -99,7 +99,7 @@ export function setFaviconColor({ tertiaryColor }: ColorVariantsByName) {
     faviconElement.href = canvasElement.toDataURL(faviconElement.type);
 }
 
-export function setThemeColor({ primaryColor }: ColorVariantsByName) {
+export function setThemeColor({ secondaryColor }: ColorVariantsByName) {
     let themeColorMetaElement = window.document.querySelector<HTMLMetaElement>(
         'head meta[name="theme-color"]'
     );
@@ -110,7 +110,7 @@ export function setThemeColor({ primaryColor }: ColorVariantsByName) {
         window.document.head.appendChild(themeColorMetaElement);
     }
 
-    themeColorMetaElement.content = primaryColor.toString();
+    themeColorMetaElement.content = secondaryColor.toString();
 }
 
 const presetColorsByTechName = new Map<TechName, Color>(
