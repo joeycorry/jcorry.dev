@@ -84,7 +84,7 @@ export function useTechNameEffects() {
             return;
         }
 
-        const timeoutId = window.setTimeout(startTechNameAnimation, 5000);
+        const timeoutId = window.setTimeout(startTechNameAnimation, 2000);
 
         return () => window.clearTimeout(timeoutId);
     }, [techNameAnimationShouldRepeat, startTechNameAnimation]);
