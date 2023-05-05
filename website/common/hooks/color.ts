@@ -1,7 +1,7 @@
-import { useAtomValue } from 'jotai';
-import { useEffect, useRef } from 'react';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useCallback, useEffect, useRef } from 'react';
 
-import { shouldUseDarkModeAtom } from '~/common/atoms/shouldUseDarkMode';
+import { colorSchemeAtom } from '~/common/atoms/color';
 import { techNameAtom } from '~/common/atoms/techName';
 import { getRendererManager } from '~/common/lib/rendererManager';
 import { createColorTransitionRenderer } from '~/common/renderers/color';
@@ -11,24 +11,81 @@ import {
     setFaviconColor,
     setThemeColor,
 } from '~/common/utils/color';
+import { removeCookie, setCookie } from '~/common/utils/cookie';
+
+export function useMediaQueryListChangeHandler() {
+    const setColorScheme = useSetAtom(colorSchemeAtom);
+
+    return useCallback(
+        ({ matches }: MediaQueryListEvent) => {
+            setColorScheme(matches ? 'dark' : 'light');
+        },
+        [setColorScheme]
+    );
+}
 
 export function useColorEffects() {
     const rendererManager = getRendererManager();
-    const shouldUseDarkMode = useAtomValue(shouldUseDarkModeAtom);
-    const previousShouldUseDarkModeRef = useRef(shouldUseDarkMode);
+    const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
+    const previousColorSchemeRef = useRef(colorScheme);
     const techName = useAtomValue(techNameAtom);
     const previousTechNameRef = useRef(techName);
+    const handleMediaQueryListChange = useMediaQueryListChangeHandler();
 
     useEffect(() => {
-        const previousShouldUseDarkMode = previousShouldUseDarkModeRef.current;
-        previousShouldUseDarkModeRef.current = shouldUseDarkMode;
+        if (colorScheme === 'normal') {
+            setColorScheme(
+                window.matchMedia('(prefers-color-scheme: dark)').matches
+                    ? 'dark'
+                    : 'light'
+            );
+        }
+    }, [setColorScheme, colorScheme]);
+
+    useEffect(() => {
+        const mediaQueryList = window.matchMedia(
+            '(prefers-color-scheme: dark)'
+        );
+
+        mediaQueryList.addEventListener('change', handleMediaQueryListChange);
+
+        return () => {
+            mediaQueryList.removeEventListener(
+                'change',
+                handleMediaQueryListChange
+            );
+        };
+    }, [setColorScheme, handleMediaQueryListChange]);
+
+    useEffect(() => {
+        if (colorScheme === undefined) {
+            removeCookie({
+                key: 'colorScheme',
+                setCookies: cookie => {
+                    window.document.cookie = cookie;
+                },
+            });
+        } else {
+            setCookie({
+                key: 'colorScheme',
+                setCookies: cookie => {
+                    window.document.cookie = cookie;
+                },
+                value: colorScheme,
+            });
+        }
+    }, [colorScheme]);
+
+    useEffect(() => {
+        const previousColorScheme = previousColorSchemeRef.current;
+        previousColorSchemeRef.current = colorScheme;
         const previousTechName = previousTechNameRef.current;
         previousTechNameRef.current = techName;
         const colorTransitionRenderer = createColorTransitionRenderer({
             animationDuration: 400,
-            newShouldUseDarkMode: shouldUseDarkMode,
+            newColorScheme: colorScheme,
             newTechName: techName,
-            previousShouldUseDarkMode,
+            previousColorScheme,
             previousTechName,
         });
 
@@ -37,7 +94,7 @@ export function useColorEffects() {
         return () => {
             rendererManager.removeRenderer(colorTransitionRenderer);
         };
-    }, [rendererManager, shouldUseDarkMode, techName]);
+    }, [rendererManager, colorScheme, techName]);
 
     useEffect(() => {
         colorVariantsByNameSubject.register(setColorVariantCssVariables);

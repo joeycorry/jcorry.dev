@@ -1,26 +1,26 @@
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { memo, useCallback } from 'react';
 import { Moon, Sun } from 'react-feather';
 
 import { backgroundIsVisibleAtom } from '~/common/atoms/background';
-import { shouldUseDarkModeAtom } from '~/common/atoms/shouldUseDarkMode';
-import { useNoArgumentSetAtom } from '~/common/hooks/atom';
+import { colorSchemeAtom } from '~/common/atoms/color';
 
 function useColorSchemeButtonClickHandler() {
-    const toggleDarkMode = useNoArgumentSetAtom(shouldUseDarkModeAtom);
+    const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
 
     return useCallback(() => {
-        toggleDarkMode();
-    }, [toggleDarkMode]);
+        setColorScheme(colorScheme === 'dark' ? 'light' : 'dark');
+    }, [colorScheme, setColorScheme]);
 }
 
 function UnmemoizedColorSchemeButton() {
     const backgroundIsVisible = useAtomValue(backgroundIsVisibleAtom);
-    const shouldUseDarkMode = useAtomValue(shouldUseDarkModeAtom);
+    const colorScheme = useAtomValue(colorSchemeAtom);
     const handleColorSchemeButtonClick = useColorSchemeButtonClickHandler();
-    const [title, Icon] = shouldUseDarkMode
-        ? ['Enable Light Mode', Sun]
-        : ['Enable Dark Mode', Moon];
+    const [title, Icon] =
+        colorScheme === 'dark'
+            ? ['Enable Light Mode', Sun]
+            : ['Enable Dark Mode', Moon];
 
     return (
         <button

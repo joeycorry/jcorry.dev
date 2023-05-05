@@ -1,5 +1,6 @@
 import { Renderer } from '~/common/lib/renderer';
 import { colorVariantsByNameSubject } from '~/common/subjects/color';
+import type { ColorScheme } from '~/common/utils/color';
 import { getColorVariantsByName } from '~/common/utils/color';
 import { easeOutQuint } from '~/common/utils/easing';
 import type { RendererOptions } from '~/common/utils/renderer';
@@ -9,16 +10,16 @@ type CreateColorTransitionRendererParameter = Pick<
     RendererOptions,
     'animationDuration'
 > & {
-    newShouldUseDarkMode: boolean | undefined;
+    newColorScheme: ColorScheme;
     newTechName: TechName;
-    previousShouldUseDarkMode: boolean | undefined;
+    previousColorScheme: ColorScheme;
     previousTechName: TechName;
 };
 
 export function createColorTransitionRenderer({
-    newShouldUseDarkMode,
+    newColorScheme,
     newTechName,
-    previousShouldUseDarkMode,
+    previousColorScheme,
     previousTechName,
     ...rendererOptions
 }: CreateColorTransitionRendererParameter) {
@@ -27,7 +28,7 @@ export function createColorTransitionRenderer({
         secondaryColor: previousSecondaryColor,
         tertiaryColor: previousTertiaryColor,
     } = getColorVariantsByName({
-        shouldUseDarkMode: previousShouldUseDarkMode,
+        colorScheme: previousColorScheme,
         techName: previousTechName,
     });
     const {
@@ -35,7 +36,7 @@ export function createColorTransitionRenderer({
         secondaryColor: newSecondaryColor,
         tertiaryColor: newTertiaryColor,
     } = getColorVariantsByName({
-        shouldUseDarkMode: newShouldUseDarkMode,
+        colorScheme: newColorScheme,
         techName: newTechName,
     });
 

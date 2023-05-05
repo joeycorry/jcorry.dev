@@ -1,12 +1,12 @@
 import { createStore } from 'jotai';
 
-import { shouldUseDarkModeAtom } from '~/common/atoms/shouldUseDarkMode';
+import { colorSchemeAtom } from '~/common/atoms/color';
 import { techNameAtom } from '~/common/atoms/techName';
 
 import type { AtomSetValueParameters } from './atom';
 
 export type JotaiStoreAtomSetValueParametersByName = {
-    shouldUseDarkMode: AtomSetValueParameters<typeof shouldUseDarkModeAtom>;
+    colorScheme: AtomSetValueParameters<typeof colorSchemeAtom>;
     techName: AtomSetValueParameters<typeof techNameAtom>;
 };
 
@@ -15,11 +15,8 @@ export function createJotaiStore(
 ) {
     const store = createStore();
 
-    if ('shouldUseDarkMode' in atomSetValueParametersByName) {
-        store.set(
-            shouldUseDarkModeAtom,
-            ...atomSetValueParametersByName.shouldUseDarkMode
-        );
+    if ('colorScheme' in atomSetValueParametersByName) {
+        store.set(colorSchemeAtom, ...atomSetValueParametersByName.colorScheme);
     }
 
     if ('techName' in atomSetValueParametersByName) {

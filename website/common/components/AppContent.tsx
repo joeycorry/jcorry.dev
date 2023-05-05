@@ -1,7 +1,6 @@
 import { memo } from 'react';
 
 import { useColorEffects } from '~/common/hooks/color';
-import { useShouldUseDarkModeEffects } from '~/common/hooks/shouldUseDarkMode';
 import { useTechNameEffects } from '~/common/hooks/techName';
 import { useViewportEffects } from '~/common/hooks/viewport';
 
@@ -11,7 +10,6 @@ import { Header } from './Header';
 import { Intro } from './Intro';
 
 function UnmemoizedAppContent() {
-    useShouldUseDarkModeEffects();
     useColorEffects();
     useTechNameEffects();
     useViewportEffects();

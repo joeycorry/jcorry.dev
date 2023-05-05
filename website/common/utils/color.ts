@@ -7,8 +7,10 @@ export type RgbChannelName = 'blue' | 'green' | 'red';
 
 export type RgbChannelOrAlphaName = 'alpha' | RgbChannelName;
 
+export type ColorScheme = 'dark' | 'light' | 'normal';
+
 type GetColorVariantsByNameParameter = {
-    shouldUseDarkMode: boolean | undefined;
+    colorScheme: ColorScheme;
     techName: TechName;
 };
 
@@ -19,12 +21,12 @@ export type ColorVariantsByName = {
 };
 
 export function getColorVariantsByName({
-    shouldUseDarkMode,
+    colorScheme,
     techName,
 }: GetColorVariantsByNameParameter): ColorVariantsByName {
     const color = getColorForTechName(techName);
 
-    if (shouldUseDarkMode === undefined) {
+    if (colorScheme === 'normal') {
         return {
             primaryColor: color,
             secondaryColor: color,
@@ -36,8 +38,8 @@ export function getColorVariantsByName({
     const lighterColor = color.lighten(0.66);
 
     return {
-        primaryColor: shouldUseDarkMode ? lighterColor : darkerColor,
-        secondaryColor: shouldUseDarkMode ? darkerColor : lighterColor,
+        primaryColor: colorScheme === 'dark' ? lighterColor : darkerColor,
+        secondaryColor: colorScheme === 'dark' ? darkerColor : lighterColor,
         tertiaryColor: color,
     };
 }
