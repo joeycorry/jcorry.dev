@@ -147,12 +147,12 @@ export class RgbColor implements Color<RgbColor> {
         }% ${this.#bluePercentage * 100}% / ${this.#alphaPercentage})`;
     }
 
-    #getRgbChannel(rgbChannelName: RgbChannelOrAlphaName) {
-        if (rgbChannelName === 'alpha') {
+    #getRgbChannelOrAlpha(rgbChannelOrAlphaName: RgbChannelOrAlphaName) {
+        if (rgbChannelOrAlphaName === 'alpha') {
             return this.#alphaPercentage;
-        } else if (rgbChannelName === 'blue') {
+        } else if (rgbChannelOrAlphaName === 'blue') {
             return this.#bluePercentage;
-        } else if (rgbChannelName === 'green') {
+        } else if (rgbChannelOrAlphaName === 'green') {
             return this.#greenPercentage;
         }
 
@@ -164,8 +164,10 @@ export class RgbColor implements Color<RgbColor> {
         percentage,
         rgbChannelOrAlphaName,
     }: PrivateInterpolateRgbChannelOrAlphaParameter) {
-        const thisColorComponent = this.#getRgbChannel(rgbChannelOrAlphaName);
-        const otherColorComponent = otherColor.#getRgbChannel(
+        const thisColorComponent = this.#getRgbChannelOrAlpha(
+            rgbChannelOrAlphaName
+        );
+        const otherColorComponent = otherColor.#getRgbChannelOrAlpha(
             rgbChannelOrAlphaName
         );
 
