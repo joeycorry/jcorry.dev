@@ -1,10 +1,13 @@
 import { Renderer } from '~/common/lib/renderer';
 import { Trapezoid } from '~/common/lib/shapes/trapezoid';
+import { colorVariantsByNameObservable } from '~/common/observables/colorVariantsByName';
 
 import type { ColorVariantCssName } from './color';
+import { getColorVariantsByName } from './color';
 import type { EasingFunction } from './easing';
 import type { Position } from './geometry';
 import { getDistance, getNewPosition } from './geometry';
+import type { TechName } from './techName';
 import type { Tuple } from './tuple';
 
 export type RendererAnimationIterationCount = number;
@@ -20,6 +23,63 @@ export type RendererOptions = {
     animationIterationCount?: RendererAnimationIterationCount;
     animationStartingDirection?: RendererStartingAnimationDirection;
 };
+
+type CreateColorTransitionRendererParameter = Pick<
+    RendererOptions,
+    'animationDuration'
+> & {
+    newShouldUseDarkMode: boolean | undefined;
+    newTechName: TechName;
+    previousShouldUseDarkMode: boolean | undefined;
+    previousTechName: TechName;
+};
+
+export function createColorTransitionRenderer({
+    newShouldUseDarkMode,
+    newTechName,
+    previousShouldUseDarkMode,
+    previousTechName,
+    ...rendererOptions
+}: CreateColorTransitionRendererParameter) {
+    const {
+        primaryColor: previousPrimaryColor,
+        secondaryColor: previousSecondaryColor,
+        tertiaryColor: previousTertiaryColor,
+    } = getColorVariantsByName({
+        shouldUseDarkMode: previousShouldUseDarkMode,
+        techName: previousTechName,
+    });
+    const {
+        primaryColor: newPrimaryColor,
+        secondaryColor: newSecondaryColor,
+        tertiaryColor: newTertiaryColor,
+    } = getColorVariantsByName({
+        shouldUseDarkMode: newShouldUseDarkMode,
+        techName: newTechName,
+    });
+
+    return new Renderer(
+        ({ currentAnimationPercentage }) => [
+            () => {
+                colorVariantsByNameObservable.set({
+                    primaryColor: previousPrimaryColor.interpolate(
+                        newPrimaryColor,
+                        currentAnimationPercentage
+                    ),
+                    secondaryColor: previousSecondaryColor.interpolate(
+                        newSecondaryColor,
+                        currentAnimationPercentage
+                    ),
+                    tertiaryColor: previousTertiaryColor.interpolate(
+                        newTertiaryColor,
+                        currentAnimationPercentage
+                    ),
+                });
+            },
+        ],
+        rendererOptions
+    );
+}
 
 type CreateCompositeRendererParameter = Pick<
     RendererOptions,
