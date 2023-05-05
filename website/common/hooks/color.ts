@@ -25,21 +25,6 @@ export function useColorEffects() {
         previousShouldUseDarkModeRef.current = shouldUseDarkMode;
         const previousTechName = previousTechNameRef.current;
         previousTechNameRef.current = techName;
-
-        if (
-            shouldUseDarkMode === previousShouldUseDarkMode &&
-            techName === previousTechName
-        ) {
-            const colorVariantsByName = getColorVariantsByName({
-                shouldUseDarkMode,
-                techName,
-            });
-
-            colorVariantsByNameObservable.set(colorVariantsByName);
-
-            return;
-        }
-
         const colorTransitionRenderer = createColorTransitionRenderer({
             animationDuration: 400,
             newShouldUseDarkMode: shouldUseDarkMode,
