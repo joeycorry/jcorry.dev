@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
 
-export const backgroundIsVisibleAtom = atom(false);
+export const backgroundIsVisibleAtom = atom(true);
 
 backgroundIsVisibleAtom.debugLabel = 'backgroundIsVisibleAtom';
