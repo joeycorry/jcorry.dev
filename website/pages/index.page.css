@@ -99,7 +99,7 @@ button {
 }
 
 button {
-    transition: opacity 0.4s;
+    transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 button:disabled {
@@ -108,7 +108,7 @@ button:disabled {
 
 @media (hover: hover) {
     a {
-        transition: opacity 0.4s;
+        transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     a:not(:hover),
