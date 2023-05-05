@@ -3,6 +3,10 @@ import { HslColor } from '~/common/lib/colors/hslColor';
 
 import type { TechName } from './techName';
 
+export type RgbChannelName = 'blue' | 'green' | 'red';
+
+export type RgbChannelOrAlphaName = 'alpha' | RgbChannelName;
+
 type GetColorVariantsByNameParameter = {
     color: Color;
     shouldUseDarkMode?: boolean;
@@ -26,8 +30,8 @@ function getColorVariantsByName({
         };
     }
 
-    const darkerColor = color.darker(0.5);
-    const lighterColor = color.lighter(0.66);
+    const darkerColor = color.darken(0.5);
+    const lighterColor = color.lighten(0.66);
 
     return {
         primaryColor: shouldUseDarkMode ? lighterColor : darkerColor,
