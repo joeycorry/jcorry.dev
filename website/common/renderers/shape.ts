@@ -1,34 +1,27 @@
 import { Renderer } from '~/common/lib/renderer';
+import type { ShapeConstructorParameter } from '~/common/lib/shapes/shape';
+import type { TrapezoidConstructorParameter } from '~/common/lib/shapes/trapezoid';
 import { Trapezoid } from '~/common/lib/shapes/trapezoid';
-import type { ColorVariantCssName } from '~/common/utils/color';
 import { easeLinear } from '~/common/utils/easing';
 import type { Position } from '~/common/utils/geometry';
-import { getDistance, getNewPosition } from '~/common/utils/geometry';
+import {
+    getDistance,
+    getNewPosition,
+    getSineOfRadians,
+} from '~/common/utils/geometry';
 import type { RendererOptions } from '~/common/utils/renderer';
-import type { Tuple } from '~/common/utils/tuple';
 
-type CreateMovingTrapezoidRendererParameter = RendererOptions & {
-    angle: number;
-    canvasContext: CanvasRenderingContext2D;
-    colorVariantCssName: ColorVariantCssName;
-    counterClockwise?: boolean;
-    lineWidth?: number;
-    parallelLineDataPair: Tuple<
-        {
-            startingPosition: Position;
-            length: number;
-        },
-        2
-    >;
-};
+type CreateMovingTrapezoidRendererParameter = RendererOptions &
+    TrapezoidConstructorParameter;
 
 export function createMovingTrapezoidRenderer({
     angle,
     canvasContext,
-    colorVariantCssName,
     counterClockwise,
+    fillStyle,
     lineWidth,
     parallelLineDataPair,
+    strokeStyle,
     ...rendererOptions
 }: CreateMovingTrapezoidRendererParameter) {
     const [firstStartingPosition, secondStartingPosition] =
@@ -50,13 +43,8 @@ export function createMovingTrapezoidRenderer({
     const firstYDistance = firstEndPosition.y - firstStartingPosition.y;
     const secondXDistance = secondEndPosition.x - secondStartingPosition.x;
     const secondYDistance = secondEndPosition.y - secondStartingPosition.y;
-    const rootElement = window.document.documentElement;
 
     return new Renderer(({ currentAnimationPercentage }) => {
-        const fillStyle =
-            rootElement.style.getPropertyValue(colorVariantCssName);
-        const strokeStyle =
-            rootElement.style.getPropertyValue(colorVariantCssName);
         const distancePercentage = 2 * easeLinear(currentAnimationPercentage);
         const firstLineData =
             distancePercentage < 1
@@ -149,4 +137,57 @@ export function createMovingTrapezoidRenderer({
             }),
         ];
     }, rendererOptions);
+}
+
+type CreateMovingRibbonRendererParameter = {
+    animationDurationScalar: number;
+    animationStartingDirection: 'alternate' | 'alternate-reverse';
+    canvasContext: CanvasRenderingContext2D;
+    directionAngle: number;
+    fillStyle: NonNullable<ShapeConstructorParameter['fillStyle']>;
+    firstRibbonLineStartingPosition: Position;
+    getYLength: (position: Position) => number;
+    secondRibbonLineStartingPosition: Position;
+    strokeStyle: NonNullable<ShapeConstructorParameter['strokeStyle']>;
+    xAxisAdjacentAngle: number;
+};
+
+export function createMovingRibbonRenderer({
+    animationDurationScalar,
+    animationStartingDirection,
+    canvasContext,
+    directionAngle,
+    fillStyle,
+    firstRibbonLineStartingPosition,
+    getYLength,
+    secondRibbonLineStartingPosition,
+    strokeStyle,
+    xAxisAdjacentAngle,
+}: CreateMovingRibbonRendererParameter) {
+    const sineOfXAxisAdjacentAngle = getSineOfRadians(xAxisAdjacentAngle);
+    const firstLength =
+        getYLength(firstRibbonLineStartingPosition) / sineOfXAxisAdjacentAngle;
+    const secondLength =
+        getYLength(secondRibbonLineStartingPosition) / sineOfXAxisAdjacentAngle;
+
+    return createMovingTrapezoidRenderer({
+        angle: directionAngle,
+        animationDuration:
+            Math.max(firstLength, secondLength) * animationDurationScalar,
+        animationIterationCount: Number.POSITIVE_INFINITY,
+        animationStartingDirection,
+        canvasContext,
+        fillStyle,
+        parallelLineDataPair: [
+            {
+                length: firstLength,
+                startingPosition: firstRibbonLineStartingPosition,
+            },
+            {
+                length: secondLength,
+                startingPosition: secondRibbonLineStartingPosition,
+            },
+        ],
+        strokeStyle,
+    });
 }

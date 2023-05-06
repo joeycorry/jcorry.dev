@@ -49,6 +49,10 @@ export type ColorVariantCssName = `--${
     | 'secondary'
     | 'tertiary'}-color`;
 
+export function getColorVariantCssNames(): ColorVariantCssName[] {
+    return ['--primary-color', '--secondary-color', '--tertiary-color'];
+}
+
 export type ColorVariantCssValuesByName = {
     [K in ColorVariantCssName]: string;
 };

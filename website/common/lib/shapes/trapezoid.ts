@@ -17,7 +17,7 @@ type TrapezoidGetPositionsParameter = {
     >;
 };
 
-type TrapezoidConstructorParameter = ShapeConstructorParameter &
+export type TrapezoidConstructorParameter = ShapeConstructorParameter &
     TrapezoidGetPositionsParameter;
 
 export class Trapezoid extends Shape {

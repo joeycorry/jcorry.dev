@@ -1,203 +1,129 @@
-import type { Renderer } from '~/common/lib/renderer';
-import { getRendererManager } from '~/common/lib/rendererManager';
-import { createMovingTrapezoidRenderer } from '~/common/renderers/shape';
+import type { MutableRefObject, RefObject } from 'react';
 
-import { getArrayElementAtIndex } from './array';
-import type { Bounds } from './bounded';
-import { getBoundedRandomInteger } from './bounded';
-import type { ColorVariantCssName } from './color';
-import type { Position } from './geometry';
-import { getSineOfRadians } from './geometry';
-import { createCompositeRenderer } from './renderer';
+import { colorVariantsByNameSubject } from '~/common/subjects/color';
+
+import type { ColorVariantCssName, ColorVariantsByName } from './color';
+import { getColorVariantCssValuesByName } from './color';
 import type { Viewport } from './viewport';
 
-type GetBackgroundRendererParameter = {
-    animationDurationScalar: number;
-    animationStartingDirection: 'alternate' | 'alternate-reverse';
-    canvasContext: CanvasRenderingContext2D;
-    colorVariantCssName: ColorVariantCssName;
-    directionAngle: number;
-    firstRibbonLineStartingPosition: Position;
-    getYLength: (position: Position) => number;
-    secondRibbonLineStartingPosition: Position;
-    xAxisAdjacentAngle: number;
+type CreateBackgroundColorVariantsByNameObserverParameter = {
+    canvasContextStyleRefsByColorVariantCssName: Record<
+        ColorVariantCssName,
+        MutableRefObject<string>
+    >;
 };
 
-function getBackgroundRenderer({
-    animationDurationScalar,
-    animationStartingDirection,
-    canvasContext,
+function createBackgroundColorVariantsByNameObserver({
+    canvasContextStyleRefsByColorVariantCssName,
+}: CreateBackgroundColorVariantsByNameObserverParameter) {
+    return (colorVariantsByName: ColorVariantsByName) => {
+        const colorVariantCssValuesByName =
+            getColorVariantCssValuesByName(colorVariantsByName);
+
+        for (const [colorVariantCssName, cssValue] of Object.entries(
+            colorVariantCssValuesByName
+        )) {
+            canvasContextStyleRefsByColorVariantCssName[
+                colorVariantCssName as ColorVariantCssName
+            ].current = cssValue;
+        }
+    };
+}
+
+type CreateBackgroundRendererFillStyleGetterParameter = {
+    colorVariantCssName: ColorVariantCssName;
+};
+
+export function createBackgroundRendererFillStyleGetter({
     colorVariantCssName,
-    directionAngle,
-    firstRibbonLineStartingPosition,
-    getYLength,
-    secondRibbonLineStartingPosition,
-    xAxisAdjacentAngle,
-}: GetBackgroundRendererParameter) {
-    const sineOfXAxisAdjacentAngle = getSineOfRadians(xAxisAdjacentAngle);
-    const firstLength =
-        getYLength(firstRibbonLineStartingPosition) / sineOfXAxisAdjacentAngle;
-    const secondLength =
-        getYLength(secondRibbonLineStartingPosition) / sineOfXAxisAdjacentAngle;
-
-    return createMovingTrapezoidRenderer({
-        angle: directionAngle,
-        animationDuration:
-            Math.max(firstLength, secondLength) * animationDurationScalar,
-        animationIterationCount: Number.POSITIVE_INFINITY,
-        animationStartingDirection,
-        canvasContext,
-        colorVariantCssName,
-        parallelLineDataPair: [
-            {
-                length: firstLength,
-                startingPosition: firstRibbonLineStartingPosition,
-            },
-            {
-                length: secondLength,
-                startingPosition: secondRibbonLineStartingPosition,
-            },
-        ],
-    });
+}: CreateBackgroundRendererFillStyleGetterParameter) {
+    return () =>
+        window.document.documentElement.style.getPropertyValue(
+            colorVariantCssName
+        );
 }
 
-const xAxisAdjacentAngle = 0.35 * Math.PI;
-const ribbonsInterstitialGutter = 5;
+type CreateBackgroundRendererStrokeStyleGetterParameter = {
+    colorVariantCssName: ColorVariantCssName;
+};
 
-function getRibbonsEdgeGutterForViewport({ width }: Viewport) {
-    return width >= 1500 ? 200 : width >= 750 ? 150 : 100;
+export function createBackgroundRendererStrokeStyleGetter({
+    colorVariantCssName,
+}: CreateBackgroundRendererStrokeStyleGetterParameter) {
+    return () =>
+        window.document.documentElement.style.getPropertyValue(
+            colorVariantCssName
+        );
 }
 
-function getRibbonsHeightForViewport({ width, height }: Viewport) {
-    return (width >= 1500 ? 0.8 : width >= 750 ? 0.6 : 0.4) * height;
-}
-
-type GetAnimationDurationScalarParameter = {
+type GetBackgroundRendererAnimationDurationScalarParameter = {
     colorVariantCssName: ColorVariantCssName;
     viewport: Viewport;
 };
 
-function getAnimationDurationScalar({
+export function getBackgroundRendererAnimationDurationScalar({
     colorVariantCssName,
     viewport: { width },
-}: GetAnimationDurationScalarParameter) {
+}: GetBackgroundRendererAnimationDurationScalarParameter) {
     return (
         (width >= 1500 ? 0.8 : width >= 750 ? 0.9 : 1) *
         (colorVariantCssName === '--primary-color' ? 18 : 7)
     );
 }
 
-type SetupBackgroundRenderersParameter = {
-    canvasContext: CanvasRenderingContext2D;
-    colorVariantCssName: ColorVariantCssName;
-    ribbonWidthBounds: Bounds;
+export function getBackgroundRendererRibbonsEdgeGutterForViewport({
+    width,
+}: Viewport) {
+    return width >= 1500 ? 200 : width >= 750 ? 150 : 100;
+}
+
+export function getBackgroundRendererRibbonsHeightForViewport({
+    width,
+    height,
+}: Viewport) {
+    return (width >= 1500 ? 0.8 : width >= 750 ? 0.6 : 0.4) * height;
+}
+
+type SetBackgroundCanvasDimensionsParameter = {
+    canvasElementRef: RefObject<HTMLCanvasElement>;
     viewport: Viewport;
 };
 
-export function setupBackgroundRenderers({
-    canvasContext,
-    colorVariantCssName,
-    ribbonWidthBounds,
+export function setBackgroundCanvasDimensions({
+    canvasElementRef,
     viewport,
-}: SetupBackgroundRenderersParameter) {
-    const rendererManager = getRendererManager();
-    const renderersByStartingTime = new Map<number, Renderer>();
-    const ribbonsHeight = getRibbonsHeightForViewport(viewport);
-    const animationDurationScalar = getAnimationDurationScalar({
-        colorVariantCssName,
-        viewport,
-    });
-    const ribbonsEdgeGutter = getRibbonsEdgeGutterForViewport(viewport);
-
-    const leftStartingYs = [ribbonsEdgeGutter];
-    const leftYLimit = ribbonsHeight;
-
-    while (
-        ribbonsInterstitialGutter +
-            getArrayElementAtIndex(leftStartingYs, -1)! <=
-        leftYLimit
-    ) {
-        leftStartingYs.push(
-            ribbonsInterstitialGutter +
-                getArrayElementAtIndex(leftStartingYs, -1)! +
-                getBoundedRandomInteger(ribbonWidthBounds)
-        );
+}: SetBackgroundCanvasDimensionsParameter) {
+    if (canvasElementRef.current === null) {
+        return;
     }
 
-    for (const [index, startingY] of leftStartingYs.slice(0, -1).entries()) {
-        const renderer = getBackgroundRenderer({
-            animationDurationScalar,
-            animationStartingDirection: 'alternate',
-            canvasContext,
-            colorVariantCssName,
-            directionAngle: -xAxisAdjacentAngle,
-            firstRibbonLineStartingPosition: {
-                x: 0,
-                y: (index > 0 ? ribbonsInterstitialGutter : 0) + startingY,
-            },
-            getYLength: position => position.y,
-            secondRibbonLineStartingPosition: {
-                x: 0,
-                y: leftStartingYs[index + 1] - ribbonsInterstitialGutter,
-            },
-            xAxisAdjacentAngle,
+    const canvasElement = canvasElementRef.current;
+    const canvasContext = canvasElement.getContext('2d')!;
+    canvasElement.width = viewport.width * viewport.devicePixelRatio;
+    canvasElement.height = viewport.height * viewport.devicePixelRatio;
+    canvasElement.style.width = `${viewport.width}px`;
+    canvasElement.style.height = `${viewport.height}px`;
+
+    canvasContext.scale(viewport.devicePixelRatio, viewport.devicePixelRatio);
+}
+
+type SetupBackgroundCanvasContextStyleSettingObserverParameter = {
+    canvasContextStyleRefsByColorVariantCssName: Record<
+        ColorVariantCssName,
+        MutableRefObject<string>
+    >;
+};
+
+export function setupBackgroundColorVariantsByNameObserver({
+    canvasContextStyleRefsByColorVariantCssName,
+}: SetupBackgroundCanvasContextStyleSettingObserverParameter) {
+    const observeColorVariantsByName =
+        createBackgroundColorVariantsByNameObserver({
+            canvasContextStyleRefsByColorVariantCssName,
         });
+    colorVariantsByNameSubject.register(observeColorVariantsByName);
 
-        renderersByStartingTime.set(
-            renderersByStartingTime.size * 250,
-            renderer
-        );
-    }
-
-    const leftRenderersCount = renderersByStartingTime.size;
-
-    const rightStartingYs = [viewport.height - ribbonsHeight];
-    const rightYLimit = viewport.height - ribbonsEdgeGutter;
-
-    while (
-        ribbonsInterstitialGutter +
-            getArrayElementAtIndex(rightStartingYs, -1)! <=
-        rightYLimit
-    ) {
-        rightStartingYs.push(
-            ribbonsInterstitialGutter +
-                getArrayElementAtIndex(rightStartingYs, -1)! +
-                getBoundedRandomInteger(ribbonWidthBounds)
-        );
-    }
-
-    for (const [index, startingY] of [
-        ...rightStartingYs.slice(0, -1).entries(),
-    ].reverse()) {
-        const renderer = getBackgroundRenderer({
-            animationDurationScalar,
-            animationStartingDirection: 'alternate-reverse',
-            canvasContext,
-            colorVariantCssName,
-            directionAngle: Math.PI - xAxisAdjacentAngle,
-            firstRibbonLineStartingPosition: {
-                x: viewport.width,
-                y: (index > 0 ? ribbonsInterstitialGutter : 0) + startingY,
-            },
-            getYLength: position => viewport.height - position.y,
-            secondRibbonLineStartingPosition: {
-                x: viewport.width,
-                y: rightStartingYs[index + 1] - ribbonsInterstitialGutter,
-            },
-            xAxisAdjacentAngle,
-        });
-
-        renderersByStartingTime.set(
-            125 + (renderersByStartingTime.size - leftRenderersCount) * 250,
-            renderer
-        );
-    }
-
-    const compositeRenderer = createCompositeRenderer({
-        renderersByStartingTime,
-    });
-
-    rendererManager.addRenderer(compositeRenderer);
-
-    return () => rendererManager.removeRenderer(compositeRenderer);
+    return () => {
+        colorVariantsByNameSubject.unregister(observeColorVariantsByName);
+    };
 }
