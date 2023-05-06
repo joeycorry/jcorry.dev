@@ -13,21 +13,17 @@ import type { ColorVariantCssName } from '~/common/utils/color';
 import { getColorVariantCssNames } from '~/common/utils/color';
 import { createMutableRef } from '~/common/utils/react';
 
-function useCanvasContextStyleRefsByColorVariantCssName(): Record<
-    ColorVariantCssName,
-    MutableRefObject<string>
-> {
-    return useMemo(() => {
-        const record: Partial<
-            Record<ColorVariantCssName, MutableRefObject<string>>
-        > = {};
-
-        for (const colorVariantCssName of getColorVariantCssNames()) {
-            record[colorVariantCssName] = createMutableRef('');
-        }
-
-        return record as Record<ColorVariantCssName, MutableRefObject<string>>;
-    }, []);
+function useBackgroundCanvasContextStyleRefsByColorVariantCssName() {
+    return useMemo(
+        () =>
+            Object.fromEntries(
+                getColorVariantCssNames().map(colorVariantCssName => [
+                    colorVariantCssName,
+                    createMutableRef(''),
+                ])
+            ) as Record<ColorVariantCssName, MutableRefObject<string>>,
+        []
+    );
 }
 
 type UseBackgroundEffectsParameter = {
@@ -40,7 +36,7 @@ export function useBackgroundEffects({
     const setBackgroundIsVisible = useSetAtom(backgroundIsVisibleAtom);
     const viewport = useAtomValue(viewportAtom);
     const canvasContextStyleRefsByColorVariantCssName =
-        useCanvasContextStyleRefsByColorVariantCssName();
+        useBackgroundCanvasContextStyleRefsByColorVariantCssName();
 
     useEffect(
         () =>
