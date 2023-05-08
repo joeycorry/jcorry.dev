@@ -1,6 +1,6 @@
 import { Renderer } from '~/common/lib/renderer';
-import { colorVariantsByNameSubject } from '~/common/subjects/color';
-import type { ColorScheme } from '~/common/utils/color';
+import type { Subject } from '~/common/lib/subject';
+import type { ColorScheme, ColorVariantsByName } from '~/common/utils/color';
 import { getColorVariantsByName } from '~/common/utils/color';
 import { easeOutQuint } from '~/common/utils/easing';
 import type { RendererOptions } from '~/common/utils/renderer';
@@ -10,6 +10,7 @@ type CreateColorTransitionRendererParameter = Pick<
     RendererOptions,
     'animationDuration'
 > & {
+    colorVariantsByNameSubject: Subject<ColorVariantsByName>;
     newColorScheme: ColorScheme;
     newTechName: TechName;
     previousColorScheme: ColorScheme;
@@ -17,6 +18,7 @@ type CreateColorTransitionRendererParameter = Pick<
 };
 
 export function createColorTransitionRenderer({
+    colorVariantsByNameSubject,
     newColorScheme,
     newTechName,
     previousColorScheme,

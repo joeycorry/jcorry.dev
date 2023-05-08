@@ -1,6 +1,6 @@
 import type { MutableRefObject, RefObject } from 'react';
 
-import { colorVariantsByNameSubject } from '~/common/subjects/color';
+import type { Subject } from '~/common/lib/subject';
 
 import type { ColorVariantCssName, ColorVariantsByName } from './color';
 import { getColorVariantCssValuesByName } from './color';
@@ -112,10 +112,12 @@ type SetupBackgroundCanvasContextStyleSettingObserverParameter = {
         ColorVariantCssName,
         MutableRefObject<string>
     >;
+    colorVariantsByNameSubject: Subject<ColorVariantsByName>;
 };
 
 export function setupBackgroundColorVariantsByNameObserver({
     canvasContextStyleRefsByColorVariantCssName,
+    colorVariantsByNameSubject,
 }: SetupBackgroundCanvasContextStyleSettingObserverParameter) {
     const observeColorVariantsByName =
         createBackgroundColorVariantsByNameObserver({

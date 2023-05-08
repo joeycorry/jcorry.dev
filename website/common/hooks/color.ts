@@ -1,17 +1,20 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useRef } from 'react';
 
-import { colorSchemeAtom } from '~/common/atoms/color';
+import {
+    colorSchemeAtom,
+    colorVariantsByNameSubjectAtom,
+} from '~/common/atoms/color';
 import { techNameAtom } from '~/common/atoms/techName';
 import { getRendererManager } from '~/common/lib/rendererManager';
 import { createColorTransitionRenderer } from '~/common/renderers/color';
-import { colorVariantsByNameSubject } from '~/common/subjects/color';
 import {
     setColorVariantCssVariables,
     setFaviconColor,
     setThemeColor,
 } from '~/common/utils/color';
 import { removeCookie, setCookie } from '~/common/utils/cookie';
+import { evauluateNoop } from '~/common/utils/function';
 
 export function useMediaQueryListChangeHandler() {
     const setColorScheme = useSetAtom(colorSchemeAtom);
@@ -28,6 +31,9 @@ export function useColorEffects() {
     const rendererManager = getRendererManager();
     const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
     const previousColorSchemeRef = useRef(colorScheme);
+    const colorVariantsByNameSubject = useAtomValue(
+        colorVariantsByNameSubjectAtom
+    );
     const techName = useAtomValue(techNameAtom);
     const previousTechNameRef = useRef(techName);
     const handleMediaQueryListChange = useMediaQueryListChangeHandler();
@@ -76,35 +82,58 @@ export function useColorEffects() {
         }
     }, [colorScheme]);
 
-    useEffect(() => {
-        const previousColorScheme = previousColorSchemeRef.current;
-        previousColorSchemeRef.current = colorScheme;
-        const previousTechName = previousTechNameRef.current;
-        previousTechNameRef.current = techName;
-        const colorTransitionRenderer = createColorTransitionRenderer({
-            animationDuration: 400,
-            newColorScheme: colorScheme,
-            newTechName: techName,
-            previousColorScheme,
-            previousTechName,
-        });
+    useEffect(
+        () =>
+            colorVariantsByNameSubject
+                ? (() => {
+                      const previousColorScheme =
+                          previousColorSchemeRef.current;
+                      previousColorSchemeRef.current = colorScheme;
+                      const previousTechName = previousTechNameRef.current;
+                      previousTechNameRef.current = techName;
+                      const colorTransitionRenderer =
+                          createColorTransitionRenderer({
+                              animationDuration: 400,
+                              colorVariantsByNameSubject,
+                              newColorScheme: colorScheme,
+                              newTechName: techName,
+                              previousColorScheme,
+                              previousTechName,
+                          });
 
-        rendererManager.addRenderer(colorTransitionRenderer);
+                      rendererManager.addRenderer(colorTransitionRenderer);
 
-        return () => {
-            rendererManager.removeRenderer(colorTransitionRenderer);
-        };
-    }, [rendererManager, colorScheme, techName]);
+                      return () => {
+                          rendererManager.removeRenderer(
+                              colorTransitionRenderer
+                          );
+                      };
+                  })()
+                : evauluateNoop(),
+        [rendererManager, colorScheme, colorVariantsByNameSubject, techName]
+    );
 
-    useEffect(() => {
-        colorVariantsByNameSubject.register(setColorVariantCssVariables);
-        colorVariantsByNameSubject.register(setFaviconColor);
-        colorVariantsByNameSubject.register(setThemeColor);
+    useEffect(
+        () =>
+            colorVariantsByNameSubject
+                ? (() => {
+                      colorVariantsByNameSubject.register(
+                          setColorVariantCssVariables
+                      );
+                      colorVariantsByNameSubject.register(setFaviconColor);
+                      colorVariantsByNameSubject.register(setThemeColor);
 
-        return () => {
-            colorVariantsByNameSubject.unregister(setColorVariantCssVariables);
-            colorVariantsByNameSubject.unregister(setFaviconColor);
-            colorVariantsByNameSubject.unregister(setThemeColor);
-        };
-    }, []);
+                      return () => {
+                          colorVariantsByNameSubject.unregister(
+                              setColorVariantCssVariables
+                          );
+                          colorVariantsByNameSubject.unregister(
+                              setFaviconColor
+                          );
+                          colorVariantsByNameSubject.unregister(setThemeColor);
+                      };
+                  })()
+                : evauluateNoop(),
+        [colorVariantsByNameSubject]
+    );
 }

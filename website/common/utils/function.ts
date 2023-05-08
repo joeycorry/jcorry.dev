@@ -23,9 +23,8 @@ export function debounceFunction<T extends unknown[]>(
     };
 }
 
-export function evaluateFunction<T>(func: () => T) {
-    return func();
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+export function evauluateNoop() {}
 
 export function throttleFunction<T extends unknown[]>(
     func: (...args: T) => void,
