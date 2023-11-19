@@ -40,7 +40,7 @@ export abstract class Shape implements RenderableObject {
     protected abstract _performRender(): void;
 
     #setBaseContextAttributes() {
-        const fillStyle = this.#getStrokeStyle();
+        const fillStyle = this.#getFillStyle();
         const lineWidth = this.#getLineWidth();
         const strokeStyle = this.#getStrokeStyle();
 
