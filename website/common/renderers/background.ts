@@ -1,6 +1,7 @@
 import type { SetStateAction } from 'jotai';
 import type { MutableRefObject, RefObject } from 'react';
 
+import { Point } from '~/common/lib/point';
 import type { Renderer } from '~/common/lib/renderer';
 import { getRendererManager } from '~/common/lib/rendererManager';
 import { createMovingRibbonRenderer } from '~/common/renderers/shape';
@@ -104,19 +105,17 @@ export function setupBackgroundRenderer({
                 canvasContext,
                 directionAngle: -xAxisAdjacentAngle,
                 fillStyle: styleRef,
-                firstRibbonLineStartingPosition: {
-                    x: 0,
-                    y:
-                        (startingYIndex > 0 ? ribbonsInterstitialGutter : 0) +
-                        startingY,
-                },
-                getYLength: position => position.y,
-                secondRibbonLineStartingPosition: {
-                    x: 0,
-                    y:
-                        leftStartingYs[startingYIndex + 1] -
-                        ribbonsInterstitialGutter,
-                },
+                firstRibbonLineStartingPoint: new Point(
+                    0,
+                    (startingYIndex > 0 ? ribbonsInterstitialGutter : 0) +
+                        startingY
+                ),
+                getYLength: point => point.y,
+                secondRibbonLineStartingPoint: new Point(
+                    0,
+                    leftStartingYs[startingYIndex + 1] -
+                        ribbonsInterstitialGutter
+                ),
                 strokeStyle: styleRef,
                 xAxisAdjacentAngle,
             });
@@ -153,19 +152,17 @@ export function setupBackgroundRenderer({
                 canvasContext,
                 directionAngle: Math.PI - xAxisAdjacentAngle,
                 fillStyle: styleRef,
-                firstRibbonLineStartingPosition: {
-                    x: viewport.width,
-                    y:
-                        (startingYIndex > 0 ? ribbonsInterstitialGutter : 0) +
-                        startingY,
-                },
-                getYLength: position => viewport.height - position.y,
-                secondRibbonLineStartingPosition: {
-                    x: viewport.width,
-                    y:
-                        rightStartingYs[startingYIndex + 1] -
-                        ribbonsInterstitialGutter,
-                },
+                firstRibbonLineStartingPoint: new Point(
+                    viewport.width,
+                    (startingYIndex > 0 ? ribbonsInterstitialGutter : 0) +
+                        startingY
+                ),
+                getYLength: point => viewport.height - point.y,
+                secondRibbonLineStartingPoint: new Point(
+                    viewport.width,
+                    rightStartingYs[startingYIndex + 1] -
+                        ribbonsInterstitialGutter
+                ),
                 strokeStyle: styleRef,
                 xAxisAdjacentAngle,
             });

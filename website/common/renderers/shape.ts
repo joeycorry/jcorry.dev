@@ -1,14 +1,10 @@
+import { Point } from '~/common/lib/point';
 import { Renderer } from '~/common/lib/renderer';
 import type { ShapeConstructorParameter } from '~/common/lib/shapes/shape';
 import type { TrapezoidConstructorParameter } from '~/common/lib/shapes/trapezoid';
 import { Trapezoid } from '~/common/lib/shapes/trapezoid';
 import { easeLinear } from '~/common/utils/easing';
-import type { Position } from '~/common/utils/geometry';
-import {
-    getDistance,
-    getNewPosition,
-    getSineOfRadians,
-} from '~/common/utils/geometry';
+import { getSineOfRadians } from '~/common/utils/geometry';
 import type { RendererOptions } from '~/common/utils/renderer';
 
 type CreateMovingTrapezoidRendererParameter = RendererOptions &
@@ -24,105 +20,94 @@ export function createMovingTrapezoidRenderer({
     strokeStyle,
     ...rendererOptions
 }: CreateMovingTrapezoidRendererParameter) {
-    const [firstStartingPosition, secondStartingPosition] =
-        parallelLineDataPair.map(data => data.startingPosition);
+    const [firstStartingPoint, secondStartingPoint] = parallelLineDataPair.map(
+        data => data.startingPoint
+    );
     const maxLength = Math.max(
         ...parallelLineDataPair.map(data => data.length)
     );
     const [firstLength, secondLength] = Array(2).fill(maxLength);
-    const [firstEndPosition, secondEndPosition] = parallelLineDataPair.map(
-        data =>
-            getNewPosition({
+    const [firstEndPoint, secondEndPoint] = parallelLineDataPair.map(
+        ({ startingPoint }) =>
+            startingPoint.addAngleAndLength({
                 angle,
                 counterClockwise,
                 length: maxLength,
-                startingPosition: data.startingPosition,
             })
     );
-    const firstXDistance = firstEndPosition.x - firstStartingPosition.x;
-    const firstYDistance = firstEndPosition.y - firstStartingPosition.y;
-    const secondXDistance = secondEndPosition.x - secondStartingPosition.x;
-    const secondYDistance = secondEndPosition.y - secondStartingPosition.y;
+    const firstXDistance = firstEndPoint.calculateXDistance(firstStartingPoint);
+    const firstYDistance = firstEndPoint.calculateYDistance(firstStartingPoint);
+    const secondXDistance =
+        secondEndPoint.calculateXDistance(secondStartingPoint);
+    const secondYDistance =
+        secondEndPoint.calculateYDistance(secondStartingPoint);
 
     return new Renderer(({ currentAnimationPercentage }) => {
         const distancePercentage = 2 * easeLinear(currentAnimationPercentage);
         const firstLineData =
             distancePercentage < 1
                 ? {
-                      length: getDistance(firstStartingPosition, {
-                          x:
-                              firstStartingPosition.x +
-                              distancePercentage * firstXDistance,
-                          y:
-                              firstStartingPosition.y +
-                              distancePercentage * firstYDistance,
-                      }),
-                      startingPosition: firstStartingPosition,
+                      length: firstStartingPoint.calculateDistance(
+                          new Point(
+                              firstStartingPoint.x +
+                                  distancePercentage * firstXDistance,
+                              firstStartingPoint.y +
+                                  distancePercentage * firstYDistance
+                          )
+                      ),
+                      startingPoint: firstStartingPoint,
                   }
                 : distancePercentage > 1
                 ? {
-                      length: getDistance(
-                          {
-                              x:
-                                  firstEndPosition.x -
-                                  (2 - distancePercentage) * firstXDistance,
-                              y:
-                                  firstEndPosition.y -
-                                  (2 - distancePercentage) * firstYDistance,
-                          },
-                          firstEndPosition
-                      ),
-                      startingPosition: {
-                          x:
-                              firstEndPosition.x -
+                      length: new Point(
+                          firstEndPoint.x -
                               (2 - distancePercentage) * firstXDistance,
-                          y:
-                              firstEndPosition.y -
-                              (2 - distancePercentage) * firstYDistance,
-                      },
+
+                          firstEndPoint.y -
+                              (2 - distancePercentage) * firstYDistance
+                      ).calculateDistance(firstEndPoint),
+                      startingPoint: new Point(
+                          firstEndPoint.x -
+                              (2 - distancePercentage) * firstXDistance,
+                          firstEndPoint.y -
+                              (2 - distancePercentage) * firstYDistance
+                      ),
                   }
                 : {
                       length: firstLength,
-                      startingPosition: firstStartingPosition,
+                      startingPoint: firstStartingPoint,
                   };
         const secondLineData =
             distancePercentage < 1
                 ? {
-                      length: getDistance(secondStartingPosition, {
-                          x:
-                              secondStartingPosition.x +
-                              distancePercentage * secondXDistance,
-                          y:
-                              secondStartingPosition.y +
-                              distancePercentage * secondYDistance,
-                      }),
-                      startingPosition: secondStartingPosition,
+                      length: secondStartingPoint.calculateDistance(
+                          new Point(
+                              secondStartingPoint.x +
+                                  distancePercentage * secondXDistance,
+                              secondStartingPoint.y +
+                                  distancePercentage * secondYDistance
+                          )
+                      ),
+                      startingPoint: secondStartingPoint,
                   }
                 : distancePercentage > 1
                 ? {
-                      length: getDistance(
-                          {
-                              x:
-                                  secondEndPosition.x -
-                                  (2 - distancePercentage) * secondXDistance,
-                              y:
-                                  secondEndPosition.y -
-                                  (2 - distancePercentage) * secondYDistance,
-                          },
-                          secondEndPosition
-                      ),
-                      startingPosition: {
-                          x:
-                              secondEndPosition.x -
+                      length: new Point(
+                          secondEndPoint.x -
                               (2 - distancePercentage) * secondXDistance,
-                          y:
-                              secondEndPosition.y -
-                              (2 - distancePercentage) * secondYDistance,
-                      },
+                          secondEndPoint.y -
+                              (2 - distancePercentage) * secondYDistance
+                      ).calculateDistance(secondEndPoint),
+                      startingPoint: new Point(
+                          secondEndPoint.x -
+                              (2 - distancePercentage) * secondXDistance,
+                          secondEndPoint.y -
+                              (2 - distancePercentage) * secondYDistance
+                      ),
                   }
                 : {
                       length: secondLength,
-                      startingPosition: secondStartingPosition,
+                      startingPoint: secondStartingPoint,
                   };
 
         return [
@@ -145,9 +130,9 @@ type CreateMovingRibbonRendererParameter = {
     canvasContext: CanvasRenderingContext2D;
     directionAngle: number;
     fillStyle: NonNullable<ShapeConstructorParameter['fillStyle']>;
-    firstRibbonLineStartingPosition: Position;
-    getYLength: (position: Position) => number;
-    secondRibbonLineStartingPosition: Position;
+    firstRibbonLineStartingPoint: Point;
+    getYLength: (point: Point) => number;
+    secondRibbonLineStartingPoint: Point;
     strokeStyle: NonNullable<ShapeConstructorParameter['strokeStyle']>;
     xAxisAdjacentAngle: number;
 };
@@ -158,17 +143,17 @@ export function createMovingRibbonRenderer({
     canvasContext,
     directionAngle,
     fillStyle,
-    firstRibbonLineStartingPosition,
+    firstRibbonLineStartingPoint,
     getYLength,
-    secondRibbonLineStartingPosition,
+    secondRibbonLineStartingPoint,
     strokeStyle,
     xAxisAdjacentAngle,
 }: CreateMovingRibbonRendererParameter) {
     const sineOfXAxisAdjacentAngle = getSineOfRadians(xAxisAdjacentAngle);
     const firstLength =
-        getYLength(firstRibbonLineStartingPosition) / sineOfXAxisAdjacentAngle;
+        getYLength(firstRibbonLineStartingPoint) / sineOfXAxisAdjacentAngle;
     const secondLength =
-        getYLength(secondRibbonLineStartingPosition) / sineOfXAxisAdjacentAngle;
+        getYLength(secondRibbonLineStartingPoint) / sineOfXAxisAdjacentAngle;
 
     return createMovingTrapezoidRenderer({
         angle: directionAngle,
@@ -181,11 +166,11 @@ export function createMovingRibbonRenderer({
         parallelLineDataPair: [
             {
                 length: firstLength,
-                startingPosition: firstRibbonLineStartingPosition,
+                startingPoint: firstRibbonLineStartingPoint,
             },
             {
                 length: secondLength,
-                startingPosition: secondRibbonLineStartingPosition,
+                startingPoint: secondRibbonLineStartingPoint,
             },
         ],
         strokeStyle,

@@ -1,83 +1,80 @@
-import type { Position } from '~/common/utils/geometry';
-import { getNewPosition } from '~/common/utils/geometry';
+import type { Point } from '~/common/lib/point';
 import type { Tuple } from '~/common/utils/tuple';
 
 import type { ShapeConstructorParameter } from './shape';
 import { Shape } from './shape';
 
-type TrapezoidGetPositionsParameter = {
+type ParallelLineDataPair = Tuple<
+    {
+        startingPoint: Point;
+        length: number;
+    },
+    2
+>;
+
+export type TrapezoidConstructorParameter = ShapeConstructorParameter & {
     angle: number;
     counterClockwise?: boolean;
-    parallelLineDataPair: Tuple<
-        {
-            startingPosition: Position;
-            length: number;
-        },
-        2
-    >;
+    parallelLineDataPair: ParallelLineDataPair;
 };
 
-export type TrapezoidConstructorParameter = ShapeConstructorParameter &
-    TrapezoidGetPositionsParameter;
-
 export class Trapezoid extends Shape {
-    #positions: Tuple<Position, 4>;
+    #angle: number;
+    #cachedBoundingPoints?: Tuple<Point, 4>;
+    #counterClockwise: boolean;
+    #parallelLineDataPair: ParallelLineDataPair;
 
     constructor({
         angle,
-        canvasContext,
         counterClockwise,
-        fillStyle,
-        lineWidth,
         parallelLineDataPair,
-        strokeStyle,
+        ...shapeConstructorParameter
     }: TrapezoidConstructorParameter) {
-        super({ canvasContext, lineWidth, fillStyle, strokeStyle });
+        super(shapeConstructorParameter);
 
-        this.#positions = this.#getPositions({
-            angle,
-            counterClockwise,
-            parallelLineDataPair,
-        });
+        this.#angle = angle;
+        this.#counterClockwise = counterClockwise ?? false;
+        this.#parallelLineDataPair = parallelLineDataPair;
     }
 
-    protected _performRender() {
-        this._canvasContext.beginPath();
-        this._canvasContext.moveTo(this.#positions[0].x, this.#positions[0].y);
+    protected _calculateNextPath() {
+        const path = new Path2D();
 
-        for (const position of this.#positions.slice(1)) {
-            this._canvasContext.lineTo(position.x, position.y);
+        path.moveTo(this.#boundingPoints[0].x, this.#boundingPoints[0].y);
+
+        for (const point of this.#boundingPoints.slice(1)) {
+            path.lineTo(point.x, point.y);
         }
 
-        this._canvasContext.closePath();
-        this._canvasContext.stroke();
-        this._canvasContext.fill();
+        return path;
     }
 
-    #getPositions({
-        angle,
-        counterClockwise,
-        parallelLineDataPair,
-    }: TrapezoidGetPositionsParameter): Tuple<Position, 4> {
+    get #boundingPoints(): Tuple<Point, 4> {
+        if (this.#cachedBoundingPoints !== undefined) {
+            return this.#cachedBoundingPoints;
+        }
+
         const [
-            firstOriginalPosition,
-            firstComputedPosition,
-            secondOriginalPosition,
-            secondComputedPosition,
-        ] = parallelLineDataPair.flatMap(data => [
-            data.startingPosition,
-            getNewPosition({
-                angle,
-                counterClockwise,
-                ...data,
+            firstOriginalPoint,
+            firstComputedPoint,
+            secondOriginalPoint,
+            secondComputedPoint,
+        ] = this.#parallelLineDataPair.flatMap(({ length, startingPoint }) => [
+            startingPoint,
+            startingPoint.addAngleAndLength({
+                angle: this.#angle,
+                counterClockwise: this.#counterClockwise,
+                length,
             }),
         ]);
 
-        return [
-            firstOriginalPosition,
-            firstComputedPosition,
-            secondComputedPosition,
-            secondOriginalPosition,
+        this.#cachedBoundingPoints = [
+            firstOriginalPoint,
+            firstComputedPoint,
+            secondComputedPoint,
+            secondOriginalPoint,
         ];
+
+        return this.#cachedBoundingPoints;
     }
 }
