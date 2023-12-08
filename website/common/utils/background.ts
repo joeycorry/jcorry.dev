@@ -1,86 +1,36 @@
-import type { MutableRefObject, RefObject } from 'react';
+import type { RefObject } from 'react';
 
-import type { Subject } from '~/common/lib/subject';
-
-import type { ColorVariantCssName, ColorVariantsByName } from './color';
-import { getColorVariantCssValuesByName } from './color';
+import type { ColorVariantName } from './color';
 import type { Viewport } from './viewport';
 
-type CreateBackgroundColorVariantsByNameObserverParameter = {
-    canvasContextStyleRefsByColorVariantCssName: Record<
-        ColorVariantCssName,
-        MutableRefObject<string>
-    >;
-};
-
-function createBackgroundColorVariantsByNameObserver({
-    canvasContextStyleRefsByColorVariantCssName,
-}: CreateBackgroundColorVariantsByNameObserverParameter) {
-    return (colorVariantsByName: ColorVariantsByName) => {
-        const colorVariantCssValuesByName =
-            getColorVariantCssValuesByName(colorVariantsByName);
-
-        for (const [colorVariantCssName, cssValue] of Object.entries(
-            colorVariantCssValuesByName
-        )) {
-            canvasContextStyleRefsByColorVariantCssName[
-                colorVariantCssName as ColorVariantCssName
-            ].current = cssValue;
-        }
-    };
-}
-
-type CreateBackgroundRendererFillStyleGetterParameter = {
-    colorVariantCssName: ColorVariantCssName;
-};
-
-export function createBackgroundRendererFillStyleGetter({
-    colorVariantCssName,
-}: CreateBackgroundRendererFillStyleGetterParameter) {
-    return () =>
-        window.document.documentElement.style.getPropertyValue(
-            colorVariantCssName
-        );
-}
-
-type CreateBackgroundRendererStrokeStyleGetterParameter = {
-    colorVariantCssName: ColorVariantCssName;
-};
-
-export function createBackgroundRendererStrokeStyleGetter({
-    colorVariantCssName,
-}: CreateBackgroundRendererStrokeStyleGetterParameter) {
-    return () =>
-        window.document.documentElement.style.getPropertyValue(
-            colorVariantCssName
-        );
-}
-
 type GetBackgroundRendererAnimationDurationScalarParameter = {
-    colorVariantCssName: ColorVariantCssName;
+    colorVariantName: ColorVariantName;
     viewport: Viewport;
 };
 
 export function getBackgroundRendererAnimationDurationScalar({
-    colorVariantCssName,
+    colorVariantName,
     viewport: { width },
 }: GetBackgroundRendererAnimationDurationScalarParameter) {
     return (
         (width >= 1500 ? 0.8 : width >= 750 ? 0.9 : 1) *
-        (colorVariantCssName === '--primary-color' ? 18 : 7)
+        (colorVariantName === 'primaryColor' ? 18 : 7)
     );
 }
 
-export function getBackgroundRendererRibbonsEdgeGutterForViewport({
-    width,
-}: Viewport) {
+type GetBackgroundRendererRibbonsEdgeGutterParameter = { viewport: Viewport };
+
+export function getBackgroundRendererRibbonsEdgeGutter({
+    viewport: { width },
+}: GetBackgroundRendererRibbonsEdgeGutterParameter) {
     return width >= 1500 ? 200 : width >= 750 ? 150 : 100;
 }
 
-export function getBackgroundRendererRibbonsHeightForViewport({
-    width,
-    height,
-}: Viewport) {
+type GetBackgroundRendererRibbonsHeightParameter = { viewport: Viewport };
+
+export function getBackgroundRendererRibbonsHeight({
+    viewport: { width, height },
+}: GetBackgroundRendererRibbonsHeightParameter) {
     return (width >= 1500 ? 0.8 : width >= 750 ? 0.6 : 0.4) * height;
 }
 
@@ -105,27 +55,4 @@ export function setBackgroundCanvasDimensions({
     canvasElement.style.height = `${viewport.height}px`;
 
     canvasContext.scale(viewport.devicePixelRatio, viewport.devicePixelRatio);
-}
-
-type SetupBackgroundCanvasContextStyleSettingObserverParameter = {
-    canvasContextStyleRefsByColorVariantCssName: Record<
-        ColorVariantCssName,
-        MutableRefObject<string>
-    >;
-    colorVariantsByNameSubject: Subject<ColorVariantsByName>;
-};
-
-export function setupBackgroundColorVariantsByNameObserver({
-    canvasContextStyleRefsByColorVariantCssName,
-    colorVariantsByNameSubject,
-}: SetupBackgroundCanvasContextStyleSettingObserverParameter) {
-    const observeColorVariantsByName =
-        createBackgroundColorVariantsByNameObserver({
-            canvasContextStyleRefsByColorVariantCssName,
-        });
-    colorVariantsByNameSubject.register(observeColorVariantsByName);
-
-    return () => {
-        colorVariantsByNameSubject.unregister(observeColorVariantsByName);
-    };
 }

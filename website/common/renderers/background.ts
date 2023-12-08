@@ -1,20 +1,22 @@
 import type { SetStateAction } from 'jotai';
-import type { MutableRefObject, RefObject } from 'react';
+import type { RefObject } from 'react';
 
+import type { Color } from '~/common/lib/colors/color';
 import { Point } from '~/common/lib/point';
 import type { Renderer } from '~/common/lib/renderer';
 import { getRendererManager } from '~/common/lib/rendererManager';
+import type { Subject } from '~/common/lib/subject';
 import { createMovingRibbonRenderer } from '~/common/renderers/shape';
 import { getArrayElementAtIndex } from '~/common/utils/array';
 import {
     getBackgroundRendererAnimationDurationScalar,
-    getBackgroundRendererRibbonsEdgeGutterForViewport,
-    getBackgroundRendererRibbonsHeightForViewport,
+    getBackgroundRendererRibbonsEdgeGutter,
+    getBackgroundRendererRibbonsHeight,
 } from '~/common/utils/background';
 import type { Bounds } from '~/common/utils/bounded';
 import { getBoundedRandomInteger } from '~/common/utils/bounded';
-import type { ColorVariantCssName } from '~/common/utils/color';
-import { getColorVariantCssNames } from '~/common/utils/color';
+import type { ColorVariantName } from '~/common/utils/color';
+import { getColorVariantNames } from '~/common/utils/color';
 import { createCompositeRenderer } from '~/common/utils/renderer';
 import type { Viewport } from '~/common/utils/viewport';
 
@@ -23,20 +25,17 @@ const xAxisAdjacentAngle = 0.35 * Math.PI;
 const ribbonsInterstitialGutter = 5;
 
 type SetupBackgroundRendererParameter = {
-    canvasContextStyleRefsByColorVariantCssName: Record<
-        ColorVariantCssName,
-        MutableRefObject<string>
-    >;
     canvasElementRef: RefObject<HTMLCanvasElement>;
-    excludedColorVariantCssName: ColorVariantCssName;
+    colorVariantSubjectsByName: Record<ColorVariantName, Subject<Color>>;
+    excludedColorVariantName: ColorVariantName;
     setBackgroundIsVisible: (value: SetStateAction<boolean>) => void;
     viewport: Viewport;
 };
 
 export function setupBackgroundRenderer({
-    canvasContextStyleRefsByColorVariantCssName,
     canvasElementRef,
-    excludedColorVariantCssName,
+    colorVariantSubjectsByName,
+    excludedColorVariantName,
     setBackgroundIsVisible,
     viewport,
 }: SetupBackgroundRendererParameter) {
@@ -49,35 +48,35 @@ export function setupBackgroundRenderer({
     const canvasElement = canvasElementRef.current;
     const canvasContext = canvasElement.getContext('2d')!;
     const rendererManager = getRendererManager();
-    const renderersByColorVariantCssNameByStartingTime = new Map<
-        ColorVariantCssName,
+    const renderersByColorVariantNameByStartingTime = new Map<
+        ColorVariantName,
         Map<number, Renderer>
     >();
-    const ribbonsEdgeGutter =
-        getBackgroundRendererRibbonsEdgeGutterForViewport(viewport);
-    const ribbonsHeight =
-        getBackgroundRendererRibbonsHeightForViewport(viewport);
-    const colorVariantCssNames = getColorVariantCssNames().filter(
-        name => name !== excludedColorVariantCssName
+    const ribbonsEdgeGutter = getBackgroundRendererRibbonsEdgeGutter({
+        viewport,
+    });
+    const ribbonsHeight = getBackgroundRendererRibbonsHeight({ viewport });
+    const colorVariantNames = getColorVariantNames().filter(
+        name => name !== excludedColorVariantName
     );
 
     for (const [
-        colorVariantCssNameIndex,
-        colorVariantCssName,
-    ] of colorVariantCssNames.entries()) {
+        colorVariantNameIndex,
+        colorVariantName,
+    ] of colorVariantNames.entries()) {
         const renderersByStartingTime = new Map<number, Renderer>();
-        const styleRef =
-            canvasContextStyleRefsByColorVariantCssName[colorVariantCssName];
+        const colorVariantSubject =
+            colorVariantSubjectsByName[colorVariantName];
         const animationDurationScalar =
             getBackgroundRendererAnimationDurationScalar({
-                colorVariantCssName,
+                colorVariantName,
                 viewport,
             });
         const leftStartingYs = [ribbonsEdgeGutter];
         const leftYLimit = ribbonsHeight;
 
-        renderersByColorVariantCssNameByStartingTime.set(
-            colorVariantCssName,
+        renderersByColorVariantNameByStartingTime.set(
+            colorVariantName,
             renderersByStartingTime
         );
 
@@ -96,9 +95,12 @@ export function setupBackgroundRenderer({
         for (const [startingYIndex, startingY] of leftStartingYs
             .slice(0, -1)
             .entries()) {
+            const styleRef = colorVariantSubject.map(
+                maybeColor => maybeColor?.toString() ?? ''
+            );
             const startingTime =
                 renderersByStartingTime.size * 250 +
-                (colorVariantCssNameIndex * 250) / colorVariantCssNames.length;
+                (colorVariantNameIndex * 250) / colorVariantNames.length;
             const renderer = createMovingRibbonRenderer({
                 animationDurationScalar,
                 animationStartingDirection: 'alternate',
@@ -142,9 +144,12 @@ export function setupBackgroundRenderer({
         for (const [startingYIndex, startingY] of [
             ...rightStartingYs.slice(0, -1).entries(),
         ].reverse()) {
+            const styleRef = colorVariantSubject.map(
+                maybeColor => maybeColor?.toString() ?? ''
+            );
             const startingTime =
                 (renderersByStartingTime.size - leftRenderersCount) * 250 +
-                (colorVariantCssNameIndex * 250) / colorVariantCssNames.length +
+                (colorVariantNameIndex * 250) / colorVariantNames.length +
                 1;
             const renderer = createMovingRibbonRenderer({
                 animationDurationScalar,
@@ -172,7 +177,7 @@ export function setupBackgroundRenderer({
     }
 
     const finalRenderersByStartingTime = new Map(
-        [...renderersByColorVariantCssNameByStartingTime.values()]
+        [...renderersByColorVariantNameByStartingTime.values()]
             .map(renderersByStartingTime => [...renderersByStartingTime])
             .flat()
     );

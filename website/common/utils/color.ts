@@ -1,5 +1,6 @@
 import type { Color } from '~/common/lib/colors/color';
 import { HslColor } from '~/common/lib/colors/hslColor';
+import type { Subject } from '~/common/lib/subject';
 
 import type { TechName } from './techName';
 
@@ -9,15 +10,57 @@ export type RgbChannelOrAlphaName = 'alpha' | RgbChannelName;
 
 export type ColorScheme = 'dark' | 'light' | 'normal';
 
+export type ColorVariantName = `${'primary' | 'secondary' | 'tertiary'}Color`;
+
+export type ColorVariantsByName = Record<ColorVariantName, Color>;
+
+export type ColorVariantSubjectsByName = Record<
+    ColorVariantName,
+    Subject<Color>
+>;
+
+type ColorVariantCssName = `--${'primary' | 'secondary' | 'tertiary'}-color`;
+
+type ColorVariantCssValuesByName = Record<ColorVariantCssName, string>;
+
+function convertColorVariantNameToCssName(
+    colorVariantName: ColorVariantName
+): ColorVariantCssName {
+    if (colorVariantName === 'primaryColor') {
+        return '--primary-color';
+    } else if (colorVariantName === 'secondaryColor') {
+        return '--secondary-color';
+    } else if (colorVariantName === 'tertiaryColor') {
+        return '--tertiary-color';
+    }
+
+    throw new Error(`Invalid color variant name: ${colorVariantName}`);
+}
+
+type CreateColorVariantCssVariableSetterParameter = {
+    colorVariantName: ColorVariantName;
+};
+
+export function createColorVariantCssVariableSetter({
+    colorVariantName,
+}: CreateColorVariantCssVariableSetterParameter) {
+    const colorVariantCssName =
+        convertColorVariantNameToCssName(colorVariantName);
+
+    return (color: Color) => {
+        const rootElement = window.document.documentElement;
+
+        rootElement.style.setProperty(colorVariantCssName, color.toString());
+    };
+}
+
+export function getColorVariantNames(): ColorVariantName[] {
+    return ['primaryColor', 'secondaryColor', 'tertiaryColor'];
+}
+
 type GetColorVariantsByNameParameter = {
     colorScheme: ColorScheme;
     techName: TechName;
-};
-
-type ColorVariantName = `${'primary' | 'secondary' | 'tertiary'}Color`;
-
-export type ColorVariantsByName = {
-    [K in ColorVariantName]: Color;
 };
 
 export function getColorVariantsByName({
@@ -44,24 +87,13 @@ export function getColorVariantsByName({
     };
 }
 
-export type ColorVariantCssName = `--${
-    | 'primary'
-    | 'secondary'
-    | 'tertiary'}-color`;
-
-export function getColorVariantCssNames(): ColorVariantCssName[] {
-    return ['--primary-color', '--secondary-color', '--tertiary-color'];
-}
-
-export type ColorVariantCssValuesByName = {
-    [K in ColorVariantCssName]: string;
-};
+type GetColorVariantCssValuesByNameParameter = ColorVariantsByName;
 
 export function getColorVariantCssValuesByName({
     primaryColor,
     secondaryColor,
     tertiaryColor,
-}: ColorVariantsByName): ColorVariantCssValuesByName {
+}: GetColorVariantCssValuesByNameParameter): ColorVariantCssValuesByName {
     return {
         '--primary-color': primaryColor.toString(),
         '--secondary-color': secondaryColor.toString(),
@@ -69,24 +101,12 @@ export function getColorVariantCssValuesByName({
     };
 }
 
-export function setColorVariantCssVariables(
-    colorVariantsByName: ColorVariantsByName
-) {
-    const rootElement = window.document.documentElement;
-    const colorVariantCssValuesByName =
-        getColorVariantCssValuesByName(colorVariantsByName);
-
-    for (const [name, value] of Object.entries(colorVariantCssValuesByName)) {
-        rootElement.style.setProperty(name, value);
-    }
-}
-
-export function setFaviconColor({ secondaryColor }: ColorVariantsByName) {
+export function setFaviconColor(color: Color) {
     const canvasElement = window.document.createElement('canvas');
     const canvasContext = canvasElement.getContext('2d')!;
     canvasElement.width = 24;
     canvasElement.height = 24;
-    canvasContext.fillStyle = secondaryColor.toString();
+    canvasContext.fillStyle = color.toString();
 
     canvasContext.fill(new Path2D('M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z'));
 
@@ -105,7 +125,7 @@ export function setFaviconColor({ secondaryColor }: ColorVariantsByName) {
     faviconElement.href = canvasElement.toDataURL(faviconElement.type);
 }
 
-export function setThemeColor({ secondaryColor }: ColorVariantsByName) {
+export function setThemeColor(color: Color) {
     let themeColorMetaElement = window.document.querySelector<HTMLMetaElement>(
         'head meta[name="theme-color"]'
     );
@@ -116,7 +136,7 @@ export function setThemeColor({ secondaryColor }: ColorVariantsByName) {
         window.document.head.appendChild(themeColorMetaElement);
     }
 
-    themeColorMetaElement.content = secondaryColor.toString();
+    themeColorMetaElement.content = color.toString();
 }
 
 const presetColorsByTechName = new Map<TechName, Color>(
