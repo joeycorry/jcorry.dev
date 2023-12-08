@@ -14,7 +14,7 @@ export function getBackgroundRendererAnimationDurationScalar({
 }: GetBackgroundRendererAnimationDurationScalarParameter) {
     return (
         (width >= 1500 ? 0.8 : width >= 750 ? 0.9 : 1) *
-        (colorVariantName === 'primaryColor' ? 18 : 7)
+        (colorVariantName === 'foregroundColor' ? 18 : 7)
     );
 }
 

@@ -23,7 +23,7 @@
     font-size: 6px;
     -webkit-font-smoothing: antialiased;
 
-    background-color: var(--secondary-color);
+    background-color: var(--background-color);
 }
 
 @media (min-width: 300px) {
@@ -52,7 +52,7 @@ body,
 }
 
 body {
-    background-color: var(--secondary-color);
+    background-color: var(--background-color);
 }
 
 body.no-transition * {

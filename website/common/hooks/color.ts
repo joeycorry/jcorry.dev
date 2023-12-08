@@ -140,14 +140,14 @@ export function useColorEffects() {
                           );
                       }
 
-                      const secondaryColorSubject =
-                          colorVariantSubjectsByName.secondaryColor;
+                      const backgroundColorSubject =
+                          colorVariantSubjectsByName.backgroundColor;
 
                       unregisterObserverCallbacks.push(
-                          secondaryColorSubject.register(setFaviconColor)
+                          backgroundColorSubject.register(setFaviconColor)
                       );
                       unregisterObserverCallbacks.push(
-                          secondaryColorSubject.register(setThemeColor)
+                          backgroundColorSubject.register(setThemeColor)
                       );
 
                       return () => {

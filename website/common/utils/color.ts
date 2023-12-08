@@ -10,7 +10,9 @@ export type RgbChannelOrAlphaName = 'alpha' | RgbChannelName;
 
 export type ColorScheme = 'dark' | 'light' | 'normal';
 
-export type ColorVariantName = `${'primary' | 'secondary' | 'tertiary'}Color`;
+type ColorVariantKey = 'accent' | 'background' | 'foreground';
+
+export type ColorVariantName = `${ColorVariantKey}Color`;
 
 export type ColorVariantsByName = Record<ColorVariantName, Color>;
 
@@ -19,19 +21,19 @@ export type ColorVariantSubjectsByName = Record<
     Subject<Color>
 >;
 
-type ColorVariantCssName = `--${'primary' | 'secondary' | 'tertiary'}-color`;
+type ColorVariantCssName = `--${ColorVariantKey}-color`;
 
 type ColorVariantCssValuesByName = Record<ColorVariantCssName, string>;
 
 function convertColorVariantNameToCssName(
     colorVariantName: ColorVariantName
 ): ColorVariantCssName {
-    if (colorVariantName === 'primaryColor') {
-        return '--primary-color';
-    } else if (colorVariantName === 'secondaryColor') {
-        return '--secondary-color';
-    } else if (colorVariantName === 'tertiaryColor') {
-        return '--tertiary-color';
+    if (colorVariantName === 'accentColor') {
+        return '--accent-color';
+    } else if (colorVariantName === 'backgroundColor') {
+        return '--background-color';
+    } else if (colorVariantName === 'foregroundColor') {
+        return '--foreground-color';
     }
 
     throw new Error(`Invalid color variant name: ${colorVariantName}`);
@@ -55,7 +57,7 @@ export function createColorVariantCssVariableSetter({
 }
 
 export function getColorVariantNames(): ColorVariantName[] {
-    return ['primaryColor', 'secondaryColor', 'tertiaryColor'];
+    return ['accentColor', 'backgroundColor', 'foregroundColor'];
 }
 
 type GetColorVariantsByNameParameter = {
@@ -71,9 +73,9 @@ export function getColorVariantsByName({
 
     if (colorScheme === 'normal') {
         return {
-            primaryColor: color,
-            secondaryColor: color,
-            tertiaryColor: color,
+            accentColor: color,
+            backgroundColor: color,
+            foregroundColor: color,
         };
     }
 
@@ -81,23 +83,23 @@ export function getColorVariantsByName({
     const lighterColor = color.lighten(0.66);
 
     return {
-        primaryColor: colorScheme === 'dark' ? lighterColor : darkerColor,
-        secondaryColor: colorScheme === 'dark' ? darkerColor : lighterColor,
-        tertiaryColor: color,
+        foregroundColor: colorScheme === 'dark' ? lighterColor : darkerColor,
+        backgroundColor: colorScheme === 'dark' ? darkerColor : lighterColor,
+        accentColor: color,
     };
 }
 
 type GetColorVariantCssValuesByNameParameter = ColorVariantsByName;
 
 export function getColorVariantCssValuesByName({
-    primaryColor,
-    secondaryColor,
-    tertiaryColor,
+    accentColor,
+    backgroundColor,
+    foregroundColor,
 }: GetColorVariantCssValuesByNameParameter): ColorVariantCssValuesByName {
     return {
-        '--primary-color': primaryColor.toString(),
-        '--secondary-color': secondaryColor.toString(),
-        '--tertiary-color': tertiaryColor.toString(),
+        '--accent-color': accentColor.toString(),
+        '--background-color': backgroundColor.toString(),
+        '--foreground-color': foregroundColor.toString(),
     };
 }
 

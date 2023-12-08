@@ -33,7 +33,7 @@
     height: 4.5em;
     width: 4.5em;
 
-    stroke: var(--primary-color);
+    stroke: var(--foreground-color);
 }
 
 @media (min-width: 300px) {

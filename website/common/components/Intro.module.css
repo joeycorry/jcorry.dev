@@ -3,7 +3,7 @@
 
     font-size: 5em;
 
-    color: var(--primary-color);
+    color: var(--foreground-color);
 
     pointer-events: none;
     user-select: none;
@@ -20,13 +20,13 @@
 .tech-name {
     font-weight: 700;
 
-    color: var(--primary-color);
+    color: var(--foreground-color);
 }
 
 .tech-name::after {
     content: attr(data-hidden-tech-name);
 
-    background-color: var(--primary-color);
+    background-color: var(--foreground-color);
     color: transparent;
 }
 
