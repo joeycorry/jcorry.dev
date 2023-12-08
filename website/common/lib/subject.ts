@@ -22,7 +22,7 @@ export class Subject<T> implements MutableRefObject<T> {
         return this.#value;
     }
 
-    map<U>(mapper: (value?: T) => U) {
+    public map<U>(mapper: (value?: T) => U) {
         const subject = new Subject(
             this.#value === emptyValueSymbol ? mapper() : mapper(this.#value)
         );
@@ -32,7 +32,7 @@ export class Subject<T> implements MutableRefObject<T> {
         return subject;
     }
 
-    register(observer: Observer<T>): UnregisterObserver {
+    public register(observer: Observer<T>): UnregisterObserver {
         this.#observers.push(observer);
 
         if (this.#value !== emptyValueSymbol) {
@@ -42,7 +42,7 @@ export class Subject<T> implements MutableRefObject<T> {
         return () => this.#unregister(observer);
     }
 
-    set(newValue: T) {
+    public set(newValue: T) {
         this.#value = newValue;
 
         for (const observer of this.#observers) {

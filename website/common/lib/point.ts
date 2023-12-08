@@ -4,7 +4,7 @@ import { Vector } from './vector';
 type PointAddAngleAndLengthParameter = VectorStaticFromAngleAndLengthParameter;
 
 export class Point {
-    constructor(public x: number, public y: number) {}
+    public constructor(public x: number, public y: number) {}
 
     public addAngleAndLength(parameter: PointAddAngleAndLengthParameter) {
         return this.addVector(Vector.fromAngleAndLength(parameter));

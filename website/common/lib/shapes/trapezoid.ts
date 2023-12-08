@@ -24,7 +24,7 @@ export class Trapezoid extends Shape {
     #counterClockwise: boolean;
     #parallelLineDataPair: ParallelLineDataPair;
 
-    constructor({
+    public constructor({
         angle,
         counterClockwise,
         parallelLineDataPair,

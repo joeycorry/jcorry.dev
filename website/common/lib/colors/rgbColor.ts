@@ -24,7 +24,7 @@ export class RgbColor implements Color<RgbColor> {
     #greenPercentage: number;
     #redPercentage: number;
 
-    constructor({
+    public constructor({
         alphaPercentage,
         bluePercentage,
         greenPercentage,
