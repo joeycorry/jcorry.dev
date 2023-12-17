@@ -48,12 +48,12 @@ export function getBackgroundRendererMappedStyleSubject({
     complementaryColorVariantSubject,
     interpolationPercentageSubject,
 }: GetBackgroundRendererMappedStyleSubjectParameter) {
-    return Subject.mapAll(
+    return Subject.mapAll<[Color, Color, number], string>(
         [
             colorVariantSubject,
             complementaryColorVariantSubject,
             interpolationPercentageSubject,
-        ] as const,
+        ],
         (...args) => {
             if (args.length === 0) {
                 return '';
