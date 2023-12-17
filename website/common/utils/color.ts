@@ -11,7 +11,13 @@ export type RgbChannelOrAlphaName = 'alpha' | RgbChannelName;
 
 export type ColorScheme = 'dark' | 'light' | 'normal';
 
-type ColorVariantKey = 'accent' | 'background' | 'foreground';
+type ColorVariantKey =
+    | 'accent'
+    | 'background'
+    | 'foreground'
+    | 'secondaryAccent'
+    | 'secondaryBackground'
+    | 'secondaryForeground';
 
 export type ColorVariantName = `${ColorVariantKey}Color`;
 
@@ -35,6 +41,12 @@ function convertColorVariantNameToCssName(
         return '--background-color';
     } else if (colorVariantName === 'foregroundColor') {
         return '--foreground-color';
+    } else if (colorVariantName === 'secondaryAccentColor') {
+        return '--secondary-accent-color';
+    } else if (colorVariantName === 'secondaryBackgroundColor') {
+        return '--secondary-background-color';
+    } else if (colorVariantName === 'secondaryForegroundColor') {
+        return '--secondary-foreground-color';
     }
 
     throw new Error(`Invalid color variant name: ${colorVariantName}`);
@@ -58,7 +70,14 @@ export function createColorVariantCssVariableSetter({
 }
 
 export function getColorVariantNames(): ColorVariantName[] {
-    return ['accentColor', 'backgroundColor', 'foregroundColor'];
+    return [
+        'accentColor',
+        'backgroundColor',
+        'foregroundColor',
+        'secondaryAccentColor',
+        'secondaryBackgroundColor',
+        'secondaryForegroundColor',
+    ];
 }
 
 type GetColorVariantsByNameParameter = {
@@ -77,16 +96,30 @@ export function getColorVariantsByName({
             accentColor: color,
             backgroundColor: color,
             foregroundColor: color,
+            secondaryAccentColor: color,
+            secondaryBackgroundColor: color,
+            secondaryForegroundColor: color,
         };
     }
 
+    const slightlyDarkerColor = color.darken(0.3);
     const darkerColor = color.darken(0.5);
-    const lighterColor = color.lighten(0.66);
+    const darkestColor = color.darken(0.9);
+    const slightlyLighterColor = color.lighten(0.3);
+    const lighterColor = color.lighten(0.5);
+    const lightestColor = color.lighten(0.9);
 
     return {
+        accentColor:
+            colorScheme === 'dark' ? slightlyLighterColor : slightlyDarkerColor,
+        backgroundColor: colorScheme === 'dark' ? darkestColor : lightestColor,
         foregroundColor: colorScheme === 'dark' ? lighterColor : darkerColor,
-        backgroundColor: colorScheme === 'dark' ? darkerColor : lighterColor,
-        accentColor: color,
+        secondaryAccentColor:
+            colorScheme === 'dark' ? darkerColor : lighterColor,
+        secondaryBackgroundColor:
+            colorScheme === 'dark' ? lightestColor : darkestColor,
+        secondaryForegroundColor:
+            colorScheme === 'dark' ? slightlyDarkerColor : slightlyLighterColor,
     };
 }
 
@@ -96,11 +129,17 @@ export function getColorVariantCssValuesByName({
     accentColor,
     backgroundColor,
     foregroundColor,
+    secondaryAccentColor,
+    secondaryBackgroundColor,
+    secondaryForegroundColor,
 }: GetColorVariantCssValuesByNameParameter): ColorVariantCssValuesByName {
     return {
         '--accent-color': accentColor.toString(),
         '--background-color': backgroundColor.toString(),
         '--foreground-color': foregroundColor.toString(),
+        '--secondary-accent-color': secondaryAccentColor.toString(),
+        '--secondary-background-color': secondaryBackgroundColor.toString(),
+        '--secondary-foreground-color': secondaryForegroundColor.toString(),
     };
 }
 
