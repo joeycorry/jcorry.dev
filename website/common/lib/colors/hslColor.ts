@@ -92,9 +92,18 @@ export class HslColor implements Color<HslColor> {
     }
 
     public toString() {
-        return `hsl(${this.#hueDegrees}deg ${
-            this.#saturationPercentage * 100
-        }% ${this.#lightnessPercentage * 100}% / ${this.#alphaPercentage})`;
+        const formattedHueDegrees = parseFloat(this.#hueDegrees.toFixed(3));
+        const formattedSaturationPercentage = parseFloat(
+            (this.#saturationPercentage * 100).toFixed(3)
+        );
+        const formattedLightnessPercentage = parseFloat(
+            (this.#lightnessPercentage * 100).toFixed(3)
+        );
+        const formattedAlphaPercentage = parseFloat(
+            this.#alphaPercentage.toFixed(3)
+        );
+
+        return `hsl(${formattedHueDegrees}deg ${formattedSaturationPercentage}% ${formattedLightnessPercentage}% / ${formattedAlphaPercentage})`;
     }
 
     #getRgbChannel(rgbChannelName: RgbChannelName) {

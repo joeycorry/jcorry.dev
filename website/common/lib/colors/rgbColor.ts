@@ -142,9 +142,20 @@ export class RgbColor implements Color<RgbColor> {
     }
 
     public toString() {
-        return `rgb(${this.#redPercentage * 100}% ${
-            this.#greenPercentage * 100
-        }% ${this.#bluePercentage * 100}% / ${this.#alphaPercentage})`;
+        const formattedRedPercentage = parseFloat(
+            (this.#redPercentage * 100).toFixed(3)
+        );
+        const formattedGreenPercentage = parseFloat(
+            (this.#greenPercentage * 100).toFixed(3)
+        );
+        const formattedBluePercentage = parseFloat(
+            (this.#bluePercentage * 100).toFixed(3)
+        );
+        const formattedAlphaPercentage = parseFloat(
+            this.#alphaPercentage.toFixed(3)
+        );
+
+        return `rgb(${formattedRedPercentage}% ${formattedGreenPercentage}% ${formattedBluePercentage}% / ${formattedAlphaPercentage})`;
     }
 
     #getRgbChannelOrAlpha(rgbChannelOrAlphaName: RgbChannelOrAlphaName) {
