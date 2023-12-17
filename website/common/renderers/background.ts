@@ -48,10 +48,7 @@ export function setupBackgroundRenderer({
     const canvasElement = canvasElementRef.current;
     const canvasContext = canvasElement.getContext('2d')!;
     const rendererManager = getRendererManager();
-    const renderersByColorVariantNameByStartingTime = new Map<
-        ColorVariantName,
-        Map<number, Renderer>
-    >();
+    const renderersByStartingTimeEntries: Array<[number, Renderer]> = [];
     const ribbonsEdgeGutter = getBackgroundRendererRibbonsEdgeGutter({
         viewport,
     });
@@ -64,7 +61,6 @@ export function setupBackgroundRenderer({
         colorVariantNameIndex,
         colorVariantName,
     ] of colorVariantNames.entries()) {
-        const renderersByStartingTime = new Map<number, Renderer>();
         const colorVariantSubject =
             colorVariantSubjectsByName[colorVariantName];
         const animationDurationScalar =
@@ -74,11 +70,6 @@ export function setupBackgroundRenderer({
             });
         const leftStartingYs = [ribbonsEdgeGutter];
         const leftYLimit = ribbonsHeight;
-
-        renderersByColorVariantNameByStartingTime.set(
-            colorVariantName,
-            renderersByStartingTime
-        );
 
         while (
             ribbonsInterstitialGutter +
@@ -99,9 +90,9 @@ export function setupBackgroundRenderer({
                 maybeColor => maybeColor?.toString() ?? ''
             );
             const startingTime =
-                renderersByStartingTime.size * 250 +
+                startingYIndex * 250 +
                 (colorVariantNameIndex * 250) / colorVariantNames.length;
-            const renderer = createMovingRibbonRenderer({
+            const movingRibbonRenderer = createMovingRibbonRenderer({
                 animationDurationScalar,
                 animationStartingDirection: 'alternate',
                 canvasContext,
@@ -122,10 +113,12 @@ export function setupBackgroundRenderer({
                 xAxisAdjacentAngle,
             });
 
-            renderersByStartingTime.set(startingTime, renderer);
+            renderersByStartingTimeEntries.push([
+                startingTime,
+                movingRibbonRenderer,
+            ]);
         }
 
-        const leftRenderersCount = renderersByStartingTime.size;
         const rightStartingYs = [viewport.height - ribbonsHeight];
         const rightYLimit = viewport.height - ribbonsEdgeGutter;
 
@@ -143,15 +136,14 @@ export function setupBackgroundRenderer({
 
         for (const [startingYIndex, startingY] of [
             ...rightStartingYs.slice(0, -1).entries(),
-        ].reverse()) {
+        ]) {
             const styleRef = colorVariantSubject.map(
                 maybeColor => maybeColor?.toString() ?? ''
             );
             const startingTime =
-                (renderersByStartingTime.size - leftRenderersCount) * 250 +
-                (colorVariantNameIndex * 250) / colorVariantNames.length +
-                1;
-            const renderer = createMovingRibbonRenderer({
+                (rightStartingYs.length - startingYIndex - 2) * 250 +
+                (colorVariantNameIndex * 250) / colorVariantNames.length;
+            const movingRibbonRenderer = createMovingRibbonRenderer({
                 animationDurationScalar,
                 animationStartingDirection: 'alternate-reverse',
                 canvasContext,
@@ -172,17 +164,15 @@ export function setupBackgroundRenderer({
                 xAxisAdjacentAngle,
             });
 
-            renderersByStartingTime.set(startingTime, renderer);
+            renderersByStartingTimeEntries.push([
+                startingTime,
+                movingRibbonRenderer,
+            ]);
         }
     }
 
-    const finalRenderersByStartingTime = new Map(
-        [...renderersByColorVariantNameByStartingTime.values()]
-            .map(renderersByStartingTime => [...renderersByStartingTime])
-            .flat()
-    );
     const compositeRenderer = createCompositeRenderer({
-        renderersByStartingTime: finalRenderersByStartingTime,
+        renderersByStartingTimeEntries,
     });
 
     rendererManager.addRenderer(compositeRenderer);

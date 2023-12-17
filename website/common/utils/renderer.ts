@@ -18,17 +18,17 @@ type CreateCompositeRendererParameter = Pick<
     RendererOptions,
     'animationIterationCount'
 > & {
-    renderersByStartingTime: Map<number, Renderer>;
+    renderersByStartingTimeEntries: Iterable<[number, Renderer]>;
 };
 
 export function createCompositeRenderer({
-    renderersByStartingTime,
+    renderersByStartingTimeEntries,
     ...rendererOptions
 }: CreateCompositeRendererParameter) {
-    const compositeRendererTotalDuration = [
-        ...renderersByStartingTime.values(),
-    ].reduce(
-        (compositeRendererTotalDuration_, renderer) =>
+    const compositeRendererTotalDuration = Array.from(
+        renderersByStartingTimeEntries
+    ).reduce(
+        (compositeRendererTotalDuration_, [, renderer]) =>
             compositeRendererTotalDuration_ + renderer.getTotalDuration(),
         0
     );
@@ -37,7 +37,10 @@ export function createCompositeRenderer({
         ({ totalElapsedTime: compositeRendererTotalElapsedTime }) => {
             const currentlyAnimatingRenderers: Renderer[] = [];
 
-            for (const [startingTime, renderer] of renderersByStartingTime) {
+            for (const [
+                startingTime,
+                renderer,
+            ] of renderersByStartingTimeEntries) {
                 if (
                     compositeRendererTotalElapsedTime < startingTime ||
                     startingTime + renderer.getTotalDuration() <

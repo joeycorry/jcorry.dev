@@ -75,9 +75,9 @@ export function createColorVariantSubjectsByNameTransitionRenderer({
     });
 
     return createCompositeRenderer({
-        renderersByStartingTime: new Map(
-            colorVariantNames.map((colorVariantName, index) => [
-                Number.EPSILON * index,
+        renderersByStartingTimeEntries: colorVariantNames.map(
+            colorVariantName => [
+                0,
                 createColorSubjectTransitionRenderer({
                     animationDuration,
                     colorSubject: colorVariantSubjectsByName[colorVariantName],
@@ -85,7 +85,7 @@ export function createColorVariantSubjectsByNameTransitionRenderer({
                     previousColor:
                         previousColorVariantsByName[colorVariantName],
                 }),
-            ])
+            ]
         ),
     });
 }
