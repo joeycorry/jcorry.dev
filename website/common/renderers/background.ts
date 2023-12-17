@@ -5,7 +5,7 @@ import type { Color } from '~/common/lib/colors/color';
 import { Point } from '~/common/lib/point';
 import type { Renderer } from '~/common/lib/renderer';
 import { getRendererManager } from '~/common/lib/rendererManager';
-import type { Subject } from '~/common/lib/subject';
+import { Subject } from '~/common/lib/subject';
 import { createMovingRibbonRenderer } from '~/common/renderers/shape';
 import { getArrayElementAtIndex } from '~/common/utils/array';
 import {
@@ -19,6 +19,8 @@ import type { ColorVariantName } from '~/common/utils/color';
 import { getColorVariantNames } from '~/common/utils/color';
 import { createCompositeRenderer } from '~/common/utils/renderer';
 import type { Viewport } from '~/common/utils/viewport';
+
+import { createNumberTransitionRenderer } from './math';
 
 const ribbonWidthBounds: Bounds = { minimum: 20, maximum: 80 };
 const xAxisAdjacentAngle = 0.35 * Math.PI;
@@ -85,6 +87,7 @@ export function setupBackgroundRenderer({
         for (const [startingYIndex, startingY] of leftStartingYs
             .slice(0, -1)
             .entries()) {
+            const interpolationPercentageSubject = new Subject<number>();
             const styleRef = colorVariantSubject.map(
                 maybeColor => maybeColor?.toString() ?? ''
             );
@@ -111,10 +114,21 @@ export function setupBackgroundRenderer({
                 strokeStyle: styleRef,
                 xAxisAdjacentAngle,
             });
+            const interpolationRenderer = createNumberTransitionRenderer({
+                animationDuration: 1500 + Math.random() * 2000,
+                animationIterationCount: Number.POSITIVE_INFINITY,
+                animationStartingDirection: 'alternate',
+                numberSubject: interpolationPercentageSubject,
+                range: { minimum: 0, maximum: 1 },
+            });
 
             renderersByStartingTimeEntries.push([
                 startingTime,
                 movingRibbonRenderer,
+            ]);
+            renderersByStartingTimeEntries.push([
+                startingTime,
+                interpolationRenderer,
             ]);
         }
 
@@ -136,6 +150,7 @@ export function setupBackgroundRenderer({
         for (const [startingYIndex, startingY] of [
             ...rightStartingYs.slice(0, -1).entries(),
         ]) {
+            const interpolationPercentageSubject = new Subject<number>();
             const styleRef = colorVariantSubject.map(
                 maybeColor => maybeColor?.toString() ?? ''
             );
@@ -162,10 +177,21 @@ export function setupBackgroundRenderer({
                 strokeStyle: styleRef,
                 xAxisAdjacentAngle,
             });
+            const interpolationRenderer = createNumberTransitionRenderer({
+                animationDuration: 1500 + Math.random() * 2000,
+                animationIterationCount: Number.POSITIVE_INFINITY,
+                animationStartingDirection: 'alternate',
+                numberSubject: interpolationPercentageSubject,
+                range: { minimum: 0, maximum: 1 },
+            });
 
             renderersByStartingTimeEntries.push([
                 startingTime,
                 movingRibbonRenderer,
+            ]);
+            renderersByStartingTimeEntries.push([
+                startingTime,
+                interpolationRenderer,
             ]);
         }
     }
