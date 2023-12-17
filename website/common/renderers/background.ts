@@ -20,7 +20,7 @@ import { getColorVariantNames } from '~/common/utils/color';
 import { createCompositeRenderer } from '~/common/utils/renderer';
 import type { Viewport } from '~/common/utils/viewport';
 
-const ribbonWidthBounds: Bounds = { minimum: 30, maximum: 60 };
+const ribbonWidthBounds: Bounds = { minimum: 20, maximum: 80 };
 const xAxisAdjacentAngle = 0.35 * Math.PI;
 const ribbonsInterstitialGutter = 5;
 
