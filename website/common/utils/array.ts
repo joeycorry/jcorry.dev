@@ -1,5 +1,19 @@
 import { modulo } from './math';
 
+type FixedArrayHelper<
+    T,
+    N extends number,
+    R extends T[]
+> = `${N}` extends `-${number}`
+    ? never
+    : number extends N
+    ? T[]
+    : R['length'] extends N
+    ? R
+    : FixedArrayHelper<T, N, [...R, T]>;
+
+export type FixedArray<T, N extends number> = FixedArrayHelper<T, N, []>;
+
 export const getArrayElementAtIndex = Object.prototype.hasOwnProperty.call(
     Array.prototype,
     'at'

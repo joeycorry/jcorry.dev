@@ -1,10 +1,10 @@
 import type { Point } from '~/common/lib/point';
-import type { Tuple } from '~/common/utils/tuple';
+import type { FixedArray } from '~/common/utils/array';
 
 import type { ShapeConstructorParameter } from './shape';
 import { Shape } from './shape';
 
-type ParallelLineDataPair = Tuple<
+type ParallelLineDataPair = FixedArray<
     {
         startingPoint: Point;
         length: number;
@@ -20,7 +20,7 @@ export type TrapezoidConstructorParameter = ShapeConstructorParameter & {
 
 export class Trapezoid extends Shape {
     #angle: number;
-    #cachedBoundingPoints?: Tuple<Point, 4>;
+    #cachedBoundingPoints?: FixedArray<Point, 4>;
     #counterClockwise: boolean;
     #parallelLineDataPair: ParallelLineDataPair;
 
@@ -49,7 +49,7 @@ export class Trapezoid extends Shape {
         return path;
     }
 
-    get #boundingPoints(): Tuple<Point, 4> {
+    get #boundingPoints(): FixedArray<Point, 4> {
         if (this.#cachedBoundingPoints !== undefined) {
             return this.#cachedBoundingPoints;
         }
