@@ -22,14 +22,33 @@ export class Subject<T> implements MutableRefObject<T> {
         return this.#value;
     }
 
-    public map<U>(mapper: (value?: T) => U) {
+    public static mapAll<T extends unknown[], U>(
+        subjects: { [K in keyof T]: Subject<T[K]> },
+        mapper: (...values: [] | { [K in keyof T]: T[K] }) => U
+    ): [Subject<U>, UnregisterObserver] {
+        const [combinedSubject, unregisterCombinedObserver] =
+            Subject.#combine<T>(...subjects);
+        const [mappedSubject, unregisterMappedObserver] = combinedSubject.map(
+            (...args) => (args.length === 0 ? mapper() : mapper(...args[0]!))
+        );
+        const unregisterObservers = () => {
+            unregisterCombinedObserver();
+            unregisterMappedObserver();
+        };
+
+        return [mappedSubject, unregisterObservers];
+    }
+
+    public map<U>(mapper: (value?: T) => U): [Subject<U>, UnregisterObserver] {
         const subject = new Subject(
             this.#value === emptyValueSymbol ? mapper() : mapper(this.#value)
         );
 
-        this.register(value => subject.set(mapper(value)));
+        const unregisterParentObserver = this.register(value =>
+            subject.set(mapper(value))
+        );
 
-        return subject;
+        return [subject, unregisterParentObserver];
     }
 
     public register(observer: Observer<T>): UnregisterObserver {
@@ -48,6 +67,37 @@ export class Subject<T> implements MutableRefObject<T> {
         for (const observer of this.#observers) {
             observer(this.#value);
         }
+    }
+
+    static #combine<T extends unknown[]>(
+        ...subjects: { [K in keyof T]: Subject<T[K]> }
+    ): [Subject<{ [K in keyof T]: T[K] }>, UnregisterObserver] {
+        const combinedValue = Array(subjects.length).fill(emptyValueSymbol) as {
+            [K in keyof T]: T[K] | typeof emptyValueSymbol;
+        };
+        const combinedSubject = new Subject<{ [K in keyof T]: T[K] }>();
+
+        const unregisterParentObserverCallbacks = subjects.map(
+            (subject, index) =>
+                subject.register(value => {
+                    combinedValue[index] = value;
+
+                    if (
+                        combinedValue.every(value => value !== emptyValueSymbol)
+                    ) {
+                        combinedSubject.set(
+                            combinedValue as { [K in keyof T]: T[K] }
+                        );
+                    }
+                })
+        );
+        const unregisterParentObservers = () => {
+            for (const unregisterParentObserver of unregisterParentObserverCallbacks) {
+                unregisterParentObserver();
+            }
+        };
+
+        return [combinedSubject, unregisterParentObservers];
     }
 
     #unregister(observer: Observer<T>) {

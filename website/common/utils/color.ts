@@ -22,6 +22,11 @@ type ColorVariantKey =
 
 export type ColorVariantName = `${ColorVariantKey}Color`;
 
+export type PrimaryColorVariantName = Exclude<
+    ColorVariantName,
+    `secondary${string}`
+>;
+
 export type ColorVariantsByName = Record<ColorVariantName, Color>;
 
 export type ColorVariantSubjectsByName = Record<
@@ -79,6 +84,24 @@ export function getColorVariantNames(): ColorVariantName[] {
         'secondaryBackgroundColor',
         'secondaryForegroundColor',
     ];
+}
+
+type GetComplementaryColorVariantNameParameter = {
+    colorVariantName: PrimaryColorVariantName;
+};
+
+export function getComplementaryColorVariantName({
+    colorVariantName,
+}: GetComplementaryColorVariantNameParameter): ColorVariantName {
+    if (colorVariantName === 'accentColor') {
+        return 'secondaryAccentColor';
+    } else if (colorVariantName === 'backgroundColor') {
+        return 'secondaryBackgroundColor';
+    } else if (colorVariantName === 'foregroundColor') {
+        return 'secondaryForegroundColor';
+    }
+
+    throw new Error(`Invalid color variant name: ${colorVariantName}`);
 }
 
 type GetColorVariantsByNameParameter = {

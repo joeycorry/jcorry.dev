@@ -10,14 +10,19 @@ import { createMovingRibbonRenderer } from '~/common/renderers/shape';
 import { getArrayElementAtIndex } from '~/common/utils/array';
 import {
     getBackgroundRendererAnimationDurationScalar,
+    getBackgroundRendererMappedStyleSubject,
     getBackgroundRendererRibbonsEdgeGutter,
     getBackgroundRendererRibbonsHeight,
 } from '~/common/utils/background';
 import type { Bounds } from '~/common/utils/bounded';
 import { getBoundedRandomInteger } from '~/common/utils/bounded';
-import type { ColorVariantName } from '~/common/utils/color';
-import { getColorVariantNames } from '~/common/utils/color';
+import type {
+    ColorVariantName,
+    PrimaryColorVariantName,
+} from '~/common/utils/color';
+import { getComplementaryColorVariantName } from '~/common/utils/color';
 import { createCompositeRenderer } from '~/common/utils/renderer';
+import type { UnregisterObserver } from '~/common/utils/subject';
 import type { Viewport } from '~/common/utils/viewport';
 
 import { createNumberTransitionRenderer } from './math';
@@ -53,10 +58,11 @@ export function setupBackgroundRenderer({
         viewport,
     });
     const ribbonsHeight = getBackgroundRendererRibbonsHeight({ viewport });
-    const colorVariantNames: ColorVariantName[] = [
+    const colorVariantNames: PrimaryColorVariantName[] = [
         'foregroundColor',
         'accentColor',
     ];
+    const unregisterObserverCallbacks: Array<UnregisterObserver> = [];
 
     for (const [
         colorVariantNameIndex,
@@ -64,6 +70,11 @@ export function setupBackgroundRenderer({
     ] of colorVariantNames.entries()) {
         const colorVariantSubject =
             colorVariantSubjectsByName[colorVariantName];
+        const complementaryColorVariantName = getComplementaryColorVariantName({
+            colorVariantName,
+        });
+        const complementaryColorVariantSubject =
+            colorVariantSubjectsByName[complementaryColorVariantName];
         const animationDurationScalar =
             getBackgroundRendererAnimationDurationScalar({
                 colorVariantName,
@@ -88,9 +99,12 @@ export function setupBackgroundRenderer({
             .slice(0, -1)
             .entries()) {
             const interpolationPercentageSubject = new Subject<number>();
-            const styleRef = colorVariantSubject.map(
-                maybeColor => maybeColor?.toString() ?? ''
-            );
+            const [styleSubject, unregisterObserver] =
+                getBackgroundRendererMappedStyleSubject({
+                    colorVariantSubject,
+                    complementaryColorVariantSubject,
+                    interpolationPercentageSubject,
+                });
             const startingTime =
                 startingYIndex * 250 +
                 (colorVariantNameIndex * 250) / colorVariantNames.length;
@@ -99,7 +113,7 @@ export function setupBackgroundRenderer({
                 animationStartingDirection: 'alternate',
                 canvasContext,
                 directionAngle: -xAxisAdjacentAngle,
-                fillStyle: styleRef,
+                fillStyle: styleSubject,
                 firstRibbonLineStartingPoint: new Point(
                     0,
                     (startingYIndex > 0 ? ribbonsInterstitialGutter : 0) +
@@ -111,7 +125,7 @@ export function setupBackgroundRenderer({
                     leftStartingYs[startingYIndex + 1] -
                         ribbonsInterstitialGutter
                 ),
-                strokeStyle: styleRef,
+                strokeStyle: styleSubject,
                 xAxisAdjacentAngle,
             });
             const interpolationRenderer = createNumberTransitionRenderer({
@@ -130,6 +144,7 @@ export function setupBackgroundRenderer({
                 startingTime,
                 interpolationRenderer,
             ]);
+            unregisterObserverCallbacks.push(unregisterObserver);
         }
 
         const rightStartingYs = [viewport.height - ribbonsHeight];
@@ -151,9 +166,12 @@ export function setupBackgroundRenderer({
             ...rightStartingYs.slice(0, -1).entries(),
         ]) {
             const interpolationPercentageSubject = new Subject<number>();
-            const styleRef = colorVariantSubject.map(
-                maybeColor => maybeColor?.toString() ?? ''
-            );
+            const [styleSubject, unregisterObserver] =
+                getBackgroundRendererMappedStyleSubject({
+                    colorVariantSubject,
+                    complementaryColorVariantSubject,
+                    interpolationPercentageSubject,
+                });
             const startingTime =
                 (rightStartingYs.length - startingYIndex - 2) * 250 +
                 (colorVariantNameIndex * 250) / colorVariantNames.length;
@@ -162,7 +180,7 @@ export function setupBackgroundRenderer({
                 animationStartingDirection: 'alternate-reverse',
                 canvasContext,
                 directionAngle: Math.PI - xAxisAdjacentAngle,
-                fillStyle: styleRef,
+                fillStyle: styleSubject,
                 firstRibbonLineStartingPoint: new Point(
                     viewport.width,
                     (startingYIndex > 0 ? ribbonsInterstitialGutter : 0) +
@@ -174,7 +192,7 @@ export function setupBackgroundRenderer({
                     rightStartingYs[startingYIndex + 1] -
                         ribbonsInterstitialGutter
                 ),
-                strokeStyle: styleRef,
+                strokeStyle: styleSubject,
                 xAxisAdjacentAngle,
             });
             const interpolationRenderer = createNumberTransitionRenderer({
@@ -193,6 +211,7 @@ export function setupBackgroundRenderer({
                 startingTime,
                 interpolationRenderer,
             ]);
+            unregisterObserverCallbacks.push(unregisterObserver);
         }
     }
 
@@ -202,5 +221,11 @@ export function setupBackgroundRenderer({
 
     rendererManager.addRenderer(compositeRenderer);
 
-    return () => rendererManager.removeRenderer(compositeRenderer);
+    return () => {
+        rendererManager.removeRenderer(compositeRenderer);
+
+        for (const unregisterObserver of unregisterObserverCallbacks) {
+            unregisterObserver();
+        }
+    };
 }

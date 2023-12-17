@@ -1,5 +1,8 @@
 import type { RefObject } from 'react';
 
+import type { Color } from '~/common/lib/colors/color';
+import { Subject } from '~/common/lib/subject';
+
 import type { ColorVariantName } from './color';
 import type { Viewport } from './viewport';
 
@@ -32,6 +35,37 @@ export function getBackgroundRendererRibbonsHeight({
     viewport: { width, height },
 }: GetBackgroundRendererRibbonsHeightParameter) {
     return (width >= 1500 ? 0.8 : width >= 750 ? 0.6 : 0.4) * height;
+}
+
+type GetBackgroundRendererMappedStyleSubjectParameter = {
+    colorVariantSubject: Subject<Color>;
+    complementaryColorVariantSubject: Subject<Color>;
+    interpolationPercentageSubject: Subject<number>;
+};
+
+export function getBackgroundRendererMappedStyleSubject({
+    colorVariantSubject,
+    complementaryColorVariantSubject,
+    interpolationPercentageSubject,
+}: GetBackgroundRendererMappedStyleSubjectParameter) {
+    return Subject.mapAll(
+        [
+            colorVariantSubject,
+            complementaryColorVariantSubject,
+            interpolationPercentageSubject,
+        ] as const,
+        (...args) => {
+            if (args.length === 0) {
+                return '';
+            }
+
+            const [color, complementaryColor, interpolationPercentage] = args;
+
+            return color
+                .interpolate(complementaryColor, interpolationPercentage)
+                .toString();
+        }
+    );
 }
 
 type SetBackgroundCanvasDimensionsParameter = {
