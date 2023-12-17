@@ -4,6 +4,7 @@ import type { Subject } from '~/common/lib/subject';
 
 import { shuffleArray } from './array';
 import type { TechName } from './techName';
+import type { KebabCase } from './type';
 
 export type RgbChannelName = 'blue' | 'green' | 'red';
 
@@ -28,7 +29,7 @@ export type ColorVariantSubjectsByName = Record<
     Subject<Color>
 >;
 
-type ColorVariantCssName = `--${ColorVariantKey}-color`;
+type ColorVariantCssName = `--${KebabCase<ColorVariantKey>}-color`;
 
 type ColorVariantCssValuesByName = Record<ColorVariantCssName, string>;
 
