@@ -31,7 +31,6 @@ export function useBackgroundEffects({
             setupBackgroundRenderer({
                 canvasElementRef,
                 colorVariantSubjectsByName,
-                excludedColorVariantName: 'backgroundColor',
                 setBackgroundIsVisible,
                 viewport,
             }),

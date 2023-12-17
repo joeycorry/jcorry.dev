@@ -27,7 +27,6 @@ const ribbonsInterstitialGutter = 5;
 type SetupBackgroundRendererParameter = {
     canvasElementRef: RefObject<HTMLCanvasElement>;
     colorVariantSubjectsByName: Record<ColorVariantName, Subject<Color>>;
-    excludedColorVariantName: ColorVariantName;
     setBackgroundIsVisible: (value: SetStateAction<boolean>) => void;
     viewport: Viewport;
 };
@@ -35,7 +34,6 @@ type SetupBackgroundRendererParameter = {
 export function setupBackgroundRenderer({
     canvasElementRef,
     colorVariantSubjectsByName,
-    excludedColorVariantName,
     setBackgroundIsVisible,
     viewport,
 }: SetupBackgroundRendererParameter) {
@@ -53,9 +51,10 @@ export function setupBackgroundRenderer({
         viewport,
     });
     const ribbonsHeight = getBackgroundRendererRibbonsHeight({ viewport });
-    const colorVariantNames = getColorVariantNames().filter(
-        name => name !== excludedColorVariantName
-    );
+    const colorVariantNames: ColorVariantName[] = [
+        'foregroundColor',
+        'accentColor',
+    ];
 
     for (const [
         colorVariantNameIndex,
