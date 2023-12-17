@@ -95,7 +95,7 @@ export function useColorEffects() {
                       previousTechNameRef.current = techName;
                       const colorVariantSubjectsByNameTransitionRenderer =
                           createColorVariantSubjectsByNameTransitionRenderer({
-                              animationDuration: 400,
+                              animationDuration: 800,
                               colorVariantSubjectsByName,
                               newColorScheme: colorScheme,
                               newTechName: techName,
