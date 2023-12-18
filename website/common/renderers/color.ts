@@ -10,10 +10,8 @@ import {
     getColorVariantsByName,
 } from '~/common/utils/color';
 import { easeOutQuint } from '~/common/utils/easing';
-import {
-    type RendererOptions,
-    createCompositeRenderer,
-} from '~/common/utils/renderer';
+import type { RendererOptions } from '~/common/utils/renderer';
+import { createCompositeRenderer } from '~/common/utils/renderer';
 import type { TechName } from '~/common/utils/techName';
 
 type CreateColorSubjectTransitionRendererParameter = Pick<
@@ -36,12 +34,12 @@ export function createColorSubjectTransitionRenderer({
             const percentage = easeOutQuint(currentAnimationPercentage);
             const interpolatedColor = previousColor.interpolate(
                 newColor,
-                percentage
+                percentage,
             );
 
             return [() => colorSubject.set(interpolatedColor)];
         },
-        { animationDuration }
+        { animationDuration },
     );
 }
 
@@ -85,7 +83,7 @@ export function createColorVariantSubjectsByNameTransitionRenderer({
                     previousColor:
                         previousColorVariantsByName[colorVariantName],
                 }),
-            ]
+            ],
         ),
     });
 }

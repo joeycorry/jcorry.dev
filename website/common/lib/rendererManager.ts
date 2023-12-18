@@ -8,11 +8,11 @@ class RendererManager {
     #renderers: Renderer[] = [];
 
     public constructor(
-        constructorSymbol: typeof rendererManagerConstructorSymbol
+        constructorSymbol: typeof rendererManagerConstructorSymbol,
     ) {
         if (constructorSymbol !== rendererManagerConstructorSymbol) {
             throw new Error(
-                `Instances of \`${RendererManager.name}\` can only be constructed indirectly via \`getRenderingManagerInstance()\`.`
+                `Instances of \`${RendererManager.name}\` can only be constructed indirectly via \`getRenderingManagerInstance()\`.`,
             );
         }
     }
@@ -30,7 +30,7 @@ class RendererManager {
         }
 
         this.#renderers = this.#renderers.filter(
-            renderer_ => renderer !== renderer_
+            renderer_ => renderer !== renderer_,
         );
     }
 
@@ -45,7 +45,7 @@ class RendererManager {
 
         this.#isAnimating = true;
         this.#animationFrameRequestId = window.requestAnimationFrame(
-            this.#stepAnimation
+            this.#stepAnimation,
         );
     }
 
@@ -102,7 +102,7 @@ class RendererManager {
         this.#removeFinishedRenderers();
 
         this.#animationFrameRequestId = window.requestAnimationFrame(
-            this.#stepAnimation
+            this.#stepAnimation,
         );
     };
 }
@@ -111,7 +111,7 @@ let maybeRendererManager: RendererManager | undefined;
 
 export function getRendererManager(): RendererManager {
     maybeRendererManager ??= new RendererManager(
-        rendererManagerConstructorSymbol
+        rendererManagerConstructorSymbol,
     );
 
     return maybeRendererManager;

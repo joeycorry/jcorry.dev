@@ -4,7 +4,7 @@ const defaultDelayMilliseconds = 50;
 
 export function debounceFunction<T extends unknown[]>(
     func: (...args: T) => void,
-    options?: { milliseconds?: number }
+    options?: { milliseconds?: number },
 ) {
     const { milliseconds: rawMilliseconds = defaultDelayMilliseconds } =
         options || {};
@@ -28,7 +28,7 @@ export function evauluateNoop() {}
 
 export function throttleFunction<T extends unknown[]>(
     func: (...args: T) => void,
-    options?: { milliseconds?: number }
+    options?: { milliseconds?: number },
 ) {
     const { milliseconds: rawMilliseconds = defaultDelayMilliseconds } =
         options || {};

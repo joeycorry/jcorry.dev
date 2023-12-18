@@ -21,10 +21,10 @@ export function createMovingTrapezoidRenderer({
     ...rendererOptions
 }: CreateMovingTrapezoidRendererParameter) {
     const [firstStartingPoint, secondStartingPoint] = parallelLineDataPair.map(
-        data => data.startingPoint
+        data => data.startingPoint,
     );
     const maxLength = Math.max(
-        ...parallelLineDataPair.map(data => data.length)
+        ...parallelLineDataPair.map(data => data.length),
     );
     const [firstLength, secondLength] = Array(2).fill(maxLength);
     const [firstEndPoint, secondEndPoint] = parallelLineDataPair.map(
@@ -33,7 +33,7 @@ export function createMovingTrapezoidRenderer({
                 angle,
                 counterClockwise,
                 length: maxLength,
-            })
+            }),
     );
     const firstXDistance = firstEndPoint.calculateXDistance(firstStartingPoint);
     const firstYDistance = firstEndPoint.calculateYDistance(firstStartingPoint);
@@ -52,31 +52,31 @@ export function createMovingTrapezoidRenderer({
                               firstStartingPoint.x +
                                   distancePercentage * firstXDistance,
                               firstStartingPoint.y +
-                                  distancePercentage * firstYDistance
-                          )
+                                  distancePercentage * firstYDistance,
+                          ),
                       ),
                       startingPoint: firstStartingPoint,
                   }
                 : distancePercentage > 1
-                ? {
-                      length: new Point(
-                          firstEndPoint.x -
-                              (2 - distancePercentage) * firstXDistance,
+                  ? {
+                        length: new Point(
+                            firstEndPoint.x -
+                                (2 - distancePercentage) * firstXDistance,
 
-                          firstEndPoint.y -
-                              (2 - distancePercentage) * firstYDistance
-                      ).calculateDistance(firstEndPoint),
-                      startingPoint: new Point(
-                          firstEndPoint.x -
-                              (2 - distancePercentage) * firstXDistance,
-                          firstEndPoint.y -
-                              (2 - distancePercentage) * firstYDistance
-                      ),
-                  }
-                : {
-                      length: firstLength,
-                      startingPoint: firstStartingPoint,
-                  };
+                            firstEndPoint.y -
+                                (2 - distancePercentage) * firstYDistance,
+                        ).calculateDistance(firstEndPoint),
+                        startingPoint: new Point(
+                            firstEndPoint.x -
+                                (2 - distancePercentage) * firstXDistance,
+                            firstEndPoint.y -
+                                (2 - distancePercentage) * firstYDistance,
+                        ),
+                    }
+                  : {
+                        length: firstLength,
+                        startingPoint: firstStartingPoint,
+                    };
         const secondLineData =
             distancePercentage < 1
                 ? {
@@ -85,30 +85,30 @@ export function createMovingTrapezoidRenderer({
                               secondStartingPoint.x +
                                   distancePercentage * secondXDistance,
                               secondStartingPoint.y +
-                                  distancePercentage * secondYDistance
-                          )
+                                  distancePercentage * secondYDistance,
+                          ),
                       ),
                       startingPoint: secondStartingPoint,
                   }
                 : distancePercentage > 1
-                ? {
-                      length: new Point(
-                          secondEndPoint.x -
-                              (2 - distancePercentage) * secondXDistance,
-                          secondEndPoint.y -
-                              (2 - distancePercentage) * secondYDistance
-                      ).calculateDistance(secondEndPoint),
-                      startingPoint: new Point(
-                          secondEndPoint.x -
-                              (2 - distancePercentage) * secondXDistance,
-                          secondEndPoint.y -
-                              (2 - distancePercentage) * secondYDistance
-                      ),
-                  }
-                : {
-                      length: secondLength,
-                      startingPoint: secondStartingPoint,
-                  };
+                  ? {
+                        length: new Point(
+                            secondEndPoint.x -
+                                (2 - distancePercentage) * secondXDistance,
+                            secondEndPoint.y -
+                                (2 - distancePercentage) * secondYDistance,
+                        ).calculateDistance(secondEndPoint),
+                        startingPoint: new Point(
+                            secondEndPoint.x -
+                                (2 - distancePercentage) * secondXDistance,
+                            secondEndPoint.y -
+                                (2 - distancePercentage) * secondYDistance,
+                        ),
+                    }
+                  : {
+                        length: secondLength,
+                        startingPoint: secondStartingPoint,
+                    };
 
         return [
             new Trapezoid({

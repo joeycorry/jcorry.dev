@@ -11,7 +11,7 @@ const getViewportValue = import.meta.env.SSR
 
 export const viewportAtom = atomWithNoArgumentSetter<Viewport>(
     getViewportValue(),
-    getViewportValue
+    getViewportValue,
 );
 
 viewportAtom.debugLabel = 'viewportAtom';

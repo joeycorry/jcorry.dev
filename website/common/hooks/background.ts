@@ -18,12 +18,12 @@ export function useBackgroundEffects({
     const setBackgroundIsVisible = useSetAtom(backgroundIsVisibleAtom);
     const viewport = useAtomValue(viewportAtom);
     const colorVariantSubjectsByName = useAtomValue(
-        colorVariantSubjectsByNameAtom
+        colorVariantSubjectsByNameAtom,
     );
 
     useEffect(
         () => setBackgroundCanvasDimensions({ canvasElementRef, viewport }),
-        [canvasElementRef, viewport]
+        [canvasElementRef, viewport],
     );
 
     useEffect(
@@ -39,6 +39,6 @@ export function useBackgroundEffects({
             colorVariantSubjectsByName,
             setBackgroundIsVisible,
             viewport,
-        ]
+        ],
     );
 }

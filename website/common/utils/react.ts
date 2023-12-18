@@ -13,7 +13,7 @@ function isMutableRefObject<T>(thing: unknown): thing is MutableRefObject<T> {
 }
 
 export function getValueFromMutableRefOrRaw<T>(
-    maybeMutableRef: T | MutableRefObject<T>
+    maybeMutableRef: T | MutableRefObject<T>,
 ) {
     return isMutableRefObject(maybeMutableRef)
         ? maybeMutableRef.current

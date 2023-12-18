@@ -3,20 +3,20 @@ import { atom } from 'jotai';
 
 export function atomWithNoArgumentSetter<Value>(
     initialValue: Value,
-    setValue: () => Value
+    setValue: () => Value,
 ): WritableAtom<Value, [undefined], void> {
     const baseAtom = atom(initialValue);
 
     return atom(
         get => get(baseAtom),
-        (_, set) => set(baseAtom, setValue())
+        (_, set) => set(baseAtom, setValue()),
     );
 }
 
 const initializeValueSymbol = Symbol('initializeValue');
 
 export function mountInitializedReadonlyAtom<Value>(
-    getInitialValue: () => Value
+    getInitialValue: () => Value,
 ) {
     const baseAtom = atom<Value | null>(null);
     const resultAtom: WritableAtom<
@@ -30,8 +30,8 @@ export function mountInitializedReadonlyAtom<Value>(
                 baseAtom,
                 value === initializeValueSymbol
                     ? getInitialValue()
-                    : get(baseAtom)
-            )
+                    : get(baseAtom),
+            ),
     );
     resultAtom.onMount = setAtom => setAtom(initializeValueSymbol);
 
@@ -45,13 +45,13 @@ export type AtomSetValueParameters<T> = T extends WritableAtom<
 >
     ? Parameters
     : T extends Atom<infer Parameter>
-    ? [Parameter]
-    : never;
+      ? [Parameter]
+      : never;
 
 export type WritableAtomWithInitialValue<
     Value,
     Args extends unknown[],
-    Result
+    Result,
 > = WritableAtom<Value, Args, Result> & {
     init: Value;
 };

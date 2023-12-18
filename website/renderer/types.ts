@@ -15,7 +15,7 @@ type Page<PageProps extends Record<string, unknown> = Record<string, unknown>> =
     (pageProps: PageProps) => ReactElement;
 
 export type CustomPageContext<
-    PageProps extends Record<string, unknown> = Record<string, unknown>
+    PageProps extends Record<string, unknown> = Record<string, unknown>,
 > = {
     Page: Page<PageProps>;
     documentProps?: DocumentProps;
@@ -26,17 +26,17 @@ export type CustomPageContext<
 };
 
 export type ServerPageContext<
-    PageProps extends Record<string, unknown> = Record<string, unknown>
+    PageProps extends Record<string, unknown> = Record<string, unknown>,
 > = PageContextBuiltInServer<Page<PageProps>> &
     CustomPageContext<PageProps> & {
         originalRequest: Request;
     };
 
 export type ServerOnBeforeRenderResult<
-    PageProps extends Record<string, unknown> = Record<string, unknown>
+    PageProps extends Record<string, unknown> = Record<string, unknown>,
 > = { pageContext: Partial<ServerPageContext<PageProps>> };
 
 export type ClientPageContext<
-    PageProps extends Record<string, unknown> = Record<string, unknown>
+    PageProps extends Record<string, unknown> = Record<string, unknown>,
 > = PageContextBuiltInClientWithServerRouting<Page<PageProps>> &
     CustomPageContext<PageProps>;

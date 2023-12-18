@@ -7,7 +7,7 @@ export interface Color<This extends Color = DerivedColor> {
     darken(rawPercentage: number): This;
     interpolate<OtherColor extends Color>(
         otherColor: OtherColor,
-        rawPercentage: number
+        rawPercentage: number,
     ): This;
     lighten(rawPercentage: number): This;
     toRgbColor(): RgbColor;

@@ -42,7 +42,7 @@ export class RgbColor implements Color<RgbColor> {
 
     public interpolate<OtherColor extends Color>(
         otherColor: OtherColor,
-        rawPercentage: number
+        rawPercentage: number,
     ): RgbColor {
         const otherRgbColor = otherColor.toRgbColor();
         const partialPrivateInterpolateRgbChannelParameter: Omit<
@@ -85,12 +85,12 @@ export class RgbColor implements Color<RgbColor> {
         const maximumPercentage = Math.max(
             redPercentage,
             greenPercentage,
-            bluePercentage
+            bluePercentage,
         );
         const minimumPercentage = Math.min(
             redPercentage,
             greenPercentage,
-            bluePercentage
+            bluePercentage,
         );
         const lightnessPercentage = (maximumPercentage + minimumPercentage) / 2;
 
@@ -117,12 +117,12 @@ export class RgbColor implements Color<RgbColor> {
                       percentageExtremaDifference +
                   (greenPercentage < bluePercentage ? 6 : 0)
                 : maximumPercentage === greenPercentage
-                ? (bluePercentage - redPercentage) /
-                      percentageExtremaDifference +
-                  2
-                : (redPercentage - greenPercentage) /
-                      percentageExtremaDifference +
-                  4;
+                  ? (bluePercentage - redPercentage) /
+                        percentageExtremaDifference +
+                    2
+                  : (redPercentage - greenPercentage) /
+                        percentageExtremaDifference +
+                    4;
 
         return new HslColor({
             alphaPercentage,
@@ -143,16 +143,16 @@ export class RgbColor implements Color<RgbColor> {
 
     public toString() {
         const formattedRedPercentage = parseFloat(
-            (this.#redPercentage * 100).toFixed(3)
+            (this.#redPercentage * 100).toFixed(3),
         );
         const formattedGreenPercentage = parseFloat(
-            (this.#greenPercentage * 100).toFixed(3)
+            (this.#greenPercentage * 100).toFixed(3),
         );
         const formattedBluePercentage = parseFloat(
-            (this.#bluePercentage * 100).toFixed(3)
+            (this.#bluePercentage * 100).toFixed(3),
         );
         const formattedAlphaPercentage = parseFloat(
-            this.#alphaPercentage.toFixed(3)
+            this.#alphaPercentage.toFixed(3),
         );
 
         return `rgb(${formattedRedPercentage}% ${formattedGreenPercentage}% ${formattedBluePercentage}% / ${formattedAlphaPercentage})`;
@@ -176,10 +176,10 @@ export class RgbColor implements Color<RgbColor> {
         rgbChannelOrAlphaName,
     }: PrivateInterpolateRgbChannelOrAlphaParameter) {
         const thisColorComponent = this.#getRgbChannelOrAlpha(
-            rgbChannelOrAlphaName
+            rgbChannelOrAlphaName,
         );
         const otherColorComponent = otherColor.#getRgbChannelOrAlpha(
-            rgbChannelOrAlphaName
+            rgbChannelOrAlphaName,
         );
 
         return (

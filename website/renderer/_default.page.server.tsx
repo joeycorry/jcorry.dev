@@ -14,7 +14,7 @@ export const passToClient = ['pageProps'];
 export async function render(pageContext: ServerPageContext) {
     const { Page, pageProps } = pageContext;
     const readableStream = await renderToReadableStream(
-        <Page {...pageProps} />
+        <Page {...pageProps} />,
     );
 
     return escapeInject`
@@ -25,7 +25,7 @@ export async function render(pageContext: ServerPageContext) {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <title>${getTitleString(pageContext)}</title>
           <style>${dangerouslySkipEscape(
-              getDefaultStyleString(pageContext)
+              getDefaultStyleString(pageContext),
           )}</style>
         </head>
         <body class="no-transition">

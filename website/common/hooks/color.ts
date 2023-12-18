@@ -25,7 +25,7 @@ export function useMediaQueryListChangeHandler() {
         ({ matches }: MediaQueryListEvent) => {
             setColorScheme(matches ? 'dark' : 'light');
         },
-        [setColorScheme]
+        [setColorScheme],
     );
 }
 
@@ -34,7 +34,7 @@ export function useColorEffects() {
     const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
     const previousColorSchemeRef = useRef(colorScheme);
     const colorVariantSubjectsByName = useAtomValue(
-        colorVariantSubjectsByNameAtom
+        colorVariantSubjectsByNameAtom,
     );
     const techName = useAtomValue(techNameAtom);
     const previousTechNameRef = useRef(techName);
@@ -45,14 +45,14 @@ export function useColorEffects() {
             setColorScheme(
                 window.matchMedia('(prefers-color-scheme: dark)').matches
                     ? 'dark'
-                    : 'light'
+                    : 'light',
             );
         }
     }, [setColorScheme, colorScheme]);
 
     useEffect(() => {
         const mediaQueryList = window.matchMedia(
-            '(prefers-color-scheme: dark)'
+            '(prefers-color-scheme: dark)',
         );
 
         mediaQueryList.addEventListener('change', handleMediaQueryListChange);
@@ -60,7 +60,7 @@ export function useColorEffects() {
         return () => {
             mediaQueryList.removeEventListener(
                 'change',
-                handleMediaQueryListChange
+                handleMediaQueryListChange,
             );
         };
     }, [setColorScheme, handleMediaQueryListChange]);
@@ -104,17 +104,17 @@ export function useColorEffects() {
                           });
 
                       rendererManager.addRenderer(
-                          colorVariantSubjectsByNameTransitionRenderer
+                          colorVariantSubjectsByNameTransitionRenderer,
                       );
 
                       return () => {
                           rendererManager.removeRenderer(
-                              colorVariantSubjectsByNameTransitionRenderer
+                              colorVariantSubjectsByNameTransitionRenderer,
                           );
                       };
                   })()
                 : evauluateNoop(),
-        [rendererManager, colorScheme, colorVariantSubjectsByName, techName]
+        [rendererManager, colorScheme, colorVariantSubjectsByName, techName],
     );
 
     useEffect(
@@ -135,8 +135,8 @@ export function useColorEffects() {
 
                           unregisterObserverCallbacks.push(
                               colorVariantSubject.register(
-                                  setColorVariantCssVariable
-                              )
+                                  setColorVariantCssVariable,
+                              ),
                           );
                       }
 
@@ -145,13 +145,13 @@ export function useColorEffects() {
 
                       unregisterObserverCallbacks.push(
                           secondaryForegroundColorSubject.register(
-                              setFaviconColor
-                          )
+                              setFaviconColor,
+                          ),
                       );
                       unregisterObserverCallbacks.push(
                           secondaryForegroundColorSubject.register(
-                              setThemeColor
-                          )
+                              setThemeColor,
+                          ),
                       );
 
                       return () => {
@@ -161,6 +161,6 @@ export function useColorEffects() {
                       };
                   })()
                 : evauluateNoop(),
-        [colorVariantSubjectsByName]
+        [colorVariantSubjectsByName],
     );
 }

@@ -4,7 +4,10 @@ import { Vector } from './vector';
 type PointAddAngleAndLengthParameter = VectorStaticFromAngleAndLengthParameter;
 
 export class Point {
-    public constructor(public x: number, public y: number) {}
+    public constructor(
+        public x: number,
+        public y: number,
+    ) {}
 
     public addAngleAndLength(parameter: PointAddAngleAndLengthParameter) {
         return this.addVector(Vector.fromAngleAndLength(parameter));
@@ -16,7 +19,7 @@ export class Point {
 
     public calculateDistance(other: Point) {
         return Math.sqrt(
-            Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2)
+            Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2),
         );
     }
 

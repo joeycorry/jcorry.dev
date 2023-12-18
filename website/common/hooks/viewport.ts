@@ -26,7 +26,7 @@ function useWindowResizeHandler() {
             setBackgroundIsVisible(false);
             debouncedSetViewport();
         }),
-        [debouncedSetViewport, setBackgroundIsVisible]
+        [debouncedSetViewport, setBackgroundIsVisible],
     );
 }
 
@@ -43,7 +43,7 @@ export function useViewportEffects() {
 
     useEffect(() => {
         const mediaQueryList = window.matchMedia(
-            `(resolution: ${devicePixelRatio}dppx)`
+            `(resolution: ${devicePixelRatio}dppx)`,
         );
 
         mediaQueryList.addEventListener('change', handleWindowResize);

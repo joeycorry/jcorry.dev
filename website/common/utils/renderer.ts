@@ -26,11 +26,11 @@ export function createCompositeRenderer({
     ...rendererOptions
 }: CreateCompositeRendererParameter) {
     const compositeRendererTotalDuration = Array.from(
-        renderersByStartingTimeEntries
+        renderersByStartingTimeEntries,
     ).reduce(
         (compositeRendererTotalDuration_, [, renderer]) =>
             compositeRendererTotalDuration_ + renderer.getTotalDuration(),
-        0
+        0,
     );
 
     return new Renderer(
@@ -73,6 +73,6 @@ export function createCompositeRenderer({
         {
             ...rendererOptions,
             animationDuration: compositeRendererTotalDuration,
-        }
+        },
     );
 }

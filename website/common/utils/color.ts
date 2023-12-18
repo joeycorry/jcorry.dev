@@ -39,7 +39,7 @@ type ColorVariantCssName = `--${KebabCase<ColorVariantKey>}-color`;
 type ColorVariantCssValuesByName = Record<ColorVariantCssName, string>;
 
 function convertColorVariantNameToCssName(
-    colorVariantName: ColorVariantName
+    colorVariantName: ColorVariantName,
 ): ColorVariantCssName {
     if (colorVariantName === 'accentColor') {
         return '--accent-color';
@@ -178,7 +178,7 @@ export function setFaviconColor(color: Color) {
 
     const faviconElement =
         window.document.head.querySelector<HTMLLinkElement>(
-            'link[rel="icon"]'
+            'link[rel="icon"]',
         ) || window.document.createElement('link');
 
     if (!window.document.head.contains(faviconElement)) {
@@ -193,7 +193,7 @@ export function setFaviconColor(color: Color) {
 
 export function setThemeColor(color: Color) {
     let themeColorMetaElement = window.document.querySelector<HTMLMetaElement>(
-        'head meta[name="theme-color"]'
+        'head meta[name="theme-color"]',
     );
 
     if (themeColorMetaElement === null) {
@@ -221,8 +221,8 @@ const presetColorsByTechName = new Map<TechName, Color>(
                 lightnessPercentage,
                 saturationPercentage,
             }),
-        ]
-    )
+        ],
+    ),
 );
 
 export function getColorForTechName(techName: TechName) {

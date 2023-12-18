@@ -22,13 +22,13 @@ function getClampedNumber(parameter: GetClampedNumberParameter) {
 }
 
 export function getClampedFloat(
-    parameter: Omit<GetClampedNumberParameter, 'isInteger'>
+    parameter: Omit<GetClampedNumberParameter, 'isInteger'>,
 ) {
     return getClampedNumber({ ...parameter, isInteger: false });
 }
 
 export function getClampedInteger(
-    parameter: Omit<GetClampedNumberParameter, 'isInteger'>
+    parameter: Omit<GetClampedNumberParameter, 'isInteger'>,
 ) {
     return getClampedNumber({ ...parameter, isInteger: true });
 }
@@ -65,13 +65,13 @@ function getBoundedRandomNumber({
 }
 
 export function getBoundedRandomFloat(
-    parameter: Omit<GetBoundedRandomNumberParameter, 'isInteger'>
+    parameter: Omit<GetBoundedRandomNumberParameter, 'isInteger'>,
 ) {
     return getBoundedRandomNumber({ ...parameter, isInteger: false });
 }
 
 export function getBoundedRandomInteger(
-    parameter: Omit<GetBoundedRandomNumberParameter, 'isInteger'>
+    parameter: Omit<GetBoundedRandomNumberParameter, 'isInteger'>,
 ) {
     return getBoundedRandomNumber({ ...parameter, isInteger: true });
 }

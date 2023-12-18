@@ -17,7 +17,7 @@ type CurrentAnimationData = {
 };
 
 type GetNextRenderables = (
-    currentAnimationData: CurrentAnimationData
+    currentAnimationData: CurrentAnimationData,
 ) => Renderable[];
 
 type SetAnimationPercentageOptions = {
@@ -37,7 +37,7 @@ export class Renderer implements RenderableObject {
 
     public constructor(
         getNextRenderables: GetNextRenderables,
-        options?: RendererOptions
+        options?: RendererOptions,
     ) {
         this.#getNextRenderables = getNextRenderables;
         this.#startingAnimationDirection =
@@ -100,7 +100,7 @@ export class Renderer implements RenderableObject {
 
     public render() {
         const nextRenderables = this.#getNextRenderables(
-            this.#getCurrentAnimationData()
+            this.#getCurrentAnimationData(),
         );
 
         for (const renderable of nextRenderables) {
@@ -122,10 +122,10 @@ export class Renderer implements RenderableObject {
         rawAnimationPercentage: number,
         {
             shouldConvertPercentageForDirection = true,
-        }: SetAnimationPercentageOptions = {}
+        }: SetAnimationPercentageOptions = {},
     ) {
         const unconvertedAnimationPercentage = getClampedPercentage(
-            rawAnimationPercentage
+            rawAnimationPercentage,
         );
         const animationPercentage =
             !shouldConvertPercentageForDirection ||
@@ -160,7 +160,7 @@ export class Renderer implements RenderableObject {
         return this.#animationDuration === Number.POSITIVE_INFINITY
             ? 0
             : getClampedPercentage(
-                  this.#currentAnimationTime / this.#animationDuration
+                  this.#currentAnimationTime / this.#animationDuration,
               );
     }
 

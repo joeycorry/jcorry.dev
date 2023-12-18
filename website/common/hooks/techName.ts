@@ -17,10 +17,10 @@ import { useNoArgumentSetAtom } from './atom';
 
 export function useTechNameAnimationStarter() {
     const techNameAnimationIsFinished = useAtomValue(
-        techNameAnimationIsFinishedAtom
+        techNameAnimationIsFinishedAtom,
     );
     const setNextTechNameAnimationData = useNoArgumentSetAtom(
-        techNameAnimationDataAtom
+        techNameAnimationDataAtom,
     );
 
     return useCallback(() => {
@@ -37,44 +37,50 @@ function useTechNameAnimationStepper() {
     const setNextTechName = useNoArgumentSetAtom(techNameAtom);
     const techNameAnimationData = useAtomValue(techNameAnimationDataAtom);
     const setNextTechNameAnimationData = useNoArgumentSetAtom(
-        techNameAnimationDataAtom
+        techNameAnimationDataAtom,
     );
 
     return useCallback(
         () =>
-            window.setTimeout(() => {
-                if (
-                    techNameAnimationIsWaitingForNewTechName(
-                        techNameAnimationData
-                    )
-                ) {
-                    setNextTechName();
-                }
+            window.setTimeout(
+                () => {
+                    if (
+                        techNameAnimationIsWaitingForNewTechName(
+                            techNameAnimationData,
+                        )
+                    ) {
+                        setNextTechName();
+                    }
 
-                if (
-                    !techNameAnimationIsFinished({
-                        animationData: techNameAnimationData,
-                        techName,
-                    })
-                ) {
-                    setNextTechNameAnimationData();
-                }
-            }, getTechNameAnimationStepTime({ animationData: techNameAnimationData, techName })),
+                    if (
+                        !techNameAnimationIsFinished({
+                            animationData: techNameAnimationData,
+                            techName,
+                        })
+                    ) {
+                        setNextTechNameAnimationData();
+                    }
+                },
+                getTechNameAnimationStepTime({
+                    animationData: techNameAnimationData,
+                    techName,
+                }),
+            ),
         [
             techNameAnimationData,
             setNextTechName,
             setNextTechNameAnimationData,
             techName,
-        ]
+        ],
     );
 }
 
 export function useTechNameEffects() {
     const techNameAnimationIsFinished = useAtomValue(
-        techNameAnimationIsFinishedAtom
+        techNameAnimationIsFinishedAtom,
     );
     const techNameAnimationShouldRepeat = useAtomValue(
-        techNameAnimationShouldRepeatAtom
+        techNameAnimationShouldRepeatAtom,
     );
     const startTechNameAnimation = useTechNameAnimationStarter();
     const stepTechNameAnimation = useTechNameAnimationStepper();

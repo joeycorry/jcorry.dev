@@ -91,7 +91,7 @@ export function setupBackgroundRenderer({
             leftStartingYs.push(
                 ribbonsInterstitialGutter +
                     getArrayElementAtIndex(leftStartingYs, -1)! +
-                    getBoundedRandomInteger(ribbonWidthBounds)
+                    getBoundedRandomInteger(ribbonWidthBounds),
             );
         }
 
@@ -117,13 +117,13 @@ export function setupBackgroundRenderer({
                 firstRibbonLineStartingPoint: new Point(
                     0,
                     (startingYIndex > 0 ? ribbonsInterstitialGutter : 0) +
-                        startingY
+                        startingY,
                 ),
                 getYLength: point => point.y,
                 secondRibbonLineStartingPoint: new Point(
                     0,
                     leftStartingYs[startingYIndex + 1] -
-                        ribbonsInterstitialGutter
+                        ribbonsInterstitialGutter,
                 ),
                 strokeStyle: styleSubject,
                 xAxisAdjacentAngle,
@@ -158,7 +158,7 @@ export function setupBackgroundRenderer({
             rightStartingYs.push(
                 ribbonsInterstitialGutter +
                     getArrayElementAtIndex(rightStartingYs, -1)! +
-                    getBoundedRandomInteger(ribbonWidthBounds)
+                    getBoundedRandomInteger(ribbonWidthBounds),
             );
         }
 
@@ -184,13 +184,13 @@ export function setupBackgroundRenderer({
                 firstRibbonLineStartingPoint: new Point(
                     viewport.width,
                     (startingYIndex > 0 ? ribbonsInterstitialGutter : 0) +
-                        startingY
+                        startingY,
                 ),
                 getYLength: point => viewport.height - point.y,
                 secondRibbonLineStartingPoint: new Point(
                     viewport.width,
                     rightStartingYs[startingYIndex + 1] -
-                        ribbonsInterstitialGutter
+                        ribbonsInterstitialGutter,
                 ),
                 strokeStyle: styleSubject,
                 xAxisAdjacentAngle,

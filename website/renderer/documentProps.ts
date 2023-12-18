@@ -20,7 +20,7 @@ export function getHtmlAttributesString({
 
     return Object.entries(htmlAttributes)
         .map(([attribute, value]) =>
-            value === undefined ? attribute : `${attribute}="${value}"`
+            value === undefined ? attribute : `${attribute}="${value}"`,
         )
         .join(' ');
 }

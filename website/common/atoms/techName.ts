@@ -20,7 +20,7 @@ export const techNameAtom: TechNameAtom = atom<
     [TechName | undefined],
     void
 >(getRandomTechName(), (get, set, techName) =>
-    set(techNameAtom, techName || getNextTechName(get(techNameAtom)))
+    set(techNameAtom, techName || getNextTechName(get(techNameAtom))),
 );
 
 techNameAtom.debugLabel = 'techNameAtom';
@@ -43,7 +43,7 @@ export const techNameAnimationDataAtom = atom<
             >;
         const techName = get(techNameAtom);
         const { animationStatus, visibleLength } = get(
-            techNameAnimationDataAtom_
+            techNameAnimationDataAtom_,
         );
 
         if (visibleLength === techName.length) {
@@ -83,14 +83,14 @@ export const techNameAnimationDataAtom = atom<
         } else {
             console.warn(
                 'Resetting to default tech name data state; invalid tech name data encountered:',
-                { visibleLength, animationStatus }
+                { visibleLength, animationStatus },
             );
             set(techNameAnimationDataAtom_, {
                 animationStatus: 'paused',
                 visibleLength: techName.length,
             });
         }
-    }
+    },
 );
 
 techNameAnimationDataAtom.debugLabel = 'techNameAnimationDataAtom';
@@ -99,7 +99,7 @@ export const techNameAnimationIsFinishedAtom = atom(get =>
     techNameAnimationIsFinished({
         animationData: get(techNameAnimationDataAtom),
         techName: get(techNameAtom),
-    })
+    }),
 );
 
 techNameAnimationIsFinishedAtom.debugLabel = 'techNameAnimationIsFinishedAtom';
@@ -115,8 +115,8 @@ export const techNameAnimationShouldRepeatAtom: WritableAtomWithInitialValue<
             [boolean],
             void
         >,
-        !get(techNameAnimationShouldRepeatAtom)
-    )
+        !get(techNameAnimationShouldRepeatAtom),
+    ),
 );
 
 export const techNameDisplayDataAtom = atom(get => {

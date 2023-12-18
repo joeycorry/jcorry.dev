@@ -6,6 +6,6 @@ import type { ClientPageContext } from './types';
 export async function render({ Page, pageProps }: ClientPageContext) {
     hydrateRoot(
         window.document.getElementById(rootHtmlId)!,
-        <Page {...pageProps} />
+        <Page {...pageProps} />,
     );
 }

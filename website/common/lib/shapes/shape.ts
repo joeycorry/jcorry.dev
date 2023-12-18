@@ -38,7 +38,7 @@ export abstract class Shape implements RenderableObject {
             ? this._canvasContext.isPointInPath(
                   this._lastPath,
                   candidatePoint.x,
-                  candidatePoint.y
+                  candidatePoint.y,
               )
             : false;
     }

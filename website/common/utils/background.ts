@@ -64,7 +64,7 @@ export function getBackgroundRendererMappedStyleSubject({
             return color
                 .interpolate(complementaryColor, interpolationPercentage)
                 .toString();
-        }
+        },
     );
 }
 

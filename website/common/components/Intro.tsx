@@ -7,7 +7,7 @@ import styles from './Intro.module.css';
 
 function UnmemoizedIntro() {
     const { hiddenTechName, visibleTechName } = useAtomValue(
-        techNameDisplayDataAtom
+        techNameDisplayDataAtom,
     );
 
     return (

@@ -24,12 +24,12 @@ export class Subject<T> implements MutableRefObject<T> {
 
     public static mapAll<T extends unknown[], U>(
         subjects: { [K in keyof T]: Subject<T[K]> },
-        mapper: (...values: [] | { [K in keyof T]: T[K] }) => U
+        mapper: (...values: [] | { [K in keyof T]: T[K] }) => U,
     ): [Subject<U>, UnregisterObserver] {
         const [combinedSubject, unregisterCombinedObserver] =
             Subject.#combine<T>(...subjects);
         const [mappedSubject, unregisterMappedObserver] = combinedSubject.map(
-            (...args) => (args.length === 0 ? mapper() : mapper(...args[0]!))
+            (...args) => (args.length === 0 ? mapper() : mapper(...args[0]!)),
         );
         const unregisterObservers = () => {
             unregisterCombinedObserver();
@@ -41,11 +41,11 @@ export class Subject<T> implements MutableRefObject<T> {
 
     public map<U>(mapper: (value?: T) => U): [Subject<U>, UnregisterObserver] {
         const subject = new Subject(
-            this.#value === emptyValueSymbol ? mapper() : mapper(this.#value)
+            this.#value === emptyValueSymbol ? mapper() : mapper(this.#value),
         );
 
         const unregisterParentObserver = this.register(value =>
-            subject.set(mapper(value))
+            subject.set(mapper(value)),
         );
 
         return [subject, unregisterParentObserver];
@@ -86,10 +86,10 @@ export class Subject<T> implements MutableRefObject<T> {
                         combinedValue.every(value => value !== emptyValueSymbol)
                     ) {
                         combinedSubject.set(
-                            combinedValue as { [K in keyof T]: T[K] }
+                            combinedValue as { [K in keyof T]: T[K] },
                         );
                     }
-                })
+                }),
         );
         const unregisterParentObservers = () => {
             for (const unregisterParentObserver of unregisterParentObserverCallbacks) {

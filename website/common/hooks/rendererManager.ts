@@ -31,14 +31,14 @@ export function useRendererManagerEffects() {
         rendererManager.startAnimation();
         window.document.addEventListener(
             'visibilitychange',
-            handleVisibilityChange
+            handleVisibilityChange,
         );
 
         return () => {
             rendererManager.stopAnimation();
             window.document.removeEventListener(
                 'visibilitychange',
-                handleVisibilityChange
+                handleVisibilityChange,
             );
         };
     }, [rendererManager, handleVisibilityChange]);

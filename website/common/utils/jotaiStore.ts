@@ -11,7 +11,7 @@ export type JotaiStoreAtomSetValueParametersByName = {
 };
 
 export function createJotaiStore(
-    atomSetValueParametersByName: JotaiStoreAtomSetValueParametersByName
+    atomSetValueParametersByName: JotaiStoreAtomSetValueParametersByName,
 ) {
     const store = createStore();
 

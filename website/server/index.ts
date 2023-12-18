@@ -13,7 +13,7 @@ const port = parseInt(process.env.JCORRY_DEV_SERVER_PORT || '3000');
 
 async function pipeReadableStreamToExpressResponse<R>(
     readableStream: ReadableStream<R>,
-    response: Response
+    response: Response,
 ) {
     const streamReader = readableStream.getReader();
     let lastReadResult: ReadableStreamReadResult<R> | undefined;
@@ -49,7 +49,7 @@ async function startServer() {
                     server: {
                         middlewareMode: true,
                     },
-                })
+                }),
             )
         ).middlewares;
 
@@ -78,7 +78,7 @@ async function startServer() {
 
         await pipeReadableStreamToExpressResponse(
             readableStream,
-            res.status(statusCode).type(contentType)
+            res.status(statusCode).type(contentType),
         );
     });
 

@@ -58,7 +58,7 @@ export function getTechNameAnimationStepTime({
 
 export function getNextTechName(techName: TechName) {
     const currentIndex = presetTechNames.findIndex(
-        techName_ => techName === techName_
+        techName_ => techName === techName_,
     );
 
     if (currentIndex === -1) {
@@ -67,7 +67,7 @@ export function getNextTechName(techName: TechName) {
 
     return getArrayElementAtModuloReducedIndex(
         presetTechNames,
-        currentIndex + 1
+        currentIndex + 1,
     )!;
 }
 

@@ -3,24 +3,24 @@ import { modulo } from './math';
 type FixedArrayHelper<
     T,
     N extends number,
-    R extends T[]
+    R extends T[],
 > = `${N}` extends `-${number}`
     ? never
     : number extends N
-    ? T[]
-    : R['length'] extends N
-    ? R
-    : FixedArrayHelper<T, N, [...R, T]>;
+      ? T[]
+      : R['length'] extends N
+        ? R
+        : FixedArrayHelper<T, N, [...R, T]>;
 
 export type FixedArray<T, N extends number> = FixedArrayHelper<T, N, []>;
 
 export const getArrayElementAtIndex = Object.prototype.hasOwnProperty.call(
     Array.prototype,
-    'at'
+    'at',
 )
     ? function getArrayElementAtIndex<T extends unknown[]>(
           array: [...T] | readonly [...T],
-          index: number
+          index: number,
       ): T[number] | undefined {
           return Array.prototype.at.call<
               [...T] | readonly [...T],
@@ -30,7 +30,7 @@ export const getArrayElementAtIndex = Object.prototype.hasOwnProperty.call(
       }
     : function getArrayElementAtIndex<T extends unknown[]>(
           array: [...T] | readonly [...T],
-          index: number
+          index: number,
       ): T[number] | undefined {
           return array[index < 0 ? array.length + index : index];
       };
@@ -41,13 +41,13 @@ export function getRandomArrayElement<T>(array: T[] | readonly T[]) {
 
 export function getArrayElementAtModuloReducedIndex<T extends unknown[]>(
     array: [...T] | readonly [...T],
-    index: number
+    index: number,
 ) {
     return getArrayElementAtIndex(array, modulo(index, array.length));
 }
 
 export function shuffleArray<T extends unknown[]>(
-    array: [...T] | readonly [...T]
+    array: [...T] | readonly [...T],
 ) {
     const arrayCopy = [...array];
 

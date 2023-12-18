@@ -40,7 +40,7 @@ export class HslColor implements Color<HslColor> {
             alphaPercentage: this.#alphaPercentage,
             hueDegrees: this.#hueDegrees,
             lightnessPercentage: getClampedPercentage(
-                this.#lightnessPercentage * (1 - percentage)
+                this.#lightnessPercentage * (1 - percentage),
             ),
             saturationPercentage: this.#saturationPercentage,
         });
@@ -48,7 +48,7 @@ export class HslColor implements Color<HslColor> {
 
     public interpolate<OtherColor extends Color>(
         otherColor: OtherColor,
-        rawPercentage: number
+        rawPercentage: number,
     ): HslColor {
         return this.toRgbColor()
             .interpolate(otherColor, rawPercentage)
@@ -65,7 +65,7 @@ export class HslColor implements Color<HslColor> {
             alphaPercentage: this.#alphaPercentage,
             hueDegrees: this.#hueDegrees,
             lightnessPercentage: getClampedPercentage(
-                this.#lightnessPercentage * (1 + percentage)
+                this.#lightnessPercentage * (1 + percentage),
             ),
             saturationPercentage: this.#saturationPercentage,
         });
@@ -94,13 +94,13 @@ export class HslColor implements Color<HslColor> {
     public toString() {
         const formattedHueDegrees = parseFloat(this.#hueDegrees.toFixed(3));
         const formattedSaturationPercentage = parseFloat(
-            (this.#saturationPercentage * 100).toFixed(3)
+            (this.#saturationPercentage * 100).toFixed(3),
         );
         const formattedLightnessPercentage = parseFloat(
-            (this.#lightnessPercentage * 100).toFixed(3)
+            (this.#lightnessPercentage * 100).toFixed(3),
         );
         const formattedAlphaPercentage = parseFloat(
-            this.#alphaPercentage.toFixed(3)
+            this.#alphaPercentage.toFixed(3),
         );
 
         return `hsl(${formattedHueDegrees}deg ${formattedSaturationPercentage}% ${formattedLightnessPercentage}% / ${formattedAlphaPercentage})`;

@@ -20,9 +20,9 @@ export function createNumberTransitionRenderer({
             () =>
                 numberSubject.set(
                     currentAnimationPercentage * intervalMagnitude +
-                        range.minimum
+                        range.minimum,
                 ),
         ],
-        rendererOptions
+        rendererOptions,
     );
 }
