@@ -7,8 +7,11 @@ FROM node:20.10.0
 # - ./website/server:/home/website/server
 
 WORKDIR /home/website
-COPY .eslintrc .eslintignore .gitignore .prettierrc .prettierignore nodemon.json package.json \
-    tsconfig.eslint.json tsconfig.json vite.config.ts yarn.lock ./
-RUN yarn --frozen-lockfile --non-interactive
 
-CMD yarn dev
+COPY .eslintrc .eslintignore .gitignore .prettierrc .prettierignore nodemon.json package.json \
+    pnpm-lock.yaml tsconfig.eslint.json tsconfig.json vite.config.ts ./
+
+RUN npm install -g pnpm@8.12.1
+RUN pnpm install --frozen-lockfile
+
+CMD pnpm run dev

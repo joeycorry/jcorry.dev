@@ -19,14 +19,14 @@ Lower versions of the prerequisites listed below may work. For a given prerequis
 ### Prerequisites (HTTP)
 
 - Node.js v18.13.0 or later
-- [Yarn](https://classic.yarnpkg.com) v1.22.19 or later (or [NPM](https://www.npmjs.com) v8.19.3 or later)
+- [PNPM](https://pnpm.io/) v8.12.1 or later (or [NPM](https://www.npmjs.com) v8.19.3 or later)
 
-#### Yarn
+#### PNPM
 
 ```
 # Install dependencies and run dev server
 pushd website
-yarn && yarn dev
+pnpm install && pnpm run dev
 popd
 ```
 
