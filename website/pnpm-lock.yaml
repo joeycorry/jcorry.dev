@@ -36,8 +36,8 @@ dependencies:
     specifier: 2.0.3
     version: 2.0.3
   terser:
-    specifier: 5.16.1
-    version: 5.16.1
+    specifier: 5.26.0
+    version: 5.26.0
   tsx:
     specifier: 4.6.2
     version: 4.6.2
@@ -49,7 +49,7 @@ dependencies:
     version: 0.4.150(vite@4.2.1)
   vite:
     specifier: 4.2.1
-    version: 4.2.1(@types/node@20.10.5)(terser@5.16.1)
+    version: 4.2.1(@types/node@20.10.5)(terser@5.26.0)
 
 devDependencies:
   '@types/compression':
@@ -1352,7 +1352,7 @@ packages:
       '@babel/plugin-transform-react-jsx-source': 7.23.3(@babel/core@7.23.6)
       magic-string: 0.27.0
       react-refresh: 0.14.0
-      vite: 4.2.1(@types/node@20.10.5)(terser@5.16.1)
+      vite: 4.2.1(@types/node@20.10.5)(terser@5.26.0)
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -3960,8 +3960,8 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /terser@5.16.1:
-    resolution: {integrity: sha512-xvQfyfA1ayT0qdK47zskQgRZeWLoOQ8JQ6mIgRGVNwZKdQMU+5FkCBjmv4QjcrTzyZquRw2FVtlJSRUmMKQslw==}
+  /terser@5.26.0:
+    resolution: {integrity: sha512-dytTGoE2oHgbNV9nTzgBEPaqAWvcJNl66VZ0BkJqlvp71IjO8CxdBx/ykCNb47cLnCmCvRZ6ZR0tLkqvZCdVBQ==}
     engines: {node: '>=10'}
     hasBin: true
     dependencies:
@@ -4180,10 +4180,10 @@ packages:
       fast-glob: 3.3.2
       sirv: 2.0.3
       source-map-support: 0.5.21
-      vite: 4.2.1(@types/node@20.10.5)(terser@5.16.1)
+      vite: 4.2.1(@types/node@20.10.5)(terser@5.26.0)
     dev: false
 
-  /vite@4.2.1(@types/node@20.10.5)(terser@5.16.1):
+  /vite@4.2.1(@types/node@20.10.5)(terser@5.26.0):
     resolution: {integrity: sha512-7MKhqdy0ISo4wnvwtqZkjke6XN4taqQ2TBaTccLIpOKv7Vp2h4Y+NpmWCnGDeSvvn45KxvWgGyb0MkHvY1vgbg==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -4213,7 +4213,7 @@ packages:
       postcss: 8.4.32
       resolve: 1.22.8
       rollup: 3.29.4
-      terser: 5.16.1
+      terser: 5.26.0
     optionalDependencies:
       fsevents: 2.3.3
     dev: false
