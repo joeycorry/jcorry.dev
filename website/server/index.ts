@@ -2,8 +2,8 @@ import compression from 'compression';
 import type { Response } from 'express';
 import express from 'express';
 import { URL } from 'url';
+import { renderPage } from 'vike/server';
 import type { UserConfig } from 'vite';
-import { renderPage } from 'vite-plugin-ssr/server';
 
 const __dirname = new URL('.', import.meta.url).pathname.slice(0, -1);
 const root = `${__dirname}/..`;

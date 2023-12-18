@@ -1,9 +1,9 @@
 import type { Request } from 'express';
 import type { ReactElement } from 'react';
 import type {
-    PageContextBuiltIn,
     PageContextBuiltInClientWithServerRouting,
-} from 'vite-plugin-ssr/types';
+    PageContextBuiltInServer,
+} from 'vike/types';
 
 export type DocumentProps = {
     defaultStyle?: string;
@@ -27,7 +27,7 @@ export type CustomPageContext<
 
 export type ServerPageContext<
     PageProps extends Record<string, unknown> = Record<string, unknown>
-> = PageContextBuiltIn<Page<PageProps>> &
+> = PageContextBuiltInServer<Page<PageProps>> &
     CustomPageContext<PageProps> & {
         originalRequest: Request;
     };

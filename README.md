@@ -8,7 +8,7 @@
 - [Jotai](https://jotai.org)
 - [Express](https://expressjs.com)
 - [Vite](https://vitejs.dev)
-- [vite-plugin-ssr](https://vite-plugin-ssr.com)
+- [Vike](https://vike.dev)
 - [Docker](https://www.docker.com)
 - [Caddy](https://caddyserver.com)
 
