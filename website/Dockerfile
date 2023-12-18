@@ -1,4 +1,4 @@
-FROM node:18.13.0
+FROM node:20.10.0
 
 # It's expected that these volumes are provided (either by Docker CLI or Docker Compose -- see parent folder)
 # - ./website/common:/home/website/common
