@@ -34,7 +34,7 @@
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "react-feather": "2.0.10",
-        "sirv": "2.0.2",
+        "sirv": "2.0.3",
         "terser": "5.16.1",
         "tsx": "4.6.2",
         "typescript": "4.9.4",
@@ -42,8 +42,8 @@
         "vite-plugin-ssr": "0.4.111"
     },
     "devDependencies": {
-        "@types/compression": "1.7.2",
-        "@types/express": "4.17.15",
+        "@types/compression": "1.7.5",
+        "@types/express": "4.17.21",
         "@types/node": "20.10.5",
         "@types/react": "18.0.26",
         "@types/react-dom": "18.0.10",
@@ -54,7 +54,7 @@
         "eslint-import-resolver-typescript": "3.5.2",
         "eslint-plugin-import": "2.26.0",
         "eslint-plugin-jsx-a11y": "6.6.1",
-        "eslint-plugin-no-relative-import-paths": "1.5.2",
+        "eslint-plugin-no-relative-import-paths": "1.5.3",
         "eslint-plugin-prettier": "4.2.1",
         "eslint-plugin-react": "7.31.11",
         "eslint-plugin-react-hooks": "4.6.0",
