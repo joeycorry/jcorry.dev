@@ -28,8 +28,11 @@ export function createCompositeRenderer({
     const compositeRendererTotalDuration = Array.from(
         renderersByStartingTimeEntries,
     ).reduce(
-        (compositeRendererTotalDuration_, [, renderer]) =>
-            compositeRendererTotalDuration_ + renderer.getTotalDuration(),
+        (compositeRendererTotalDuration_, [startingTime, renderer]) =>
+            Math.max(
+                compositeRendererTotalDuration_,
+                startingTime + renderer.getTotalDuration(),
+            ),
         0,
     );
 
@@ -58,7 +61,7 @@ export function createCompositeRenderer({
                     totalElapsedTime / animationDuration -
                     elapsedAnimationIterationCount;
 
-                while (rawAnimationPercentage >= 1) {
+                while (rawAnimationPercentage > 1) {
                     rawAnimationPercentage--;
 
                     renderer.onIterationFinish();
