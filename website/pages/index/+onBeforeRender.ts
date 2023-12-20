@@ -13,12 +13,13 @@ import type {
     ServerPageContext,
 } from '~/renderer/types';
 
-import type { PageProps } from './index.page';
-import defaultStyle from './index.page.css?inline';
+import type { PageProps } from './+Page';
+import defaultStyle from './page.css?inline';
 
 const title = process.env.JCORRY_DEV_DOCUMENT_TITLE || 'Joey Corry';
 
-export async function onBeforeRender({
+// eslint-disable-next-line import/no-default-export
+export default async function onBeforeRender({
     originalRequest,
 }: ServerPageContext): Promise<ServerOnBeforeRenderResult<PageProps>> {
     const requestCookie = originalRequest.header('cookie') || '';

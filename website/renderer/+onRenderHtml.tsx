@@ -9,9 +9,8 @@ import {
 import { rootHtmlId } from './root';
 import type { ServerPageContext } from './types';
 
-export const passToClient = ['pageProps'];
-
-export async function render(pageContext: ServerPageContext) {
+// eslint-disable-next-line import/no-default-export
+export default async function render(pageContext: ServerPageContext) {
     const { Page, pageProps } = pageContext;
     const readableStream = await renderToReadableStream(
         <Page {...pageProps} />,

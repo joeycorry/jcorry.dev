@@ -73,12 +73,23 @@ async function startServer() {
             return next();
         }
 
-        const { statusCode, contentType } = httpResponse;
+        const { earlyHints, statusCode, headers } = httpResponse;
+
+        for (const [name, value] of headers) {
+            res.setHeader(name, value);
+        }
+
+        if (earlyHints) {
+            res.writeEarlyHints({
+                link: earlyHints.map(({ earlyHintLink }) => earlyHintLink),
+            });
+        }
+
         const readableStream = httpResponse.getReadableWebStream();
 
         await pipeReadableStreamToExpressResponse(
             readableStream,
-            res.status(statusCode).type(contentType),
+            res.status(statusCode),
         );
     });
 
