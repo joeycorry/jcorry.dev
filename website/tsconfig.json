@@ -9,7 +9,7 @@
         "forceConsistentCasingInFileNames": true,
         "isolatedModules": true,
         "jsx": "react-jsx",
-        "moduleResolution": "Node",
+        "moduleResolution": "Bundler",
         "noEmit": true,
         "noFallthroughCasesInSwitch": true,
         "resolveJsonModule": true,
@@ -20,13 +20,6 @@
         "baseUrl": ".",
         "paths": {
             "~/*": ["./*"]
-        }
-    },
-    "ts-node": {
-        "transpileOnly": true,
-        "esm": true,
-        "compilerOptions": {
-            "moduleResolution": "Node16"
         }
     },
     "include": [
