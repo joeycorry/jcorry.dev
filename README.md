@@ -16,30 +16,7 @@
 
 Lower versions of the prerequisites listed below may work. For a given prerequisite, the provided base version is a version that has been explicitly verified to work for this repository.
 
-### Prerequisites (HTTP)
-
-- Node.js v18.13.0 or later
-- [PNPM](https://pnpm.io/) v8.12.1 or later (or [NPM](https://www.npmjs.com) v8.19.3 or later)
-
-#### PNPM
-
-```
-# Install dependencies and run dev server
-pushd website
-pnpm install && pnpm run dev
-popd
-```
-
-#### NPM
-
-```
-# Install dependencies and run dev server
-pushd website
-npm install && npm run dev
-popd
-```
-
-### Prerequisites (HTTPS)
+### Prerequisites
 
 - [mkcert](https://mkcert.dev) v1.4.4 or later
 - Docker v20.10.22 or later
