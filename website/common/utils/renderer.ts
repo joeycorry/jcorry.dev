@@ -9,7 +9,7 @@ export type RendererStartingAnimationDirection =
     | 'forward';
 
 export type RendererOptions = {
-    animationDuration?: number;
+    animationDuration: number;
     animationIterationCount?: RendererAnimationIterationCount;
     animationStartingDirection?: RendererStartingAnimationDirection;
 };

@@ -37,11 +37,15 @@ export class Renderer implements RenderableObject {
 
     public constructor(
         getNextRenderables: GetNextRenderables,
-        options?: RendererOptions,
+        {
+            animationDuration,
+            animationIterationCount,
+            animationStartingDirection,
+        }: RendererOptions,
     ) {
         this.#getNextRenderables = getNextRenderables;
         this.#startingAnimationDirection =
-            options?.animationStartingDirection ?? 'forward';
+            animationStartingDirection ?? 'forward';
         this.#currentAnimationDirection =
             this.#startingAnimationDirection === 'forward' ||
             this.#startingAnimationDirection === 'alternate'
@@ -49,7 +53,7 @@ export class Renderer implements RenderableObject {
                 : 'backward';
         this.#animationDuration = getClampedFloat({
             minimum: 1,
-            value: options?.animationDuration ?? 400,
+            value: animationDuration,
         });
         this.#currentAnimationTime =
             this.#currentAnimationDirection === 'forward'
@@ -57,7 +61,7 @@ export class Renderer implements RenderableObject {
                 : this.#animationDuration;
         this.#startingAnimationIterationCount = getClampedInteger({
             minimum: 1,
-            value: options?.animationIterationCount ?? 1,
+            value: animationIterationCount ?? 1,
         });
     }
 
