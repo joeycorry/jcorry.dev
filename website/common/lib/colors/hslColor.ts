@@ -46,6 +46,22 @@ export class HslColor implements Color<HslColor> {
         });
     }
 
+    public desaturate(rawPercentage: number): HslColor {
+        const percentage = getClampedFloat({
+            maximum: 1,
+            value: rawPercentage,
+        });
+
+        return new HslColor({
+            alphaPercentage: this.#alphaPercentage,
+            hueDegrees: this.#hueDegrees,
+            lightnessPercentage: this.#lightnessPercentage,
+            saturationPercentage: getClampedPercentage(
+                this.#saturationPercentage * (1 - percentage),
+            ),
+        });
+    }
+
     public interpolate<OtherColor extends Color>(
         otherColor: OtherColor,
         rawPercentage: number,
@@ -68,6 +84,22 @@ export class HslColor implements Color<HslColor> {
                 this.#lightnessPercentage * (1 + percentage),
             ),
             saturationPercentage: this.#saturationPercentage,
+        });
+    }
+
+    public saturate(rawPercentage: number): HslColor {
+        const percentage = getClampedFloat({
+            minimum: -1,
+            value: rawPercentage,
+        });
+
+        return new HslColor({
+            alphaPercentage: this.#alphaPercentage,
+            hueDegrees: this.#hueDegrees,
+            lightnessPercentage: this.#lightnessPercentage,
+            saturationPercentage: getClampedPercentage(
+                this.#saturationPercentage * (1 + percentage),
+            ),
         });
     }
 

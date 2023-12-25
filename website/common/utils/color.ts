@@ -16,9 +16,11 @@ type ColorVariantKey =
     | 'accent'
     | 'background'
     | 'foreground'
+    | 'neutral'
     | 'secondaryAccent'
     | 'secondaryBackground'
-    | 'secondaryForeground';
+    | 'secondaryForeground'
+    | 'secondaryNeutral';
 
 export type ColorVariantName = `${ColorVariantKey}Color`;
 
@@ -47,12 +49,16 @@ function convertColorVariantNameToCssName(
         return '--background-color';
     } else if (colorVariantName === 'foregroundColor') {
         return '--foreground-color';
+    } else if (colorVariantName === 'neutralColor') {
+        return '--neutral-color';
     } else if (colorVariantName === 'secondaryAccentColor') {
         return '--secondary-accent-color';
     } else if (colorVariantName === 'secondaryBackgroundColor') {
         return '--secondary-background-color';
     } else if (colorVariantName === 'secondaryForegroundColor') {
         return '--secondary-foreground-color';
+    } else if (colorVariantName === 'secondaryNeutralColor') {
+        return '--secondary-neutral-color';
     }
 
     throw new Error(`Invalid color variant name: ${colorVariantName}`);
@@ -80,9 +86,11 @@ export function getColorVariantNames(): ColorVariantName[] {
         'accentColor',
         'backgroundColor',
         'foregroundColor',
+        'neutralColor',
         'secondaryAccentColor',
         'secondaryBackgroundColor',
         'secondaryForegroundColor',
+        'secondaryNeutralColor',
     ];
 }
 
@@ -99,6 +107,8 @@ export function getComplementaryColorVariantName({
         return 'secondaryBackgroundColor';
     } else if (colorVariantName === 'foregroundColor') {
         return 'secondaryForegroundColor';
+    } else if (colorVariantName === 'neutralColor') {
+        return 'secondaryNeutralColor';
     }
 
     throw new Error(`Invalid color variant name: ${colorVariantName}`);
@@ -120,11 +130,17 @@ export function getColorVariantsByName({
             accentColor: color,
             backgroundColor: color,
             foregroundColor: color,
+            neutralColor: color,
             secondaryAccentColor: color,
             secondaryBackgroundColor: color,
             secondaryForegroundColor: color,
+            secondaryNeutralColor: color,
         };
     }
+
+    const rawNeutralColor = color.desaturate(0.75).toHslColor();
+    const neutralLightColor = rawNeutralColor.lighten(0.5);
+    const neutralDarkColor = rawNeutralColor.darken(0.5);
 
     const slightlyDarkerColor = color.darken(0.3);
     const darkerColor = color.darken(0.5);
@@ -138,12 +154,16 @@ export function getColorVariantsByName({
             colorScheme === 'dark' ? slightlyLighterColor : slightlyDarkerColor,
         backgroundColor: colorScheme === 'dark' ? darkestColor : lightestColor,
         foregroundColor: colorScheme === 'dark' ? lighterColor : darkerColor,
+        neutralColor:
+            colorScheme === 'dark' ? neutralLightColor : neutralDarkColor,
         secondaryAccentColor:
             colorScheme === 'dark' ? darkerColor : lighterColor,
         secondaryBackgroundColor:
             colorScheme === 'dark' ? lightestColor : darkestColor,
         secondaryForegroundColor:
             colorScheme === 'dark' ? slightlyDarkerColor : slightlyLighterColor,
+        secondaryNeutralColor:
+            colorScheme === 'dark' ? neutralDarkColor : neutralLightColor,
     };
 }
 
@@ -153,17 +173,21 @@ export function getColorVariantCssValuesByName({
     accentColor,
     backgroundColor,
     foregroundColor,
+    neutralColor,
     secondaryAccentColor,
     secondaryBackgroundColor,
     secondaryForegroundColor,
+    secondaryNeutralColor,
 }: GetColorVariantCssValuesByNameParameter): ColorVariantCssValuesByName {
     return {
         '--accent-color': accentColor.toString(),
         '--background-color': backgroundColor.toString(),
         '--foreground-color': foregroundColor.toString(),
+        '--neutral-color': neutralColor.toString(),
         '--secondary-accent-color': secondaryAccentColor.toString(),
         '--secondary-background-color': secondaryBackgroundColor.toString(),
         '--secondary-foreground-color': secondaryForegroundColor.toString(),
+        '--secondary-neutral-color': secondaryNeutralColor.toString(),
     };
 }
 

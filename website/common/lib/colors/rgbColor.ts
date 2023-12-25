@@ -40,6 +40,10 @@ export class RgbColor implements Color<RgbColor> {
         return this.toHslColor().darken(rawPercentage).toRgbColor();
     }
 
+    public desaturate(rawPercentage: number): RgbColor {
+        return this.toHslColor().desaturate(rawPercentage).toRgbColor();
+    }
+
     public interpolate<OtherColor extends Color>(
         otherColor: OtherColor,
         rawPercentage: number,
@@ -75,6 +79,10 @@ export class RgbColor implements Color<RgbColor> {
 
     public lighten(rawPercentage: number) {
         return this.toHslColor().lighten(rawPercentage).toRgbColor();
+    }
+
+    public saturate(rawPercentage: number): RgbColor {
+        return this.toHslColor().saturate(rawPercentage).toRgbColor();
     }
 
     public toHslColor() {
