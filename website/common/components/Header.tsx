@@ -1,17 +1,14 @@
 import { memo } from 'react';
 
+import styles from '~/common/styles/Header.module.css';
+
 import { ColorSchemeButton } from './ColorSchemeButton';
-import { GitHubLink } from './GitHubLink';
-import styles from './Header.module.css';
 
 function UnmemoizedHeader() {
     return (
         <header className={styles.header}>
             <ul>
-                <li>
-                    <GitHubLink />
-                </li>
-                <li className="color-scheme">
+                <li className={styles['color-scheme-li']}>
                     <ColorSchemeButton />
                 </li>
             </ul>

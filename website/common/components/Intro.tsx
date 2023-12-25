@@ -2,8 +2,7 @@ import { useAtomValue } from 'jotai';
 import { memo } from 'react';
 
 import { techNameDisplayDataAtom } from '~/common/atoms/techName';
-
-import styles from './Intro.module.css';
+import styles from '~/common/styles/Intro.module.css';
 
 function UnmemoizedIntro() {
     const { hiddenTechName, visibleTechName } = useAtomValue(

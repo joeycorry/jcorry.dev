@@ -4,6 +4,7 @@ import { Moon, Sun } from 'react-feather';
 
 import { backgroundIsVisibleAtom } from '~/common/atoms/background';
 import { colorSchemeAtom } from '~/common/atoms/color';
+import styles from '~/common/styles/ColorSchemeButton.module.css';
 
 function useColorSchemeButtonClickHandler() {
     const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
@@ -24,6 +25,7 @@ function UnmemoizedColorSchemeButton() {
 
     return (
         <button
+            className={styles['icon-button']}
             disabled={!backgroundIsVisible}
             title={title}
             onClick={handleColorSchemeButtonClick}
