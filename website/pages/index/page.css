@@ -14,39 +14,23 @@
     font-weight: 400;
 }
 
-#root {
+:root {
+    font-family: -apple-system, 'Segoe UI', 'Roboto', system-ui;
+    font-size: 6px;
+    -webkit-font-smoothing: antialiased;
+}
+
+#app-root {
     position: relative;
 
     line-height: 1.5;
 
-    font-family: -apple-system, 'Segoe UI', 'Roboto', system-ui;
-    font-size: 6px;
-    -webkit-font-smoothing: antialiased;
-
     background-color: var(--background-color);
-}
-
-@media (min-width: 300px) {
-    #root {
-        font-size: 8px;
-    }
-}
-
-@media (min-width: 750px) {
-    #root {
-        font-size: 16px;
-    }
-}
-
-@media (min-width: 1500px) {
-    #root {
-        font-size: 24px;
-    }
 }
 
 html,
 body,
-#root {
+#app-root {
     width: 100%;
     height: 100%;
 }
@@ -92,7 +76,7 @@ button {
     cursor: pointer;
 }
 
-#root {
+#app-root {
     isolation: isolate;
 
     height: 100%;
@@ -106,6 +90,24 @@ button:disabled {
     opacity: 0.25;
 }
 
+@media (min-width: 300px) {
+    :root {
+        font-size: 8px;
+    }
+}
+
+@media (min-width: 750px) {
+    :root {
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 1500px) {
+    :root {
+        font-size: 24px;
+    }
+}
+
 @media (hover: hover) {
     a {
         transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
@@ -113,6 +115,6 @@ button:disabled {
 
     a:not(:hover),
     button:not(:disabled):not(:hover) {
-        opacity: 0.6;
+        opacity: 0.75;
     }
 }

@@ -1,1 +1,1 @@
-export const rootHtmlId = 'root';
+export const rootHtmlId = 'app-root';
