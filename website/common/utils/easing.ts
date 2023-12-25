@@ -1,59 +1,42 @@
+import cubicBezier from 'bezier-easing';
+
+import { Point } from '~/common/lib/point';
+
 import { getClampedPercentage } from './bounded';
-import { getCosineOfRadians } from './geometry';
 
-export type EasingFunction = (percentage: number) => number;
+const cubicBezierFunctionsByKey = new Map<string, EasingFunction>();
 
-export function easeOutBounce(rawPercentage: number): number {
-    let percentage = getClampedPercentage(rawPercentage);
+export type EasingFunction = (rawPercentage: number) => number;
 
-    const n1 = 7.5625;
-    const d1 = 2.75;
+function getCubicBezierFunction(point1: Point, point2: Point): EasingFunction {
+    const key = `${point1}, ${point2}`;
 
-    if (percentage < 1 / d1) {
-        return n1 * percentage * percentage;
-    } else if (percentage < 2 / d1) {
-        return n1 * (percentage -= 1.5 / d1) * percentage + 0.75;
-    } else if (percentage < 2.5 / d1) {
-        return n1 * (percentage -= 2.25 / d1) * percentage + 0.9375;
-    } else {
-        return n1 * (percentage -= 2.625 / d1) * percentage + 0.984375;
+    if (!cubicBezierFunctionsByKey.has(key)) {
+        cubicBezierFunctionsByKey.set(key, (rawPercentage: number) =>
+            cubicBezier(
+                point1.x,
+                point1.y,
+                point2.x,
+                point2.y,
+            )(getClampedPercentage(rawPercentage)),
+        );
     }
+
+    return cubicBezierFunctionsByKey.get(key)!;
 }
 
-export function easeInOutBounce(rawPercentage: number): number {
-    const percentage = getClampedPercentage(rawPercentage);
-
-    return percentage < 0.5
-        ? (1 - easeOutBounce(1 - 2 * percentage)) / 2
-        : (1 + easeOutBounce(2 * percentage - 1)) / 2;
-}
-
-export function easeInOutCubic(rawPercentage: number): number {
-    const percentage = getClampedPercentage(rawPercentage);
-
-    return percentage < 0.5
-        ? 4 * Math.pow(percentage, 3)
-        : 1 - Math.pow(-2 * percentage + 2, 3) / 2;
-}
-
-export function easeInOutSine(rawPercentage: number): number {
-    const percentage = getClampedPercentage(rawPercentage);
-
-    return -(getCosineOfRadians(Math.PI * percentage) - 1) / 2;
-}
-
-export function easeInOutQuad(rawPercentage: number): number {
-    const percentage = getClampedPercentage(rawPercentage);
-
-    return percentage < 0.5
-        ? 2 * percentage * percentage
-        : 1 - Math.pow(-2 * percentage + 2, 2) / 2;
+export function easeInQuint(rawPercentage: number): number {
+    return getCubicBezierFunction(
+        new Point(0.64, 0),
+        new Point(0.78, 0),
+    )(rawPercentage);
 }
 
 export function easeOutQuint(rawPercentage: number): number {
-    const percentage = getClampedPercentage(rawPercentage);
-
-    return 1 - Math.pow(1 - percentage, 5);
+    return getCubicBezierFunction(
+        new Point(0.22, 1),
+        new Point(0.36, 1),
+    )(rawPercentage);
 }
 
 export function easeLinear(percentage: number): number {

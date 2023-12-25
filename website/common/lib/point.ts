@@ -30,4 +30,8 @@ export class Point {
     public calculateYDistance(other: Point) {
         return this.y - other.y;
     }
+
+    public toString() {
+        return `(${this.x}, ${this.y})`;
+    }
 }
