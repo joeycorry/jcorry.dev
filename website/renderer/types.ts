@@ -1,4 +1,4 @@
-import type { Request } from 'express';
+import type { H3Event } from 'h3';
 import type { ReactElement } from 'react';
 import type {
     PageContextBuiltInClientWithServerRouting,
@@ -28,7 +28,7 @@ export type ServerPageContext<
     PageProps extends Record<string, unknown> = Record<string, unknown>,
 > = PageContextBuiltInServer<Page<PageProps>> &
     CustomPageContext<PageProps> & {
-        originalRequest: Request;
+        originalEvent: H3Event;
     };
 
 export type ServerOnBeforeRenderResult<

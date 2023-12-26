@@ -1,3 +1,5 @@
+import { getHeader } from 'h3';
+
 import { colorSchemeAtom } from '~/common/atoms/color';
 import { techNameAtom } from '~/common/atoms/techName';
 import {
@@ -19,9 +21,9 @@ const title = process.env.JCORRY_DEV_DOCUMENT_TITLE || 'Joey Corry';
 
 // eslint-disable-next-line import/no-default-export
 export default async function onBeforeRender({
-    originalRequest,
+    originalEvent,
 }: ServerPageContext): Promise<ServerOnBeforeRenderResult<PageProps>> {
-    const requestCookie = originalRequest.header('cookie') || '';
+    const requestCookie = getHeader(originalEvent, 'cookie') || '';
     const colorSchemeCookie = getCookie({
         getCookies: () => requestCookie,
         key: 'colorScheme',

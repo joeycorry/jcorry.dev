@@ -1,6 +1,16 @@
-import compression from 'compression';
-import type { Response } from 'express';
-import express from 'express';
+import {
+    createApp,
+    eventHandler,
+    fromNodeMiddleware,
+    getHeader,
+    setResponseHeader,
+    setResponseHeaders,
+    setResponseStatus,
+    toNodeListener,
+    writeEarlyHints,
+} from 'h3';
+import { useCompressionStream } from 'h3-compression';
+import { createServer } from 'http';
 import { URL } from 'url';
 import { renderPage } from 'vike/server';
 import type { UserConfig } from 'vite';
@@ -11,34 +21,13 @@ const root = `${__dirname}/..`;
 const isProduction = process.env.NODE_ENV === 'production';
 const port = parseInt(process.env.JCORRY_DEV_SERVER_PORT || '3000');
 
-async function pipeReadableStreamToExpressResponse<R>(
-    readableStream: ReadableStream<R>,
-    response: Response,
-) {
-    const streamReader = readableStream.getReader();
-    let lastReadResult: ReadableStreamReadResult<R> | undefined;
-
-    while (!lastReadResult?.done) {
-        if (lastReadResult !== undefined) {
-            response.write(lastReadResult.value);
-        }
-
-        lastReadResult = await streamReader.read();
-    }
-
-    response.end();
-}
-
 async function startServer() {
-    const app = express();
-
-    app.disable('x-powered-by');
-    app.use(compression());
+    const app = createApp({ onBeforeResponse: useCompressionStream });
 
     if (isProduction) {
         const sirv = (await import('sirv')).default;
 
-        app.use(sirv(`${root}/dist/client`));
+        app.use(fromNodeMiddleware(sirv(`${root}/dist/client`)));
     } else {
         const vite = await import('vite');
         const viteConfig: UserConfig = await import(`${root}/vite.config.js`);
@@ -53,47 +42,57 @@ async function startServer() {
             )
         ).middlewares;
 
-        app.use(viteDevMiddleware);
+        app.use(fromNodeMiddleware(viteDevMiddleware));
     }
 
-    app.get('/ok', async (req, res) => {
-        res.status(200).type('text/plain').write(`${req.hostname} is OK!`);
-        res.end();
-    });
+    app.use(
+        '/ok',
+        eventHandler(event => {
+            if (event.method !== 'GET') {
+                setResponseStatus(event, 405);
 
-    app.get('*', async (req, res, next) => {
-        const pageContextInit = {
-            originalRequest: req,
-            urlOriginal: req.originalUrl,
-        };
-        const pageContext = await renderPage(pageContextInit);
-        const { httpResponse } = pageContext;
+                return '';
+            }
 
-        if (!httpResponse) {
-            return next();
-        }
+            setResponseStatus(event, 200);
+            setResponseHeader(event, 'Content-Type', 'text/plain');
 
-        const { earlyHints, statusCode, headers } = httpResponse;
+            const hostname = getHeader(event, 'host');
 
-        for (const [name, value] of headers) {
-            res.setHeader(name, value);
-        }
+            return `${hostname} is OK!`;
+        }),
+    );
 
-        if (earlyHints) {
-            res.writeEarlyHints({
-                link: earlyHints.map(({ earlyHintLink }) => earlyHintLink),
+    app.use(
+        '*',
+        eventHandler(async event => {
+            const { httpResponse: vikeResponse } = await renderPage({
+                originalEvent: event,
+                urlOriginal: event.path,
             });
-        }
 
-        const readableStream = httpResponse.getReadableWebStream();
+            if (!vikeResponse) {
+                setResponseStatus(event, 404);
 
-        await pipeReadableStreamToExpressResponse(
-            readableStream,
-            res.status(statusCode),
-        );
-    });
+                return 'Invalid page.';
+            }
 
-    app.listen(port);
+            const { earlyHints, statusCode } = vikeResponse;
+
+            setResponseStatus(event, statusCode);
+            setResponseHeaders(event, Object.fromEntries(vikeResponse.headers));
+
+            if (earlyHints) {
+                writeEarlyHints(event, {
+                    link: earlyHints.map(({ earlyHintLink }) => earlyHintLink),
+                });
+            }
+
+            return vikeResponse.getReadableWebStream();
+        }),
+    );
+
+    createServer(toNodeListener(app)).listen(port);
     console.log(`Serving at http://localhost:${port}`);
 }
 
