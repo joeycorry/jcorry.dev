@@ -14,7 +14,6 @@ import type {
 } from '~/renderer/types';
 
 import type { PageProps } from './+Page';
-import defaultStyle from './page.css?inline';
 
 const title = process.env.JCORRY_DEV_DOCUMENT_TITLE || 'Joey Corry';
 
@@ -50,7 +49,6 @@ export default async function onBeforeRender({
     return {
         pageContext: {
             documentProps: {
-                defaultStyle,
                 htmlAttributes: {
                     style: htmlStyle,
                 },

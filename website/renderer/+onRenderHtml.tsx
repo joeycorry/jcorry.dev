@@ -1,11 +1,7 @@
 import { renderToReadableStream } from 'react-dom/server.browser';
 import { dangerouslySkipEscape, escapeInject } from 'vike/server';
 
-import {
-    getDefaultStyleString,
-    getHtmlAttributesString,
-    getTitleString,
-} from './documentProps';
+import { getHtmlAttributesString, getTitleString } from './documentProps';
 import { rootHtmlId } from './root';
 import type { ServerPageContext } from './types';
 
@@ -23,9 +19,6 @@ export default async function render(pageContext: ServerPageContext) {
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <title>${getTitleString(pageContext)}</title>
-          <style>${dangerouslySkipEscape(
-              getDefaultStyleString(pageContext),
-          )}</style>
         </head>
         <body class="no-transition">
           <div id="${rootHtmlId}">${readableStream}</div>

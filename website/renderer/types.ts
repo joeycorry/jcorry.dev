@@ -6,7 +6,6 @@ import type {
 } from 'vike/types';
 
 export type DocumentProps = {
-    defaultStyle?: string;
     htmlAttributes?: Record<string, string | undefined>;
     title: string;
 };

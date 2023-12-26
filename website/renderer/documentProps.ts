@@ -1,14 +1,5 @@
 import type { CustomPageContext } from './types';
 
-export function getDefaultStyleString({
-    documentProps,
-    exports,
-}: CustomPageContext): string {
-    return (
-        documentProps?.defaultStyle ?? exports.documentProps?.defaultStyle ?? ''
-    );
-}
-
 export function getHtmlAttributesString({
     documentProps,
     exports,

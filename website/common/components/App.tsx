@@ -1,3 +1,5 @@
+import '~/common/styles/App.css';
+
 import { Provider as JotaiProvider } from 'jotai';
 import { memo, StrictMode } from 'react';
 
