@@ -66,16 +66,12 @@ async function startServer() {
     app.use(
         '*',
         eventHandler(async event => {
-            const { httpResponse: vikeResponse } = await renderPage({
-                originalEvent: event,
-                urlOriginal: event.path,
-            });
-
-            if (!vikeResponse) {
-                setResponseStatus(event, 404);
-
-                return 'Invalid page.';
-            }
+            const vikeResponse = (
+                await renderPage({
+                    originalEvent: event,
+                    urlOriginal: event.path,
+                })
+            ).httpResponse!;
 
             const { earlyHints, statusCode } = vikeResponse;
 
