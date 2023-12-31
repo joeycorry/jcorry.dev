@@ -11,10 +11,10 @@ import { createColorVariantSubjectsByNameTransitionRenderer } from '~/common/ren
 import {
     createColorVariantCssVariableSetter,
     getColorVariantNames,
-    setFaviconColor,
-    setThemeColor,
 } from '~/common/utils/color';
 import { removeCookie, setCookie } from '~/common/utils/cookie';
+import { setFaviconColor } from '~/common/utils/favicon';
+import { setThemeColor } from '~/common/utils/meta';
 import type { UnregisterObserver } from '~/common/utils/subject';
 
 export function useMediaQueryListChangeHandler() {

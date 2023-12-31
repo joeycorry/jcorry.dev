@@ -6,7 +6,9 @@ import type {
 } from 'vike/types';
 
 export type DocumentProps = {
+    faviconElementString?: string;
     htmlAttributes?: Record<string, string | undefined>;
+    metaElementStrings?: string[];
     title: string;
 };
 
@@ -18,9 +20,6 @@ export type CustomPageContext<
 > = {
     Page: Page<PageProps>;
     documentProps?: DocumentProps;
-    exports: {
-        documentProps?: DocumentProps;
-    };
     pageProps?: PageProps;
 };
 
