@@ -2,10 +2,10 @@ import type { Color } from '~/common/lib/colors/color';
 import { HslColor } from '~/common/lib/colors/hslColor';
 import type { Subject } from '~/common/lib/subject';
 
+import type { KebabCase } from './formatting';
 import { setRootElementCssVariable } from './style';
 import type { TechName } from './techName';
 import { techNames } from './techName';
-import type { KebabCase } from './type';
 
 export type RgbChannelName = 'blue' | 'green' | 'red';
 
