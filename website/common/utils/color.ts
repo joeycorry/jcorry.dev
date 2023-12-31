@@ -2,6 +2,7 @@ import type { Color } from '~/common/lib/colors/color';
 import { HslColor } from '~/common/lib/colors/hslColor';
 import type { Subject } from '~/common/lib/subject';
 
+import { setRootElementCssVariable } from './style';
 import type { TechName } from './techName';
 import { techNames } from './techName';
 import type { KebabCase } from './type';
@@ -74,11 +75,11 @@ export function createColorVariantCssVariableSetter({
     const colorVariantCssName =
         convertColorVariantNameToCssName(colorVariantName);
 
-    return (color: Color) => {
-        const rootElement = window.document.documentElement;
-
-        rootElement.style.setProperty(colorVariantCssName, color.toString());
-    };
+    return (color: Color) =>
+        setRootElementCssVariable({
+            cssVariableName: colorVariantCssName,
+            cssValue: color.toString(),
+        });
 }
 
 export function getColorVariantNames(): ColorVariantName[] {
