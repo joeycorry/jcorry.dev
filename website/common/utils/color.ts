@@ -2,8 +2,8 @@ import type { Color } from '~/common/lib/colors/color';
 import { HslColor } from '~/common/lib/colors/hslColor';
 import type { Subject } from '~/common/lib/subject';
 
-import { shuffleArray } from './array';
 import type { TechName } from './techName';
+import { techNames } from './techName';
 import type { KebabCase } from './type';
 
 export type RgbChannelName = 'blue' | 'green' | 'red';
@@ -229,24 +229,33 @@ export function setThemeColor(color: Color) {
     themeColorMetaElement.content = color.toString();
 }
 
+const presetColorArgsByTechName = {
+    JavaScript: [53.4, 0.931, 0.5],
+    Ruby: [0, 1, 0.5],
+    TypeScript: [218, 0.5, 0.5],
+    React: [198.4, 0.902, 0.5],
+    Rails: [10, 0.82, 0.5],
+} as const;
+
 const presetColorsByTechName = new Map<TechName, Color>(
-    shuffleArray([
-        ['JavaScript', [53.4, 0.931, 0.5]],
-        ['Ruby', [0, 1, 0.5]],
-        ['TypeScript', [218, 0.5, 0.5]],
-        ['React', [198.4, 0.902, 0.5]],
-        ['Rails', [10, 0.82, 0.5]],
-        ['Node', [118.4, 0.399, 0.5]],
-    ] as const).map(
-        ([name, [hueDegrees, saturationPercentage, lightnessPercentage]]) => [
-            name,
-            new HslColor({
-                hueDegrees,
-                lightnessPercentage,
-                saturationPercentage,
-            }),
-        ],
-    ),
+    techNames
+        .map(
+            techName =>
+                [techName, presetColorArgsByTechName[techName]] as const,
+        )
+        .map(
+            ([
+                techName,
+                [hueDegrees, saturationPercentage, lightnessPercentage],
+            ]) => [
+                techName,
+                new HslColor({
+                    hueDegrees,
+                    lightnessPercentage,
+                    saturationPercentage,
+                }),
+            ],
+        ),
 );
 
 export function getColorForTechName(techName: TechName) {

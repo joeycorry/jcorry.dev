@@ -12,54 +12,13 @@
 }
 
 .intro h1 {
-    margin-bottom: 1rem;
+    text-align: center;
 
     font-weight: 400;
 }
 
-.intro h1,
-.intro h6 {
-    text-align: center;
-}
-
-.description > *:not(:last-child) {
-    margin-bottom: 2rem;
-}
-
-:not(h1, h6) {
-    font-weight: 100;
-}
-
-.tech-name {
-    font-weight: 700 !important;
-
-    color: var(--neutral-color);
-}
-
-.tech-name:disabled {
-    opacity: 0.75;
-}
-
-.tech-name:not(:disabled) {
-    pointer-events: initial;
-}
-
-.tech-name.active {
-    color: var(--active-tech-name-color);
-}
-
-@media (min-width: 300px) {
-    /* .intro {
-        width: 50%;
-
-        font-size: 2.5rem;
-    } */
-}
-
-@media (min-width: 750px) {
-    /* .intro {
-        font-size: 16px;
-    } */
+.intro-name {
+    color: var(--accent-color);
 }
 
 @media (min-width: 1500px) {
