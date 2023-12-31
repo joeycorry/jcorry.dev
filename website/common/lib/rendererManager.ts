@@ -1,3 +1,5 @@
+import type { UnregisterRendererCallback } from '~/common/utils/rendererManager';
+
 import type { Renderer } from './renderer';
 
 const rendererManagerConstructorSymbol = Symbol('renderingManagerConstructor');
@@ -17,25 +19,14 @@ class RendererManager {
         }
     }
 
-    public addRenderer(renderer: Renderer) {
-        this.#renderers.push(renderer);
-    }
-
-    public removeRenderer(renderer: Renderer) {
-        if (
-            this.#renderers.findIndex(renderer_ => renderer === renderer_) ===
-            -1
-        ) {
-            return;
-        }
-
-        this.#renderers = this.#renderers.filter(
-            renderer_ => renderer !== renderer_,
-        );
-    }
-
     public isAnimating() {
         return this.#isAnimating;
+    }
+
+    public registerRenderer(renderer: Renderer): UnregisterRendererCallback {
+        this.#renderers.push(renderer);
+
+        return () => this.#unregisterRenderer(renderer);
     }
 
     public startAnimation() {
@@ -74,7 +65,7 @@ class RendererManager {
 
         for (const renderer of this.#renderers) {
             if (renderer.hasFinished()) {
-                this.removeRenderer(renderer);
+                this.#unregisterRenderer(renderer);
 
                 continue;
             }
@@ -105,6 +96,19 @@ class RendererManager {
             this.#stepAnimation,
         );
     };
+
+    #unregisterRenderer(renderer: Renderer) {
+        if (
+            this.#renderers.findIndex(renderer_ => renderer === renderer_) ===
+            -1
+        ) {
+            return;
+        }
+
+        this.#renderers = this.#renderers.filter(
+            renderer_ => renderer !== renderer_,
+        );
+    }
 }
 
 let maybeRendererManager: RendererManager | undefined;

@@ -1,1 +1,1 @@
-export type UnregisterObserver = () => void;
+export type UnregisterObserverCallback = () => void;

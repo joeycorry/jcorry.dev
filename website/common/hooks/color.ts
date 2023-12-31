@@ -15,7 +15,7 @@ import {
 import { removeCookie, setCookie } from '~/common/utils/cookie';
 import { setFaviconColor } from '~/common/utils/favicon';
 import { setThemeColor } from '~/common/utils/meta';
-import type { UnregisterObserver } from '~/common/utils/subject';
+import type { UnregisterObserverCallback } from '~/common/utils/subject';
 
 export function useMediaQueryListChangeHandler() {
     const setColorScheme = useSetAtom(colorSchemeAtom);
@@ -98,20 +98,15 @@ export function useColorEffects() {
                 previousTechName,
             });
 
-        rendererManager.addRenderer(
+        return rendererManager.registerRenderer(
             colorVariantSubjectsByNameTransitionRenderer,
         );
-
-        return () => {
-            rendererManager.removeRenderer(
-                colorVariantSubjectsByNameTransitionRenderer,
-            );
-        };
     }, [rendererManager, colorScheme, colorVariantSubjectsByName, techName]);
 
     useEffect(() => {
         const colorVariantNames = getColorVariantNames();
-        const unregisterObserverCallbacks: Array<UnregisterObserver> = [];
+        const unregisterObserverCallbacks: Array<UnregisterObserverCallback> =
+            [];
 
         for (const colorVariantName of colorVariantNames) {
             const colorVariantSubject =
@@ -122,7 +117,9 @@ export function useColorEffects() {
                 });
 
             unregisterObserverCallbacks.push(
-                colorVariantSubject.register(setColorVariantCssVariable),
+                colorVariantSubject.registerObserver(
+                    setColorVariantCssVariable,
+                ),
             );
         }
 
@@ -130,10 +127,10 @@ export function useColorEffects() {
             colorVariantSubjectsByName.secondaryForegroundColor;
 
         unregisterObserverCallbacks.push(
-            secondaryForegroundColorSubject.register(setFaviconColor),
+            secondaryForegroundColorSubject.registerObserver(setFaviconColor),
         );
         unregisterObserverCallbacks.push(
-            secondaryForegroundColorSubject.register(setThemeColor),
+            secondaryForegroundColorSubject.registerObserver(setThemeColor),
         );
 
         return () => {

@@ -22,7 +22,7 @@ import type {
 } from '~/common/utils/color';
 import { getComplementaryColorVariantName } from '~/common/utils/color';
 import { createCompositeRenderer } from '~/common/utils/renderer';
-import type { UnregisterObserver } from '~/common/utils/subject';
+import type { UnregisterObserverCallback } from '~/common/utils/subject';
 import type { Viewport } from '~/common/utils/viewport';
 
 import { createNumberTransitionRenderer } from './math';
@@ -62,7 +62,7 @@ export function setupBackgroundRenderer({
         'foregroundColor',
         'accentColor',
     ];
-    const unregisterObserverCallbacks: Array<UnregisterObserver> = [];
+    const unregisterObserverCallbacks: Array<UnregisterObserverCallback> = [];
 
     for (const [
         colorVariantNameIndex,
@@ -218,11 +218,11 @@ export function setupBackgroundRenderer({
     const compositeRenderer = createCompositeRenderer({
         renderersByStartingTimeEntries,
     });
-
-    rendererManager.addRenderer(compositeRenderer);
+    const unregisterRenderer =
+        rendererManager.registerRenderer(compositeRenderer);
 
     return () => {
-        rendererManager.removeRenderer(compositeRenderer);
+        unregisterRenderer();
 
         for (const unregisterObserver of unregisterObserverCallbacks) {
             unregisterObserver();

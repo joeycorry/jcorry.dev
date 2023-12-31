@@ -1,6 +1,6 @@
 import type { MutableRefObject } from 'react';
 
-import type { UnregisterObserver } from '~/common/utils/subject';
+import type { UnregisterObserverCallback } from '~/common/utils/subject';
 
 type Observer<T> = (value: T) => void;
 
@@ -25,7 +25,7 @@ export class Subject<T> implements MutableRefObject<T> {
     public static mapAll<T extends unknown[], U>(
         subjects: { [K in keyof T]: Subject<T[K]> },
         mapper: (...values: [] | { [K in keyof T]: T[K] }) => U,
-    ): [Subject<U>, UnregisterObserver] {
+    ): [Subject<U>, UnregisterObserverCallback] {
         const [combinedSubject, unregisterCombinedObserver] =
             Subject.#combine<T>(...subjects);
         const [mappedSubject, unregisterMappedObserver] = combinedSubject.map(
@@ -39,26 +39,28 @@ export class Subject<T> implements MutableRefObject<T> {
         return [mappedSubject, unregisterObservers];
     }
 
-    public map<U>(mapper: (value?: T) => U): [Subject<U>, UnregisterObserver] {
+    public map<U>(
+        mapper: (value?: T) => U,
+    ): [Subject<U>, UnregisterObserverCallback] {
         const subject = new Subject(
             this.#value === emptyValueSymbol ? mapper() : mapper(this.#value),
         );
 
-        const unregisterParentObserver = this.register(value =>
+        const unregisterParentObserver = this.registerObserver(value =>
             subject.set(mapper(value)),
         );
 
         return [subject, unregisterParentObserver];
     }
 
-    public register(observer: Observer<T>): UnregisterObserver {
+    public registerObserver(observer: Observer<T>): UnregisterObserverCallback {
         this.#observers.push(observer);
 
         if (this.#value !== emptyValueSymbol) {
             observer(this.#value);
         }
 
-        return () => this.#unregister(observer);
+        return () => this.#unregisterObserver(observer);
     }
 
     public set(newValue: T) {
@@ -71,7 +73,7 @@ export class Subject<T> implements MutableRefObject<T> {
 
     static #combine<T extends unknown[]>(
         ...subjects: { [K in keyof T]: Subject<T[K]> }
-    ): [Subject<{ [K in keyof T]: T[K] }>, UnregisterObserver] {
+    ): [Subject<{ [K in keyof T]: T[K] }>, UnregisterObserverCallback] {
         const combinedValue = Array(subjects.length).fill(emptyValueSymbol) as {
             [K in keyof T]: T[K] | typeof emptyValueSymbol;
         };
@@ -79,7 +81,7 @@ export class Subject<T> implements MutableRefObject<T> {
 
         const unregisterParentObserverCallbacks = subjects.map(
             (subject, index) =>
-                subject.register(value => {
+                subject.registerObserver(value => {
                     combinedValue[index] = value;
 
                     if (
@@ -100,7 +102,7 @@ export class Subject<T> implements MutableRefObject<T> {
         return [combinedSubject, unregisterParentObservers];
     }
 
-    #unregister(observer: Observer<T>) {
+    #unregisterObserver(observer: Observer<T>) {
         const index = this.#observers.indexOf(observer);
 
         if (index !== -1) {
