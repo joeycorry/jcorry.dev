@@ -15,7 +15,6 @@ import {
     setThemeColor,
 } from '~/common/utils/color';
 import { removeCookie, setCookie } from '~/common/utils/cookie';
-import { evauluateNoop } from '~/common/utils/function';
 import type { UnregisterObserver } from '~/common/utils/subject';
 
 export function useMediaQueryListChangeHandler() {
@@ -84,83 +83,63 @@ export function useColorEffects() {
         }
     }, [colorScheme]);
 
-    useEffect(
-        () =>
-            colorVariantSubjectsByName
-                ? (() => {
-                      const previousColorScheme =
-                          previousColorSchemeRef.current;
-                      previousColorSchemeRef.current = colorScheme;
-                      const previousTechName = previousTechNameRef.current;
-                      previousTechNameRef.current = techName;
-                      const colorVariantSubjectsByNameTransitionRenderer =
-                          createColorVariantSubjectsByNameTransitionRenderer({
-                              animationDuration: 800,
-                              colorVariantSubjectsByName,
-                              newColorScheme: colorScheme,
-                              newTechName: techName,
-                              previousColorScheme,
-                              previousTechName,
-                          });
+    useEffect(() => {
+        const previousColorScheme = previousColorSchemeRef.current;
+        previousColorSchemeRef.current = colorScheme;
+        const previousTechName = previousTechNameRef.current;
+        previousTechNameRef.current = techName;
+        const colorVariantSubjectsByNameTransitionRenderer =
+            createColorVariantSubjectsByNameTransitionRenderer({
+                animationDuration: 800,
+                colorVariantSubjectsByName,
+                newColorScheme: colorScheme,
+                newTechName: techName,
+                previousColorScheme,
+                previousTechName,
+            });
 
-                      rendererManager.addRenderer(
-                          colorVariantSubjectsByNameTransitionRenderer,
-                      );
+        rendererManager.addRenderer(
+            colorVariantSubjectsByNameTransitionRenderer,
+        );
 
-                      return () => {
-                          rendererManager.removeRenderer(
-                              colorVariantSubjectsByNameTransitionRenderer,
-                          );
-                      };
-                  })()
-                : evauluateNoop(),
-        [rendererManager, colorScheme, colorVariantSubjectsByName, techName],
-    );
+        return () => {
+            rendererManager.removeRenderer(
+                colorVariantSubjectsByNameTransitionRenderer,
+            );
+        };
+    }, [rendererManager, colorScheme, colorVariantSubjectsByName, techName]);
 
-    useEffect(
-        () =>
-            colorVariantSubjectsByName
-                ? (() => {
-                      const colorVariantNames = getColorVariantNames();
-                      const unregisterObserverCallbacks: Array<UnregisterObserver> =
-                          [];
+    useEffect(() => {
+        const colorVariantNames = getColorVariantNames();
+        const unregisterObserverCallbacks: Array<UnregisterObserver> = [];
 
-                      for (const colorVariantName of colorVariantNames) {
-                          const colorVariantSubject =
-                              colorVariantSubjectsByName[colorVariantName];
-                          const setColorVariantCssVariable =
-                              createColorVariantCssVariableSetter({
-                                  colorVariantName,
-                              });
+        for (const colorVariantName of colorVariantNames) {
+            const colorVariantSubject =
+                colorVariantSubjectsByName[colorVariantName];
+            const setColorVariantCssVariable =
+                createColorVariantCssVariableSetter({
+                    colorVariantName,
+                });
 
-                          unregisterObserverCallbacks.push(
-                              colorVariantSubject.register(
-                                  setColorVariantCssVariable,
-                              ),
-                          );
-                      }
+            unregisterObserverCallbacks.push(
+                colorVariantSubject.register(setColorVariantCssVariable),
+            );
+        }
 
-                      const secondaryForegroundColorSubject =
-                          colorVariantSubjectsByName.secondaryForegroundColor;
+        const secondaryForegroundColorSubject =
+            colorVariantSubjectsByName.secondaryForegroundColor;
 
-                      unregisterObserverCallbacks.push(
-                          secondaryForegroundColorSubject.register(
-                              setFaviconColor,
-                          ),
-                      );
-                      unregisterObserverCallbacks.push(
-                          secondaryForegroundColorSubject.register(
-                              setThemeColor,
-                          ),
-                      );
+        unregisterObserverCallbacks.push(
+            secondaryForegroundColorSubject.register(setFaviconColor),
+        );
+        unregisterObserverCallbacks.push(
+            secondaryForegroundColorSubject.register(setThemeColor),
+        );
 
-                      return () => {
-                          for (const unregisterObserver of unregisterObserverCallbacks) {
-                              unregisterObserver();
-                          }
-                      };
-                  })()
-                : evauluateNoop(),
-        [colorVariantSubjectsByName],
-    );
+        return () => {
+            for (const unregisterObserver of unregisterObserverCallbacks) {
+                unregisterObserver();
+            }
+        };
+    }, [colorVariantSubjectsByName]);
 }
