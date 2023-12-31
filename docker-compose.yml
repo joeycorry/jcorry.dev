@@ -27,6 +27,7 @@ services:
     healthcheck:
       test: curl -f http://localhost:3000 || exit 1
       interval: 10s
+      retries: 5
       timeout: 10s
     volumes:
       - ./website/common:/home/website/common
