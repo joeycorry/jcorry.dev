@@ -2,7 +2,11 @@ import type { UnregisterRendererCallback } from '~/common/utils/rendererManager'
 
 import type { Renderer } from './renderer';
 
-const rendererManagerConstructorSymbol = Symbol('renderingManagerConstructor');
+const isConstructingRenderingManagerSymbol = Symbol(
+    'isConstructingRenderingManager',
+);
+
+let maybeRendererManager: RendererManager | undefined;
 
 class RendererManager {
     #animationFrameRequestId?: number;
@@ -10,11 +14,11 @@ class RendererManager {
     #renderers: Renderer[] = [];
 
     public constructor(
-        constructorSymbol: typeof rendererManagerConstructorSymbol,
+        constructorSymbol: typeof isConstructingRenderingManagerSymbol,
     ) {
-        if (constructorSymbol !== rendererManagerConstructorSymbol) {
+        if (constructorSymbol !== isConstructingRenderingManagerSymbol) {
             throw new Error(
-                `Instances of \`${RendererManager.name}\` can only be constructed indirectly via \`getRenderingManagerInstance()\`.`,
+                `Instances of \`${RendererManager.name}\` can only be constructed indirectly via \`getRendererManger()\`.`,
             );
         }
     }
@@ -111,12 +115,12 @@ class RendererManager {
     }
 }
 
-let maybeRendererManager: RendererManager | undefined;
-
-export function getRendererManager(): RendererManager {
+function getRendererManager(): RendererManager {
     maybeRendererManager ??= new RendererManager(
-        rendererManagerConstructorSymbol,
+        isConstructingRenderingManagerSymbol,
     );
 
     return maybeRendererManager;
 }
+
+export { getRendererManager };

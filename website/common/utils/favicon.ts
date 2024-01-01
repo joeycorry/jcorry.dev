@@ -14,11 +14,7 @@ function createFaviconDataUrl({ color }: { color: Color }): string {
     return canvasElement.toDataURL('image/png');
 }
 
-export function createFaviconElementString({
-    color,
-}: {
-    color: Color;
-}): string {
+function createFaviconElementString({ color }: { color: Color }): string {
     if (import.meta.env.SSR) {
         return `<link rel="icon" type="image/x-icon" href="data:image/x-icon;,">`;
     }
@@ -28,7 +24,7 @@ export function createFaviconElementString({
     return `<link rel="icon" type="image/png" href="${dataUrl}">`;
 }
 
-export function setFaviconColor(color: Color) {
+function setFaviconColor(color: Color) {
     const faviconElement =
         window.document.head.querySelector<HTMLLinkElement>('link[rel="icon"]');
 
@@ -42,3 +38,5 @@ export function setFaviconColor(color: Color) {
 
     faviconElement.href = createFaviconDataUrl({ color });
 }
+
+export { createFaviconElementString, setFaviconColor };

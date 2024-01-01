@@ -4,18 +4,21 @@ import type { UnregisterObserverCallback } from '~/common/utils/subject';
 
 type Observer<T> = (value: T) => void;
 
-const emptyValueSymbol = Symbol('emptyValue');
+const subjectValueIsNotInitializedSymbol = Symbol(
+    'subjectValueIsNotInitialized',
+);
 
-export class Subject<T> implements MutableRefObject<T> {
+class Subject<T> implements MutableRefObject<T> {
     #observers: Array<Observer<T>> = [];
-    #value: T | typeof emptyValueSymbol;
+    #value: T | typeof subjectValueIsNotInitializedSymbol;
 
     public constructor(value?: T) {
-        this.#value = arguments.length > 0 ? value! : emptyValueSymbol;
+        this.#value =
+            arguments.length > 0 ? value! : subjectValueIsNotInitializedSymbol;
     }
 
     public get current(): T {
-        if (this.#value === emptyValueSymbol) {
+        if (this.#value === subjectValueIsNotInitializedSymbol) {
             throw new Error('Subject has no value');
         }
 
@@ -39,43 +42,13 @@ export class Subject<T> implements MutableRefObject<T> {
         return [mappedSubject, unregisterObservers];
     }
 
-    public map<U>(
-        mapper: (value?: T) => U,
-    ): [Subject<U>, UnregisterObserverCallback] {
-        const subject = new Subject(
-            this.#value === emptyValueSymbol ? mapper() : mapper(this.#value),
-        );
-
-        const unregisterParentObserver = this.registerObserver(value =>
-            subject.set(mapper(value)),
-        );
-
-        return [subject, unregisterParentObserver];
-    }
-
-    public registerObserver(observer: Observer<T>): UnregisterObserverCallback {
-        this.#observers.push(observer);
-
-        if (this.#value !== emptyValueSymbol) {
-            observer(this.#value);
-        }
-
-        return () => this.#unregisterObserver(observer);
-    }
-
-    public set(newValue: T) {
-        this.#value = newValue;
-
-        for (const observer of this.#observers) {
-            observer(this.#value);
-        }
-    }
-
     static #combine<T extends unknown[]>(
         ...subjects: { [K in keyof T]: Subject<T[K]> }
     ): [Subject<{ [K in keyof T]: T[K] }>, UnregisterObserverCallback] {
-        const combinedValue = Array(subjects.length).fill(emptyValueSymbol) as {
-            [K in keyof T]: T[K] | typeof emptyValueSymbol;
+        const combinedValue = Array(subjects.length).fill(
+            subjectValueIsNotInitializedSymbol,
+        ) as {
+            [K in keyof T]: T[K] | typeof subjectValueIsNotInitializedSymbol;
         };
         const combinedSubject = new Subject<{ [K in keyof T]: T[K] }>();
 
@@ -85,7 +58,10 @@ export class Subject<T> implements MutableRefObject<T> {
                     combinedValue[index] = value;
 
                     if (
-                        combinedValue.every(value => value !== emptyValueSymbol)
+                        combinedValue.every(
+                            value =>
+                                value !== subjectValueIsNotInitializedSymbol,
+                        )
                     ) {
                         combinedSubject.set(
                             combinedValue as { [K in keyof T]: T[K] },
@@ -102,6 +78,40 @@ export class Subject<T> implements MutableRefObject<T> {
         return [combinedSubject, unregisterParentObservers];
     }
 
+    public map<U>(
+        mapper: (value?: T) => U,
+    ): [Subject<U>, UnregisterObserverCallback] {
+        const subject = new Subject(
+            this.#value === subjectValueIsNotInitializedSymbol
+                ? mapper()
+                : mapper(this.#value),
+        );
+
+        const unregisterParentObserver = this.registerObserver(value =>
+            subject.set(mapper(value)),
+        );
+
+        return [subject, unregisterParentObserver];
+    }
+
+    public registerObserver(observer: Observer<T>): UnregisterObserverCallback {
+        this.#observers.push(observer);
+
+        if (this.#value !== subjectValueIsNotInitializedSymbol) {
+            observer(this.#value);
+        }
+
+        return () => this.#unregisterObserver(observer);
+    }
+
+    public set(newValue: T) {
+        this.#value = newValue;
+
+        for (const observer of this.#observers) {
+            observer(this.#value);
+        }
+    }
+
     #unregisterObserver(observer: Observer<T>) {
         const index = this.#observers.indexOf(observer);
 
@@ -110,3 +120,5 @@ export class Subject<T> implements MutableRefObject<T> {
         }
     }
 }
+
+export { Subject };

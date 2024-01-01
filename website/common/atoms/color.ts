@@ -7,11 +7,11 @@ import type {
 } from '~/common/utils/color';
 import { getColorVariantNames } from '~/common/utils/color';
 
-export const colorSchemeAtom = atom<ColorScheme>('normal');
+const colorSchemeAtom = atom<ColorScheme>('normal');
 
 colorSchemeAtom.debugLabel = 'colorSchemeAtom';
 
-export const colorVariantSubjectsByNameAtom = atom(
+const colorVariantSubjectsByNameAtom = atom(
     Object.fromEntries(
         getColorVariantNames().map(colorVariantName => [
             colorVariantName,
@@ -21,3 +21,5 @@ export const colorVariantSubjectsByNameAtom = atom(
 );
 
 colorVariantSubjectsByNameAtom.debugLabel = 'colorVariantSubjectsByNameAtom';
+
+export { colorSchemeAtom, colorVariantSubjectsByNameAtom };

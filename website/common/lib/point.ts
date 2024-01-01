@@ -1,6 +1,6 @@
 import { Vector } from './vector';
 
-export class Point {
+class Point {
     public constructor(
         public x: number,
         public y: number,
@@ -36,3 +36,5 @@ export class Point {
         return `(${this.x}, ${this.y})`;
     }
 }
+
+export { Point };

@@ -5,7 +5,7 @@ import type { ValueOrMutableRef } from '~/common/utils/react';
 
 import { Shape } from './shape';
 
-export class Trapezoid extends Shape {
+class Trapezoid extends Shape {
     #angle: number;
     #cachedBoundingPoints?: FixedArray<Point, 4>;
     #counterClockwise: boolean;
@@ -30,18 +30,6 @@ export class Trapezoid extends Shape {
         this.#angle = angle;
         this.#counterClockwise = counterClockwise ?? false;
         this.#parallelLineDataPair = parallelLineDataPair;
-    }
-
-    protected _calculateNextPath() {
-        const path = new Path2D();
-
-        path.moveTo(this.#boundingPoints[0].x, this.#boundingPoints[0].y);
-
-        for (const point of this.#boundingPoints.slice(1)) {
-            path.lineTo(point.x, point.y);
-        }
-
-        return path;
     }
 
     get #boundingPoints(): FixedArray<Point, 4> {
@@ -72,4 +60,18 @@ export class Trapezoid extends Shape {
 
         return this.#cachedBoundingPoints;
     }
+
+    protected _calculateNextPath() {
+        const path = new Path2D();
+
+        path.moveTo(this.#boundingPoints[0].x, this.#boundingPoints[0].y);
+
+        for (const point of this.#boundingPoints.slice(1)) {
+            path.lineTo(point.x, point.y);
+        }
+
+        return path;
+    }
 }
+
+export { Trapezoid };

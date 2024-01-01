@@ -7,7 +7,11 @@ import { setRootElementCssVariable } from './style';
 import type { TechName } from './techName';
 import { techNames } from './techName';
 
-export type ColorScheme = 'dark' | 'light' | 'normal';
+type ColorScheme = 'dark' | 'light' | 'normal';
+
+type ColorVariantCssName = `--${KebabCase<ColorVariantKey>}-color`;
+
+type ColorVariantCssValuesByName = Record<ColorVariantCssName, string>;
 
 type ColorVariantKey =
     | 'accent'
@@ -19,23 +23,42 @@ type ColorVariantKey =
     | 'secondaryForeground'
     | 'secondaryNeutral';
 
-export type ColorVariantName = `${ColorVariantKey}Color`;
+type ColorVariantName = `${ColorVariantKey}Color`;
 
-export type PrimaryColorVariantName = Exclude<
-    ColorVariantName,
-    `secondary${string}`
->;
+type ColorVariantSubjectsByName = Record<ColorVariantName, Subject<Color>>;
 
 type ColorVariantsByName = Record<ColorVariantName, Color>;
 
-export type ColorVariantSubjectsByName = Record<
-    ColorVariantName,
-    Subject<Color>
->;
+type PrimaryColorVariantName = Exclude<ColorVariantName, `secondary${string}`>;
 
-type ColorVariantCssName = `--${KebabCase<ColorVariantKey>}-color`;
+const presetColorArgsByTechName = {
+    JavaScript: [53.4, 0.931, 0.5],
+    Ruby: [0, 1, 0.5],
+    TypeScript: [218, 0.5, 0.5],
+    React: [198.4, 0.902, 0.5],
+    Rails: [10, 0.82, 0.5],
+} satisfies Record<TechName, readonly [number, number, number]>;
 
-type ColorVariantCssValuesByName = Record<ColorVariantCssName, string>;
+const presetColorsByTechName = new Map<TechName, Color>(
+    techNames
+        .map(
+            techName =>
+                [techName, presetColorArgsByTechName[techName]] as const,
+        )
+        .map(
+            ([
+                techName,
+                [hueDegrees, saturationPercentage, lightnessPercentage],
+            ]) => [
+                techName,
+                new HslColor({
+                    hueDegrees,
+                    lightnessPercentage,
+                    saturationPercentage,
+                }),
+            ],
+        ),
+);
 
 function convertColorVariantNameToCssName(
     colorVariantName: ColorVariantName,
@@ -61,7 +84,7 @@ function convertColorVariantNameToCssName(
     throw new Error(`Invalid color variant name: ${colorVariantName}`);
 }
 
-export function createColorVariantCssVariableSetter({
+function createColorVariantCssVariableSetter({
     colorVariantName,
 }: {
     colorVariantName: ColorVariantName;
@@ -76,7 +99,37 @@ export function createColorVariantCssVariableSetter({
         });
 }
 
-export function getColorVariantNames(): ColorVariantName[] {
+function getColorForTechName(techName: TechName) {
+    if (!presetColorsByTechName.has(techName)) {
+        throw new Error(`Invalid tech name: ${techName}`);
+    }
+
+    return presetColorsByTechName.get(techName)!;
+}
+
+function getColorVariantCssValuesByName({
+    accentColor,
+    backgroundColor,
+    foregroundColor,
+    neutralColor,
+    secondaryAccentColor,
+    secondaryBackgroundColor,
+    secondaryForegroundColor,
+    secondaryNeutralColor,
+}: ColorVariantsByName): ColorVariantCssValuesByName {
+    return {
+        '--accent-color': accentColor.toString(),
+        '--background-color': backgroundColor.toString(),
+        '--foreground-color': foregroundColor.toString(),
+        '--neutral-color': neutralColor.toString(),
+        '--secondary-accent-color': secondaryAccentColor.toString(),
+        '--secondary-background-color': secondaryBackgroundColor.toString(),
+        '--secondary-foreground-color': secondaryForegroundColor.toString(),
+        '--secondary-neutral-color': secondaryNeutralColor.toString(),
+    };
+}
+
+function getColorVariantNames(): ColorVariantName[] {
     return [
         'accentColor',
         'backgroundColor',
@@ -89,25 +142,7 @@ export function getColorVariantNames(): ColorVariantName[] {
     ];
 }
 
-export function getComplementaryColorVariantName({
-    colorVariantName,
-}: {
-    colorVariantName: PrimaryColorVariantName;
-}): ColorVariantName {
-    if (colorVariantName === 'accentColor') {
-        return 'secondaryAccentColor';
-    } else if (colorVariantName === 'backgroundColor') {
-        return 'secondaryBackgroundColor';
-    } else if (colorVariantName === 'foregroundColor') {
-        return 'secondaryForegroundColor';
-    } else if (colorVariantName === 'neutralColor') {
-        return 'secondaryNeutralColor';
-    }
-
-    throw new Error(`Invalid color variant name: ${colorVariantName}`);
-}
-
-export function getColorVariantsByName({
+function getColorVariantsByName({
     colorScheme,
     techName,
 }: {
@@ -158,61 +193,35 @@ export function getColorVariantsByName({
     };
 }
 
-export function getColorVariantCssValuesByName({
-    accentColor,
-    backgroundColor,
-    foregroundColor,
-    neutralColor,
-    secondaryAccentColor,
-    secondaryBackgroundColor,
-    secondaryForegroundColor,
-    secondaryNeutralColor,
-}: ColorVariantsByName): ColorVariantCssValuesByName {
-    return {
-        '--accent-color': accentColor.toString(),
-        '--background-color': backgroundColor.toString(),
-        '--foreground-color': foregroundColor.toString(),
-        '--neutral-color': neutralColor.toString(),
-        '--secondary-accent-color': secondaryAccentColor.toString(),
-        '--secondary-background-color': secondaryBackgroundColor.toString(),
-        '--secondary-foreground-color': secondaryForegroundColor.toString(),
-        '--secondary-neutral-color': secondaryNeutralColor.toString(),
-    };
-}
-
-const presetColorArgsByTechName = {
-    JavaScript: [53.4, 0.931, 0.5],
-    Ruby: [0, 1, 0.5],
-    TypeScript: [218, 0.5, 0.5],
-    React: [198.4, 0.902, 0.5],
-    Rails: [10, 0.82, 0.5],
-} as const;
-
-const presetColorsByTechName = new Map<TechName, Color>(
-    techNames
-        .map(
-            techName =>
-                [techName, presetColorArgsByTechName[techName]] as const,
-        )
-        .map(
-            ([
-                techName,
-                [hueDegrees, saturationPercentage, lightnessPercentage],
-            ]) => [
-                techName,
-                new HslColor({
-                    hueDegrees,
-                    lightnessPercentage,
-                    saturationPercentage,
-                }),
-            ],
-        ),
-);
-
-export function getColorForTechName(techName: TechName) {
-    if (!presetColorsByTechName.has(techName)) {
-        throw new Error(`Invalid tech name: ${techName}`);
+function getComplementaryColorVariantName({
+    colorVariantName,
+}: {
+    colorVariantName: PrimaryColorVariantName;
+}): ColorVariantName {
+    if (colorVariantName === 'accentColor') {
+        return 'secondaryAccentColor';
+    } else if (colorVariantName === 'backgroundColor') {
+        return 'secondaryBackgroundColor';
+    } else if (colorVariantName === 'foregroundColor') {
+        return 'secondaryForegroundColor';
+    } else if (colorVariantName === 'neutralColor') {
+        return 'secondaryNeutralColor';
     }
 
-    return presetColorsByTechName.get(techName)!;
+    throw new Error(`Invalid color variant name: ${colorVariantName}`);
 }
+
+export type {
+    ColorScheme,
+    ColorVariantName,
+    ColorVariantSubjectsByName,
+    PrimaryColorVariantName,
+};
+export {
+    createColorVariantCssVariableSetter,
+    getColorForTechName,
+    getColorVariantCssValuesByName,
+    getColorVariantNames,
+    getColorVariantsByName,
+    getComplementaryColorVariantName,
+};

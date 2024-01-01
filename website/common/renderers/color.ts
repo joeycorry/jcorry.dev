@@ -13,7 +13,7 @@ import { easeOutQuint } from '~/common/utils/easing';
 import { createCompositeRenderer } from '~/common/utils/renderer';
 import type { TechName } from '~/common/utils/techName';
 
-export function createColorSubjectTransitionRenderer({
+function createColorSubjectTransitionRenderer({
     animationDuration,
     colorSubject,
     newColor,
@@ -38,7 +38,7 @@ export function createColorSubjectTransitionRenderer({
     );
 }
 
-export function createColorVariantSubjectsByNameTransitionRenderer({
+function createColorVariantSubjectsByNameTransitionRenderer({
     animationDuration,
     colorVariantSubjectsByName,
     newColorScheme,
@@ -78,3 +78,8 @@ export function createColorVariantSubjectsByNameTransitionRenderer({
         ),
     });
 }
+
+export {
+    createColorSubjectTransitionRenderer,
+    createColorVariantSubjectsByNameTransitionRenderer,
+};

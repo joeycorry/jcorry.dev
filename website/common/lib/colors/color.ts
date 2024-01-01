@@ -1,7 +1,7 @@
 import type { HslColor } from './hslColor';
 import type { RgbColor } from './rgbColor';
 
-export interface Color<This extends Color = HslColor | RgbColor> {
+interface Color<This extends Color = HslColor | RgbColor> {
     darken(rawPercentage: number): This;
     desaturate(rawPercentage: number): This;
     interpolate<OtherColor extends Color>(
@@ -14,3 +14,5 @@ export interface Color<This extends Color = HslColor | RgbColor> {
     toHslColor(): HslColor;
     toString(): string;
 }
+
+export type { Color };

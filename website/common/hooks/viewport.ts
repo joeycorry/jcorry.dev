@@ -16,7 +16,44 @@ function useDebouncedSetViewport() {
     ]);
 }
 
-function useWindowResizeHandler() {
+function useViewportEffects() {
+    const handleWindowResizeOrMediaQueryListResolutionChange =
+        useWindowResizeOrMediaQueryListResolutionChangeHandler();
+    const devicePixelRatio =
+        typeof window !== 'undefined' ? window.devicePixelRatio : 1;
+
+    useEffect(() => {
+        window.addEventListener(
+            'resize',
+            handleWindowResizeOrMediaQueryListResolutionChange,
+        );
+
+        return () =>
+            window.removeEventListener(
+                'resize',
+                handleWindowResizeOrMediaQueryListResolutionChange,
+            );
+    }, [handleWindowResizeOrMediaQueryListResolutionChange]);
+
+    useEffect(() => {
+        const mediaQueryList = window.matchMedia(
+            `(resolution: ${devicePixelRatio}dppx)`,
+        );
+
+        mediaQueryList.addEventListener(
+            'change',
+            handleWindowResizeOrMediaQueryListResolutionChange,
+        );
+
+        return () =>
+            mediaQueryList.removeEventListener(
+                'change',
+                handleWindowResizeOrMediaQueryListResolutionChange,
+            );
+    }, [handleWindowResizeOrMediaQueryListResolutionChange, devicePixelRatio]);
+}
+
+function useWindowResizeOrMediaQueryListResolutionChangeHandler() {
     const debouncedSetViewport = useDebouncedSetViewport();
     const setBackgroundIsVisible = useSetAtom(backgroundIsVisibleAtom);
 
@@ -30,25 +67,4 @@ function useWindowResizeHandler() {
     );
 }
 
-export function useViewportEffects() {
-    const handleWindowResize = useWindowResizeHandler();
-    const devicePixelRatio =
-        typeof window !== 'undefined' ? window.devicePixelRatio : 1;
-
-    useEffect(() => {
-        window.addEventListener('resize', handleWindowResize);
-
-        return () => window.removeEventListener('resize', handleWindowResize);
-    }, [handleWindowResize]);
-
-    useEffect(() => {
-        const mediaQueryList = window.matchMedia(
-            `(resolution: ${devicePixelRatio}dppx)`,
-        );
-
-        mediaQueryList.addEventListener('change', handleWindowResize);
-
-        return () =>
-            mediaQueryList.removeEventListener('change', handleWindowResize);
-    }, [handleWindowResize, devicePixelRatio]);
-}
+export { useViewportEffects };

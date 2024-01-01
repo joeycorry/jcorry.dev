@@ -17,18 +17,7 @@ import { setFaviconColor } from '~/common/utils/favicon';
 import { setThemeColor } from '~/common/utils/meta';
 import type { UnregisterObserverCallback } from '~/common/utils/subject';
 
-export function useMediaQueryListChangeHandler() {
-    const setColorScheme = useSetAtom(colorSchemeAtom);
-
-    return useCallback(
-        ({ matches }: MediaQueryListEvent) => {
-            setColorScheme(matches ? 'dark' : 'light');
-        },
-        [setColorScheme],
-    );
-}
-
-export function useColorEffects() {
+function useColorEffects() {
     const rendererManager = getRendererManager();
     const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
     const previousColorSchemeRef = useRef(colorScheme);
@@ -37,7 +26,8 @@ export function useColorEffects() {
     );
     const techName = useAtomValue(techNameAtom);
     const previousTechNameRef = useRef(techName);
-    const handleMediaQueryListChange = useMediaQueryListChangeHandler();
+    const handleMediaQueryListPrefersColorSchemeChange =
+        useMediaQueryListPrefersColorSchemeChangeHandler();
 
     useEffect(() => {
         if (colorScheme === 'normal') {
@@ -54,15 +44,17 @@ export function useColorEffects() {
             '(prefers-color-scheme: dark)',
         );
 
-        mediaQueryList.addEventListener('change', handleMediaQueryListChange);
+        mediaQueryList.addEventListener(
+            'change',
+            handleMediaQueryListPrefersColorSchemeChange,
+        );
 
-        return () => {
+        return () =>
             mediaQueryList.removeEventListener(
                 'change',
-                handleMediaQueryListChange,
+                handleMediaQueryListPrefersColorSchemeChange,
             );
-        };
-    }, [setColorScheme, handleMediaQueryListChange]);
+    }, [setColorScheme, handleMediaQueryListPrefersColorSchemeChange]);
 
     useEffect(() => {
         if (colorScheme === undefined) {
@@ -140,3 +132,16 @@ export function useColorEffects() {
         };
     }, [colorVariantSubjectsByName]);
 }
+
+function useMediaQueryListPrefersColorSchemeChangeHandler() {
+    const setColorScheme = useSetAtom(colorSchemeAtom);
+
+    return useCallback(
+        ({ matches }: MediaQueryListEvent) => {
+            setColorScheme(matches ? 'dark' : 'light');
+        },
+        [setColorScheme],
+    );
+}
+
+export { useColorEffects };

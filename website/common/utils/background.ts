@@ -6,7 +6,7 @@ import { Subject } from '~/common/lib/subject';
 import type { ColorVariantName } from './color';
 import type { Viewport } from './viewport';
 
-export function getBackgroundRendererAnimationDurationScalar({
+function getBackgroundRendererAnimationDurationScalar({
     colorVariantName,
     viewport: { width },
 }: {
@@ -19,23 +19,7 @@ export function getBackgroundRendererAnimationDurationScalar({
     );
 }
 
-export function getBackgroundRendererRibbonsEdgeGutter({
-    viewport: { width },
-}: {
-    viewport: Viewport;
-}) {
-    return width >= 1500 ? 200 : width >= 750 ? 150 : 100;
-}
-
-export function getBackgroundRendererRibbonsHeight({
-    viewport: { width, height },
-}: {
-    viewport: Viewport;
-}) {
-    return (width >= 1500 ? 0.8 : width >= 750 ? 0.6 : 0.4) * height;
-}
-
-export function getBackgroundRendererMappedStyleSubject({
+function getBackgroundRendererMappedStyleSubject({
     colorVariantSubject,
     complementaryColorVariantSubject,
     interpolationPercentageSubject,
@@ -64,7 +48,23 @@ export function getBackgroundRendererMappedStyleSubject({
     );
 }
 
-export function setBackgroundCanvasDimensions({
+function getBackgroundRendererRibbonsEdgeGutter({
+    viewport: { width },
+}: {
+    viewport: Viewport;
+}) {
+    return width >= 1500 ? 200 : width >= 750 ? 150 : 100;
+}
+
+function getBackgroundRendererRibbonsHeight({
+    viewport: { width, height },
+}: {
+    viewport: Viewport;
+}) {
+    return (width >= 1500 ? 0.8 : width >= 750 ? 0.6 : 0.4) * height;
+}
+
+function setBackgroundCanvasDimensions({
     canvasElementRef,
     viewport,
 }: {
@@ -84,3 +84,11 @@ export function setBackgroundCanvasDimensions({
 
     canvasContext.scale(viewport.devicePixelRatio, viewport.devicePixelRatio);
 }
+
+export {
+    getBackgroundRendererAnimationDurationScalar,
+    getBackgroundRendererMappedStyleSubject,
+    getBackgroundRendererRibbonsEdgeGutter,
+    getBackgroundRendererRibbonsHeight,
+    setBackgroundCanvasDimensions,
+};

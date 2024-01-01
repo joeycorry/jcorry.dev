@@ -1,5 +1,3 @@
-import type { getRendererManager } from '~/common/lib/rendererManager';
+type UnregisterRendererCallback = () => void;
 
-export type RendererManager = ReturnType<typeof getRendererManager>;
-
-export type UnregisterRendererCallback = () => void;
+export type { UnregisterRendererCallback };

@@ -6,7 +6,7 @@ import { RgbColor } from './rgbColor';
 
 type RgbChannelName = 'blue' | 'green' | 'red';
 
-export class HslColor implements Color<HslColor> {
+class HslColor implements Color<HslColor> {
     #alphaPercentage: number;
     #hueDegrees: number;
     #saturationPercentage: number;
@@ -153,3 +153,5 @@ export class HslColor implements Color<HslColor> {
         );
     }
 }
+
+export { HslColor };

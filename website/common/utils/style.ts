@@ -1,4 +1,4 @@
-export function setRootElementCssVariable({
+function setRootElementCssVariable({
     cssVariableName,
     cssValue,
 }: {
@@ -10,3 +10,5 @@ export function setRootElementCssVariable({
         cssValue,
     );
 }
+
+export { setRootElementCssVariable };

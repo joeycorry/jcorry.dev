@@ -1,7 +1,7 @@
 import { getCosineOfRadians, getSineOfRadians } from '~/common/utils/geometry';
 import { modulo } from '~/common/utils/math';
 
-export class Vector {
+class Vector {
     public constructor(
         public x: number,
         public y: number,
@@ -27,3 +27,5 @@ export class Vector {
         );
     }
 }
+
+export { Vector };

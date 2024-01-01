@@ -7,6 +7,8 @@ import type { JotaiStore } from '~/common/utils/jotaiStore';
 
 import { AppContent } from './AppContent';
 
+const App = memo(UnmemoizedApp);
+
 function UnmemoizedApp({ jotaiStore }: { jotaiStore: JotaiStore }) {
     return (
         <StrictMode>
@@ -17,4 +19,4 @@ function UnmemoizedApp({ jotaiStore }: { jotaiStore: JotaiStore }) {
     );
 }
 
-export const App = memo(UnmemoizedApp);
+export { App };

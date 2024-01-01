@@ -10,8 +10,7 @@ import {
 import { rootHtmlId } from './root';
 import type { ServerPageContext } from './types';
 
-// eslint-disable-next-line import/no-default-export
-export default async function render(pageContext: ServerPageContext) {
+async function render(pageContext: ServerPageContext) {
     const { Page, pageProps } = pageContext;
     const readableStream = await renderToReadableStream(
         <Page {...pageProps} />,
@@ -35,3 +34,6 @@ export default async function render(pageContext: ServerPageContext) {
       </html>
     `;
 }
+
+// eslint-disable-next-line import/no-default-export
+export default render;

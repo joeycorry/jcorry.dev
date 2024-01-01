@@ -6,6 +6,8 @@ import { backgroundIsVisibleAtom } from '~/common/atoms/background';
 import { colorSchemeAtom } from '~/common/atoms/color';
 import styles from '~/common/styles/ColorSchemeButton.module.css';
 
+const ColorSchemeButton = memo(UnmemoizedColorSchemeButton);
+
 function useColorSchemeButtonClickHandler() {
     const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
 
@@ -35,4 +37,4 @@ function UnmemoizedColorSchemeButton() {
     );
 }
 
-export const ColorSchemeButton = memo(UnmemoizedColorSchemeButton);
+export { ColorSchemeButton };

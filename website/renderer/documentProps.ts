@@ -1,6 +1,17 @@
 import type { CustomPageContext } from './types';
 
-export function createHtmlAttributesString({
+function createFaviconElementString({
+    pageContext: { documentProps },
+}: {
+    pageContext: CustomPageContext;
+}): string {
+    return (
+        documentProps?.faviconElementString ??
+        '<link rel="icon" href="data:image/x-icon;," type="image/x-icon">'
+    );
+}
+
+function createHtmlAttributesString({
     pageContext: { documentProps },
 }: {
     pageContext: CustomPageContext;
@@ -14,18 +25,7 @@ export function createHtmlAttributesString({
         .join(' ');
 }
 
-export function createFaviconElementString({
-    pageContext: { documentProps },
-}: {
-    pageContext: CustomPageContext;
-}): string {
-    return (
-        documentProps?.faviconElementString ??
-        '<link rel="icon" href="data:image/x-icon;," type="image/x-icon">'
-    );
-}
-
-export function createMetaElementStrings({
+function createMetaElementStrings({
     pageContext: { documentProps },
 }: {
     pageContext: CustomPageContext;
@@ -37,7 +37,7 @@ export function createMetaElementStrings({
     ];
 }
 
-export function createTitleElementString({
+function createTitleElementString({
     pageContext: { documentProps },
 }: {
     pageContext: CustomPageContext;
@@ -46,3 +46,10 @@ export function createTitleElementString({
 
     return `<title>${title}</title>`;
 }
+
+export {
+    createFaviconElementString,
+    createHtmlAttributesString,
+    createMetaElementStrings,
+    createTitleElementString,
+};

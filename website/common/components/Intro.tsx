@@ -2,6 +2,8 @@ import { memo } from 'react';
 
 import styles from '~/common/styles/Intro.module.css';
 
+const Intro = memo(UnmemoizedIntro);
+
 function UnmemoizedIntro() {
     return (
         <section className={styles.intro}>
@@ -13,4 +15,4 @@ function UnmemoizedIntro() {
     );
 }
 
-export const Intro = memo(UnmemoizedIntro);
+export { Intro };

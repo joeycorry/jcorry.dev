@@ -6,6 +6,8 @@ import { useBackgroundEffects } from '~/common/hooks/background';
 import { useRendererManagerEffects } from '~/common/hooks/rendererManager';
 import styles from '~/common/styles/Background.module.css';
 
+const Background = memo(UnmemoizedBackground);
+
 function UnmemoizedBackground() {
     const backgroundIsVisible = useAtomValue(backgroundIsVisibleAtom);
     const canvasElementRef = useRef<HTMLCanvasElement>(null);
@@ -23,4 +25,4 @@ function UnmemoizedBackground() {
     );
 }
 
-export const Background = memo(UnmemoizedBackground);
+export { Background };

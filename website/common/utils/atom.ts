@@ -1,7 +1,29 @@
 import type { Atom, WritableAtom } from 'jotai';
 import { atom } from 'jotai';
 
-export function atomWithNoArgumentSetter<Value>(
+type AtomSetValueParameters<T> = T extends WritableAtom<
+    unknown,
+    infer Parameters,
+    unknown
+>
+    ? Parameters
+    : T extends Atom<infer Parameter>
+      ? [Parameter]
+      : never;
+
+type WritableAtomWithInitialValue<
+    Value,
+    Args extends unknown[],
+    Result,
+> = WritableAtom<Value, Args, Result> & {
+    init: Value;
+};
+
+const readonlyAtomValueIsNotInitializedSymbol = Symbol(
+    'readonlyAtomValueIsNotInitialized',
+);
+
+function atomWithNoArgumentSetter<Value>(
     initialValue: Value,
     setValue: () => Value,
 ): WritableAtom<Value, [undefined], void> {
@@ -13,45 +35,27 @@ export function atomWithNoArgumentSetter<Value>(
     );
 }
 
-const initializeValueSymbol = Symbol('initializeValue');
-
-export function mountInitializedReadonlyAtom<Value>(
-    getInitialValue: () => Value,
-) {
+function mountInitializedReadonlyAtom<Value>(getInitialValue: () => Value) {
     const baseAtom = atom<Value | null>(null);
     const resultAtom: WritableAtom<
         Value | null,
-        [typeof initializeValueSymbol],
+        [typeof readonlyAtomValueIsNotInitializedSymbol],
         void
     > = atom(
         get => get(baseAtom),
         (get, set, value) =>
             set(
                 baseAtom,
-                value === initializeValueSymbol
+                value === readonlyAtomValueIsNotInitializedSymbol
                     ? getInitialValue()
                     : get(baseAtom),
             ),
     );
-    resultAtom.onMount = setAtom => setAtom(initializeValueSymbol);
+    resultAtom.onMount = setAtom =>
+        setAtom(readonlyAtomValueIsNotInitializedSymbol);
 
     return resultAtom as Atom<Value | null>;
 }
 
-export type AtomSetValueParameters<T> = T extends WritableAtom<
-    unknown,
-    infer Parameters,
-    unknown
->
-    ? Parameters
-    : T extends Atom<infer Parameter>
-      ? [Parameter]
-      : never;
-
-export type WritableAtomWithInitialValue<
-    Value,
-    Args extends unknown[],
-    Result,
-> = WritableAtom<Value, Args, Result> & {
-    init: Value;
-};
+export type { AtomSetValueParameters, WritableAtomWithInitialValue };
+export { atomWithNoArgumentSetter, mountInitializedReadonlyAtom };

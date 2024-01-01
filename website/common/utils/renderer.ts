@@ -1,16 +1,14 @@
 import { Renderer } from '~/common/lib/renderer';
 
-export type RendererAnimationProgressingDirection = 'backward' | 'forward';
+type RendererAnimationMountingDirection = 'alternate' | 'alternate-reverse';
 
-export type RendererAnimationMountingDirection =
-    | 'alternate'
-    | 'alternate-reverse';
+type RendererAnimationProgressingDirection = 'backward' | 'forward';
 
-export type RendererAnimationStartingDirection =
+type RendererAnimationStartingDirection =
     | RendererAnimationMountingDirection
     | RendererAnimationProgressingDirection;
 
-export function createCompositeRenderer({
+function createCompositeRenderer({
     animationIterationCount,
     renderersByStartingTimeEntries,
 }: {
@@ -71,3 +69,10 @@ export function createCompositeRenderer({
         },
     );
 }
+
+export type {
+    RendererAnimationMountingDirection,
+    RendererAnimationProgressingDirection,
+    RendererAnimationStartingDirection,
+};
+export { createCompositeRenderer };

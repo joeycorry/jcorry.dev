@@ -8,7 +8,7 @@ import { viewportAtom } from '~/common/atoms/viewport';
 import { setupBackgroundRenderer } from '~/common/renderers/background';
 import { setBackgroundCanvasDimensions } from '~/common/utils/background';
 
-export function useBackgroundEffects({
+function useBackgroundEffects({
     canvasElementRef,
 }: {
     canvasElementRef: RefObject<HTMLCanvasElement>;
@@ -40,3 +40,5 @@ export function useBackgroundEffects({
         ],
     );
 }
+
+export { useBackgroundEffects };

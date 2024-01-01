@@ -3,6 +3,8 @@ import { GitHub } from 'react-feather';
 
 import styles from '~/common/styles/GitHubLink.module.css';
 
+const GitHubLink = memo(UnmemoizedGitHubLink);
+
 function UnmemoizedGitHubLink() {
     return (
         <a
@@ -17,4 +19,4 @@ function UnmemoizedGitHubLink() {
     );
 }
 
-export const GitHubLink = memo(UnmemoizedGitHubLink);
+export { GitHubLink };

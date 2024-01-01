@@ -22,8 +22,7 @@ import type { PageProps } from './+Page';
 
 const title = process.env.JCORRY_DEV_DOCUMENT_TITLE || 'Joey Corry';
 
-// eslint-disable-next-line import/no-default-export
-export default async function onBeforeRender({
+async function onBeforeRender({
     originalEvent,
 }: ServerPageContext): Promise<ServerOnBeforeRenderResult<PageProps>> {
     const requestCookie = getHeader(originalEvent, 'cookie') || '';
@@ -71,3 +70,6 @@ export default async function onBeforeRender({
         },
     };
 }
+
+// eslint-disable-next-line import/no-default-export
+export default onBeforeRender;

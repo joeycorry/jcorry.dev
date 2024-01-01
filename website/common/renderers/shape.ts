@@ -11,7 +11,58 @@ import type {
     RendererAnimationStartingDirection,
 } from '~/common/utils/renderer';
 
-export function createMovingTrapezoidRenderer({
+function createMovingRibbonRenderer({
+    animationDurationScalar,
+    animationStartingDirection,
+    canvasContext,
+    directionAngle,
+    fillStyle,
+    firstRibbonLineStartingPoint,
+    getYLength,
+    secondRibbonLineStartingPoint,
+    strokeStyle,
+    xAxisAdjacentAngle,
+}: {
+    animationDurationScalar: number;
+    animationStartingDirection: RendererAnimationMountingDirection;
+    canvasContext: CanvasRenderingContext2D;
+    directionAngle: number;
+    fillStyle: ValueOrMutableRef<string>;
+    firstRibbonLineStartingPoint: Point;
+    getYLength: (point: Point) => number;
+    secondRibbonLineStartingPoint: Point;
+    strokeStyle: ValueOrMutableRef<string>;
+    xAxisAdjacentAngle: number;
+}) {
+    const sineOfXAxisAdjacentAngle = getSineOfRadians(xAxisAdjacentAngle);
+    const firstLength =
+        getYLength(firstRibbonLineStartingPoint) / sineOfXAxisAdjacentAngle;
+    const secondLength =
+        getYLength(secondRibbonLineStartingPoint) / sineOfXAxisAdjacentAngle;
+
+    return createMovingTrapezoidRenderer({
+        angle: directionAngle,
+        animationDuration:
+            Math.max(firstLength, secondLength) * animationDurationScalar,
+        animationIterationCount: Number.POSITIVE_INFINITY,
+        animationStartingDirection,
+        canvasContext,
+        fillStyle,
+        parallelLineDataPair: [
+            {
+                length: firstLength,
+                point: firstRibbonLineStartingPoint,
+            },
+            {
+                length: secondLength,
+                point: secondRibbonLineStartingPoint,
+            },
+        ],
+        strokeStyle,
+    });
+}
+
+function createMovingTrapezoidRenderer({
     angle,
     canvasContext,
     counterClockwise,
@@ -136,53 +187,4 @@ export function createMovingTrapezoidRenderer({
     }, rendererOptions);
 }
 
-export function createMovingRibbonRenderer({
-    animationDurationScalar,
-    animationStartingDirection,
-    canvasContext,
-    directionAngle,
-    fillStyle,
-    firstRibbonLineStartingPoint,
-    getYLength,
-    secondRibbonLineStartingPoint,
-    strokeStyle,
-    xAxisAdjacentAngle,
-}: {
-    animationDurationScalar: number;
-    animationStartingDirection: RendererAnimationMountingDirection;
-    canvasContext: CanvasRenderingContext2D;
-    directionAngle: number;
-    fillStyle: ValueOrMutableRef<string>;
-    firstRibbonLineStartingPoint: Point;
-    getYLength: (point: Point) => number;
-    secondRibbonLineStartingPoint: Point;
-    strokeStyle: ValueOrMutableRef<string>;
-    xAxisAdjacentAngle: number;
-}) {
-    const sineOfXAxisAdjacentAngle = getSineOfRadians(xAxisAdjacentAngle);
-    const firstLength =
-        getYLength(firstRibbonLineStartingPoint) / sineOfXAxisAdjacentAngle;
-    const secondLength =
-        getYLength(secondRibbonLineStartingPoint) / sineOfXAxisAdjacentAngle;
-
-    return createMovingTrapezoidRenderer({
-        angle: directionAngle,
-        animationDuration:
-            Math.max(firstLength, secondLength) * animationDurationScalar,
-        animationIterationCount: Number.POSITIVE_INFINITY,
-        animationStartingDirection,
-        canvasContext,
-        fillStyle,
-        parallelLineDataPair: [
-            {
-                length: firstLength,
-                point: firstRibbonLineStartingPoint,
-            },
-            {
-                length: secondLength,
-                point: secondRibbonLineStartingPoint,
-            },
-        ],
-        strokeStyle,
-    });
-}
+export { createMovingRibbonRenderer, createMovingTrapezoidRenderer };

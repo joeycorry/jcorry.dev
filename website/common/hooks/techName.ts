@@ -14,6 +14,8 @@ function useContinuousTechNameAnimationEffect() {
     }, [setNextTechName]);
 }
 
-export function useTechNameEffects() {
+function useTechNameEffects() {
     useContinuousTechNameAnimationEffect();
 }
+
+export { useTechNameEffects };

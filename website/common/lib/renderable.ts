@@ -1,8 +1,10 @@
-export type RenderableFunction = () => void;
+type Renderable = RenderableFunction | RenderableObject;
 
-export type RenderableObject = {
+type RenderableFunction = () => void;
+
+type RenderableObject = {
     onBeforeFrameRender(): void;
-    render: RenderableFunction;
+    render(): void;
 };
 
-export type Renderable = RenderableFunction | RenderableObject;
+export type { Renderable, RenderableFunction, RenderableObject };

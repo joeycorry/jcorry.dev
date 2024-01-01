@@ -18,6 +18,14 @@ function createKeywordsMetaElementString(): string {
     return `<meta name="keywords" content="${keywords.join(', ')}">`;
 }
 
+function createMetaElementStrings({ color }: { color: Color }): string[] {
+    return [
+        descriptionMetaElementString,
+        createKeywordsMetaElementString(),
+        createThemeColorMetaElementString({ color }),
+    ];
+}
+
 function createThemeColorMetaElementString({
     color,
 }: {
@@ -26,19 +34,7 @@ function createThemeColorMetaElementString({
     return `<meta name="theme-color" content="${color.toString()}">`;
 }
 
-export function createMetaElementStrings({
-    color,
-}: {
-    color: Color;
-}): string[] {
-    return [
-        descriptionMetaElementString,
-        createKeywordsMetaElementString(),
-        createThemeColorMetaElementString({ color }),
-    ];
-}
-
-export function setThemeColor(color: Color) {
+function setThemeColor(color: Color) {
     const themeColorMetaElement =
         window.document.head.querySelector<HTMLMetaElement>(
             'meta[name="theme-color"]',
@@ -50,3 +46,5 @@ export function setThemeColor(color: Color) {
 
     themeColorMetaElement.content = color.toString();
 }
+
+export { createMetaElementStrings, setThemeColor };

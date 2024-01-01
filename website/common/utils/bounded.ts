@@ -1,51 +1,21 @@
-function getClampedNumber(parameter: {
-    isInteger: boolean;
-    maximum?: number;
-    minimum?: number;
-    value: number;
-}) {
-    const rawMinimum = parameter.minimum ?? Number.NEGATIVE_INFINITY;
-    const rawMaximum = parameter.maximum ?? Number.POSITIVE_INFINITY;
-    const [minimum, maximum] =
-        rawMinimum <= rawMaximum
-            ? [rawMinimum, rawMaximum]
-            : [rawMaximum, rawMaximum];
-
-    const floatResult = Math.min(Math.max(parameter.value, minimum), maximum);
-
-    return parameter.isInteger ? Math.floor(floatResult) : floatResult;
-}
-
-export function getClampedFloat({
+function getBoundedRandomFloat({
     maximum,
     minimum,
-    value,
 }: {
-    maximum?: number;
-    minimum?: number;
-    value: number;
+    maximum: number;
+    minimum: number;
 }) {
-    return getClampedNumber({ isInteger: false, maximum, minimum, value });
+    return getBoundedRandomNumber({ maximum, minimum, isInteger: false });
 }
 
-export function getClampedInteger({
+function getBoundedRandomInteger({
     maximum,
     minimum,
-    value,
 }: {
-    maximum?: number;
-    minimum?: number;
-    value: number;
+    maximum: number;
+    minimum: number;
 }) {
-    return getClampedNumber({ isInteger: true, maximum, minimum, value });
-}
-
-export function getClampedPercentage(percentage: number) {
-    return getClampedFloat({
-        maximum: 1,
-        minimum: 0,
-        value: percentage,
-    });
+    return getBoundedRandomNumber({ maximum, minimum, isInteger: true });
 }
 
 function getBoundedRandomNumber({
@@ -71,22 +41,60 @@ function getBoundedRandomNumber({
     return isInteger ? Math.floor(floatResult) : floatResult;
 }
 
-export function getBoundedRandomFloat({
+function getClampedFloat({
     maximum,
     minimum,
+    value,
 }: {
-    maximum: number;
-    minimum: number;
+    maximum?: number;
+    minimum?: number;
+    value: number;
 }) {
-    return getBoundedRandomNumber({ maximum, minimum, isInteger: false });
+    return getClampedNumber({ isInteger: false, maximum, minimum, value });
 }
 
-export function getBoundedRandomInteger({
+function getClampedInteger({
     maximum,
     minimum,
+    value,
 }: {
-    maximum: number;
-    minimum: number;
+    maximum?: number;
+    minimum?: number;
+    value: number;
 }) {
-    return getBoundedRandomNumber({ maximum, minimum, isInteger: true });
+    return getClampedNumber({ isInteger: true, maximum, minimum, value });
 }
+
+function getClampedNumber(parameter: {
+    isInteger: boolean;
+    maximum?: number;
+    minimum?: number;
+    value: number;
+}) {
+    const rawMinimum = parameter.minimum ?? Number.NEGATIVE_INFINITY;
+    const rawMaximum = parameter.maximum ?? Number.POSITIVE_INFINITY;
+    const [minimum, maximum] =
+        rawMinimum <= rawMaximum
+            ? [rawMinimum, rawMaximum]
+            : [rawMaximum, rawMaximum];
+
+    const floatResult = Math.min(Math.max(parameter.value, minimum), maximum);
+
+    return parameter.isInteger ? Math.floor(floatResult) : floatResult;
+}
+
+function getClampedPercentage(percentage: number) {
+    return getClampedFloat({
+        maximum: 1,
+        minimum: 0,
+        value: percentage,
+    });
+}
+
+export {
+    getBoundedRandomFloat,
+    getBoundedRandomInteger,
+    getClampedFloat,
+    getClampedInteger,
+    getClampedPercentage,
+};

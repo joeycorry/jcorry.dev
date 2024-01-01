@@ -2,7 +2,7 @@ import { getClampedFloat } from './bounded';
 
 const defaultDelayMilliseconds = 50;
 
-export function debounceFunction<T extends unknown[]>(
+function debounceFunction<T extends unknown[]>(
     func: (...args: T) => void,
     options?: { milliseconds?: number },
 ) {
@@ -23,10 +23,7 @@ export function debounceFunction<T extends unknown[]>(
     };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-export function evauluateNoop() {}
-
-export function throttleFunction<T extends unknown[]>(
+function throttleFunction<T extends unknown[]>(
     func: (...args: T) => void,
     options?: { milliseconds?: number },
 ) {
@@ -52,3 +49,5 @@ export function throttleFunction<T extends unknown[]>(
         }, milliseconds);
     };
 }
+
+export { debounceFunction, throttleFunction };

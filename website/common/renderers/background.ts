@@ -27,10 +27,10 @@ import { createNumberTransitionRenderer } from './math';
 
 const ribbonWidthMaximum = 80;
 const ribbonWidthMinimum = 20;
-const xAxisAdjacentAngle = 0.35 * Math.PI;
 const ribbonsInterstitialGutter = 5;
+const xAxisAdjacentAngle = 0.35 * Math.PI;
 
-export function setupBackgroundRenderer({
+function setupBackgroundRenderer({
     canvasElementRef,
     colorVariantSubjectsByName,
     setBackgroundIsVisible,
@@ -232,3 +232,5 @@ export function setupBackgroundRenderer({
         }
     };
 }
+
+export { setupBackgroundRenderer };

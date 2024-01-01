@@ -3,7 +3,7 @@ import type { RenderableObject } from '~/common/lib/renderable';
 import type { ValueOrMutableRef } from '~/common/utils/react';
 import { getValueFromValueOrMutableRef } from '~/common/utils/react';
 
-export abstract class Shape implements RenderableObject {
+abstract class Shape implements RenderableObject {
     protected _canvasContext: CanvasRenderingContext2D;
     protected _lastPath: Path2D | null;
 
@@ -50,7 +50,23 @@ export abstract class Shape implements RenderableObject {
         this._canvasContext.restore();
     }
 
-    protected abstract _calculateNextPath(): Path2D;
+    #getFillStyle() {
+        return this.#fillStyle === undefined
+            ? null
+            : getValueFromValueOrMutableRef(this.#fillStyle);
+    }
+
+    #getLineWidth() {
+        return this.#lineWidth === undefined
+            ? null
+            : getValueFromValueOrMutableRef(this.#lineWidth);
+    }
+
+    #getStrokeStyle() {
+        return this.#strokeStyle === undefined
+            ? null
+            : getValueFromValueOrMutableRef(this.#strokeStyle);
+    }
 
     #setBaseContextAttributes() {
         const fillStyle = this.#getFillStyle();
@@ -70,21 +86,7 @@ export abstract class Shape implements RenderableObject {
         }
     }
 
-    #getFillStyle() {
-        return this.#fillStyle === undefined
-            ? null
-            : getValueFromValueOrMutableRef(this.#fillStyle);
-    }
-
-    #getLineWidth() {
-        return this.#lineWidth === undefined
-            ? null
-            : getValueFromValueOrMutableRef(this.#lineWidth);
-    }
-
-    #getStrokeStyle() {
-        return this.#strokeStyle === undefined
-            ? null
-            : getValueFromValueOrMutableRef(this.#strokeStyle);
-    }
+    protected abstract _calculateNextPath(): Path2D;
 }
+
+export { Shape };

@@ -19,7 +19,7 @@ type GetNextRenderables = (
     currentAnimationData: CurrentAnimationData,
 ) => Renderable[];
 
-export class Renderer implements RenderableObject {
+class Renderer implements RenderableObject {
     #animationDuration: number;
     #currentAnimationDirection: RendererAnimationProgressingDirection;
     #currentAnimationTime: number;
@@ -207,3 +207,5 @@ export class Renderer implements RenderableObject {
                 : 'forward';
     }
 }
+
+export { Renderer };

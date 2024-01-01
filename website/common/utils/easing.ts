@@ -4,9 +4,9 @@ import { Point } from '~/common/lib/point';
 
 import { getClampedPercentage } from './bounded';
 
-const cubicBezierFunctionsByKey = new Map<string, EasingFunction>();
+type EasingFunction = (rawPercentage: number) => number;
 
-export type EasingFunction = (rawPercentage: number) => number;
+const cubicBezierFunctionsByKey = new Map<string, EasingFunction>();
 
 function getCubicBezierFunction(point1: Point, point2: Point): EasingFunction {
     const key = `${point1}, ${point2}`;
@@ -25,20 +25,23 @@ function getCubicBezierFunction(point1: Point, point2: Point): EasingFunction {
     return cubicBezierFunctionsByKey.get(key)!;
 }
 
-export function easeInQuint(rawPercentage: number): number {
+function easeInQuint(rawPercentage: number): number {
     return getCubicBezierFunction(
         new Point(0.64, 0),
         new Point(0.78, 0),
     )(rawPercentage);
 }
 
-export function easeOutQuint(rawPercentage: number): number {
+function easeLinear(percentage: number): number {
+    return getClampedPercentage(percentage);
+}
+
+function easeOutQuint(rawPercentage: number): number {
     return getCubicBezierFunction(
         new Point(0.22, 1),
         new Point(0.36, 1),
     )(rawPercentage);
 }
 
-export function easeLinear(percentage: number): number {
-    return getClampedPercentage(percentage);
-}
+export type { EasingFunction };
+export { easeInQuint, easeLinear, easeOutQuint };

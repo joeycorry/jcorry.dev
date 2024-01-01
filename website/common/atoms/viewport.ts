@@ -9,9 +9,11 @@ const getViewportValue = import.meta.env.SSR
           height: window.innerHeight,
       });
 
-export const viewportAtom = atomWithNoArgumentSetter<Viewport>(
+const viewportAtom = atomWithNoArgumentSetter<Viewport>(
     getViewportValue(),
     getViewportValue,
 );
 
 viewportAtom.debugLabel = 'viewportAtom';
+
+export { viewportAtom };

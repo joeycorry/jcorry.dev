@@ -1,4 +1,4 @@
-export function createCookiesValueAccessors({
+function createCookiesValueAccessors({
     getCookies,
     setCookies,
 }: {
@@ -13,7 +13,7 @@ export function createCookiesValueAccessors({
     };
 }
 
-export function getCookie({
+function getCookie({
     getCookies,
     key,
 }: {
@@ -32,7 +32,17 @@ export function getCookie({
     return null;
 }
 
-export function setCookie({
+function removeCookie({
+    key,
+    setCookies,
+}: {
+    key: string;
+    setCookies: (cookie: string) => void;
+}) {
+    setCookies(`${key}=; max-age=0`);
+}
+
+function setCookie({
     key,
     setCookies,
     value,
@@ -44,12 +54,4 @@ export function setCookie({
     setCookies(`${key}=${value}; max-age=31536000`);
 }
 
-export function removeCookie({
-    key,
-    setCookies,
-}: {
-    key: string;
-    setCookies: (cookie: string) => void;
-}) {
-    setCookies(`${key}=; max-age=0`);
-}
+export { createCookiesValueAccessors, getCookie, removeCookie, setCookie };

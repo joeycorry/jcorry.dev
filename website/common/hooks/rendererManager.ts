@@ -1,9 +1,30 @@
 import { useCallback, useEffect, useRef } from 'react';
 
 import { getRendererManager } from '~/common/lib/rendererManager';
-import type { RendererManager } from '~/common/utils/rendererManager';
 
-function useVisibilityChangeHandler(rendererManager: RendererManager) {
+function useRendererManagerEffects() {
+    const rendererManager = getRendererManager();
+    const handleVisibilityChange = useVisibilityChangeHandler();
+
+    useEffect(() => {
+        rendererManager.startAnimation();
+        window.document.addEventListener(
+            'visibilitychange',
+            handleVisibilityChange,
+        );
+
+        return () => {
+            rendererManager.stopAnimation();
+            window.document.removeEventListener(
+                'visibilitychange',
+                handleVisibilityChange,
+            );
+        };
+    }, [rendererManager, handleVisibilityChange]);
+}
+
+function useVisibilityChangeHandler() {
+    const rendererManager = getRendererManager();
     const wasAnimatingWhenVisibleRef = useRef<boolean | null>(null);
 
     return useCallback(() => {
@@ -23,23 +44,4 @@ function useVisibilityChangeHandler(rendererManager: RendererManager) {
     }, [rendererManager, wasAnimatingWhenVisibleRef]);
 }
 
-export function useRendererManagerEffects() {
-    const rendererManager = getRendererManager();
-    const handleVisibilityChange = useVisibilityChangeHandler(rendererManager);
-
-    useEffect(() => {
-        rendererManager.startAnimation();
-        window.document.addEventListener(
-            'visibilitychange',
-            handleVisibilityChange,
-        );
-
-        return () => {
-            rendererManager.stopAnimation();
-            window.document.removeEventListener(
-                'visibilitychange',
-                handleVisibilityChange,
-            );
-        };
-    }, [rendererManager, handleVisibilityChange]);
-}
+export { useRendererManagerEffects };

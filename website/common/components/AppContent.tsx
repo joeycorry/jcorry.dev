@@ -9,6 +9,8 @@ import { Background } from './Background';
 import { Header } from './Header';
 import { Intro } from './Intro';
 
+const AppContent = memo(UnmemoizedAppContent);
+
 function UnmemoizedAppContent() {
     useColorEffects();
     useTechNameEffects();
@@ -23,4 +25,4 @@ function UnmemoizedAppContent() {
     );
 }
 
-export const AppContent = memo(UnmemoizedAppContent);
+export { AppContent };

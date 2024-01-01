@@ -2,7 +2,7 @@ import { Renderer } from '~/common/lib/renderer';
 import type { Subject } from '~/common/lib/subject';
 import type { RendererAnimationStartingDirection } from '~/common/utils/renderer';
 
-export function createNumberTransitionRenderer({
+function createNumberTransitionRenderer({
     numberSubject,
     maximum,
     minimum,
@@ -27,3 +27,5 @@ export function createNumberTransitionRenderer({
         rendererOptions,
     );
 }
+
+export { createNumberTransitionRenderer };

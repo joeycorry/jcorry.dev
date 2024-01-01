@@ -5,12 +5,14 @@ import { techNameAtom } from '~/common/atoms/techName';
 
 import type { AtomSetValueParameters } from './atom';
 
-export type JotaiStoreAtomSetValueParametersByName = {
+type JotaiStore = ReturnType<typeof createJotaiStore>;
+
+type JotaiStoreAtomSetValueParametersByName = {
     colorScheme: AtomSetValueParameters<typeof colorSchemeAtom>;
     techName: AtomSetValueParameters<typeof techNameAtom>;
 };
 
-export function createJotaiStore(
+function createJotaiStore(
     atomSetValueParametersByName: JotaiStoreAtomSetValueParametersByName,
 ) {
     const store = createStore();
@@ -26,4 +28,5 @@ export function createJotaiStore(
     return store;
 }
 
-export type JotaiStore = ReturnType<typeof createJotaiStore>;
+export type { JotaiStore, JotaiStoreAtomSetValueParametersByName };
+export { createJotaiStore };
