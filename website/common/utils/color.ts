@@ -94,8 +94,8 @@ function createColorVariantCssVariableSetter({
 
     return (color: Color) =>
         setRootElementCssVariable({
-            cssVariableName: colorVariantCssName,
             cssValue: color.toString(),
+            cssVariableName: colorVariantCssName,
         });
 }
 

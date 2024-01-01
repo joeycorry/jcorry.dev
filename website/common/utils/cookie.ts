@@ -48,8 +48,8 @@ function setCookie({
     value,
 }: {
     key: string;
-    value: string;
     setCookies: (cookie: string) => void;
+    value: string;
 }) {
     setCookies(`${key}=${value}; max-age=31536000`);
 }

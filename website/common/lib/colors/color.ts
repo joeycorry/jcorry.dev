@@ -10,8 +10,8 @@ interface Color<This extends Color = HslColor | RgbColor> {
     ): This;
     lighten(rawPercentage: number): This;
     saturate(rawPercentage: number): This;
-    toRgbColor(): RgbColor;
     toHslColor(): HslColor;
+    toRgbColor(): RgbColor;
     toString(): string;
 }
 

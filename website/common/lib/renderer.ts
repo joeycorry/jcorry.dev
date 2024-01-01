@@ -27,8 +27,8 @@ class Renderer implements RenderableObject {
     #getNextRenderables: GetNextRenderables;
     #lastRenderables: Renderable[] = [];
     #lastTimestamp?: number;
-    #startingAnimationIterationCount: number;
     #startingAnimationDirection: RendererAnimationStartingDirection;
+    #startingAnimationIterationCount: number;
 
     public constructor(
         getNextRenderables: GetNextRenderables,
@@ -64,23 +64,12 @@ class Renderer implements RenderableObject {
         });
     }
 
-    public onIterationFinish() {
-        this.#elapsedAnimationIterationCount++;
-
-        if (
-            this.#startingAnimationDirection === 'alternate' ||
-            this.#startingAnimationDirection === 'alternate-reverse'
-        ) {
-            this.#toggleAnimationDirection();
-        }
+    public getAnimationDuration() {
+        return this.#animationDuration;
     }
 
     public getElapsedAnimationIterationCount() {
         return this.#elapsedAnimationIterationCount;
-    }
-
-    public getAnimationDuration() {
-        return this.#animationDuration;
     }
 
     public getTotalDuration() {
@@ -98,6 +87,17 @@ class Renderer implements RenderableObject {
             if ('onBeforeFrameRender' in renderable) {
                 renderable.onBeforeFrameRender();
             }
+        }
+    }
+
+    public onIterationFinish() {
+        this.#elapsedAnimationIterationCount++;
+
+        if (
+            this.#startingAnimationDirection === 'alternate' ||
+            this.#startingAnimationDirection === 'alternate-reverse'
+        ) {
+            this.#toggleAnimationDirection();
         }
     }
 
@@ -161,19 +161,19 @@ class Renderer implements RenderableObject {
         };
     }
 
+    #getCurrentAnimationIterationCount() {
+        return (
+            this.#startingAnimationIterationCount -
+            this.#elapsedAnimationIterationCount
+        );
+    }
+
     #getCurrentAnimationPercentage() {
         return this.#animationDuration === Number.POSITIVE_INFINITY
             ? 0
             : getClampedPercentage(
                   this.#currentAnimationTime / this.#animationDuration,
               );
-    }
-
-    #getCurrentAnimationIterationCount() {
-        return (
-            this.#startingAnimationIterationCount -
-            this.#elapsedAnimationIterationCount
-        );
     }
 
     #getTimeDelta(timestamp: number) {

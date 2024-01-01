@@ -9,8 +9,8 @@ type RgbChannelName = 'blue' | 'green' | 'red';
 class HslColor implements Color<HslColor> {
     #alphaPercentage: number;
     #hueDegrees: number;
-    #saturationPercentage: number;
     #lightnessPercentage: number;
+    #saturationPercentage: number;
 
     public constructor({
         alphaPercentage = 1,
