@@ -6,48 +6,44 @@ import { Subject } from '~/common/lib/subject';
 import type { ColorVariantName } from './color';
 import type { Viewport } from './viewport';
 
-type GetBackgroundRendererAnimationDurationScalarParameter = {
-    colorVariantName: ColorVariantName;
-    viewport: Viewport;
-};
-
 export function getBackgroundRendererAnimationDurationScalar({
     colorVariantName,
     viewport: { width },
-}: GetBackgroundRendererAnimationDurationScalarParameter) {
+}: {
+    colorVariantName: ColorVariantName;
+    viewport: Viewport;
+}) {
     return (
         (width >= 1500 ? 0.8 : width >= 750 ? 0.9 : 1) *
         (colorVariantName === 'foregroundColor' ? 15 : 7)
     );
 }
 
-type GetBackgroundRendererRibbonsEdgeGutterParameter = { viewport: Viewport };
-
 export function getBackgroundRendererRibbonsEdgeGutter({
     viewport: { width },
-}: GetBackgroundRendererRibbonsEdgeGutterParameter) {
+}: {
+    viewport: Viewport;
+}) {
     return width >= 1500 ? 200 : width >= 750 ? 150 : 100;
 }
 
-type GetBackgroundRendererRibbonsHeightParameter = { viewport: Viewport };
-
 export function getBackgroundRendererRibbonsHeight({
     viewport: { width, height },
-}: GetBackgroundRendererRibbonsHeightParameter) {
+}: {
+    viewport: Viewport;
+}) {
     return (width >= 1500 ? 0.8 : width >= 750 ? 0.6 : 0.4) * height;
 }
-
-type GetBackgroundRendererMappedStyleSubjectParameter = {
-    colorVariantSubject: Subject<Color>;
-    complementaryColorVariantSubject: Subject<Color>;
-    interpolationPercentageSubject: Subject<number>;
-};
 
 export function getBackgroundRendererMappedStyleSubject({
     colorVariantSubject,
     complementaryColorVariantSubject,
     interpolationPercentageSubject,
-}: GetBackgroundRendererMappedStyleSubjectParameter) {
+}: {
+    colorVariantSubject: Subject<Color>;
+    complementaryColorVariantSubject: Subject<Color>;
+    interpolationPercentageSubject: Subject<number>;
+}) {
     return Subject.mapAll<[Color, Color, number], string>(
         [
             colorVariantSubject,
@@ -68,15 +64,13 @@ export function getBackgroundRendererMappedStyleSubject({
     );
 }
 
-type SetBackgroundCanvasDimensionsParameter = {
-    canvasElementRef: RefObject<HTMLCanvasElement>;
-    viewport: Viewport;
-};
-
 export function setBackgroundCanvasDimensions({
     canvasElementRef,
     viewport,
-}: SetBackgroundCanvasDimensionsParameter) {
+}: {
+    canvasElementRef: RefObject<HTMLCanvasElement>;
+    viewport: Viewport;
+}) {
     if (canvasElementRef.current === null) {
         return;
     }

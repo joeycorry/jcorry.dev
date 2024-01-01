@@ -1,12 +1,6 @@
 import { getCosineOfRadians, getSineOfRadians } from '~/common/utils/geometry';
 import { modulo } from '~/common/utils/math';
 
-export type VectorStaticFromAngleAndLengthParameter = {
-    angle: number;
-    counterClockwise?: boolean;
-    length: number;
-};
-
 export class Vector {
     public constructor(
         public x: number,
@@ -17,7 +11,11 @@ export class Vector {
         angle,
         counterClockwise = false,
         length,
-    }: VectorStaticFromAngleAndLengthParameter) {
+    }: {
+        angle: number;
+        counterClockwise?: boolean;
+        length: number;
+    }) {
         const normalizedAngle = modulo(
             (counterClockwise ? -1 : 1) * angle,
             2 * Math.PI,

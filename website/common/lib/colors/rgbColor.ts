@@ -1,22 +1,10 @@
 import { getClampedPercentage } from '~/common/utils/bounded';
-import type { RgbChannelOrAlphaName } from '~/common/utils/color';
 
 import type { Color } from './color';
 // eslint-disable-next-line import/no-cycle
 import { HslColor } from './hslColor';
 
-type RgbColorConstructorParameter = {
-    alphaPercentage: number;
-    bluePercentage: number;
-    greenPercentage: number;
-    redPercentage: number;
-};
-
-type PrivateInterpolateRgbChannelOrAlphaParameter = {
-    otherColor: RgbColor;
-    percentage: number;
-    rgbChannelOrAlphaName: RgbChannelOrAlphaName;
-};
+type RgbChannelOrAlphaName = 'alpha' | 'blue' | 'green' | 'red';
 
 export class RgbColor implements Color<RgbColor> {
     #alphaPercentage: number;
@@ -29,7 +17,12 @@ export class RgbColor implements Color<RgbColor> {
         bluePercentage,
         greenPercentage,
         redPercentage,
-    }: RgbColorConstructorParameter) {
+    }: {
+        alphaPercentage: number;
+        bluePercentage: number;
+        greenPercentage: number;
+        redPercentage: number;
+    }) {
         this.#alphaPercentage = getClampedPercentage(alphaPercentage);
         this.#bluePercentage = getClampedPercentage(bluePercentage);
         this.#greenPercentage = getClampedPercentage(greenPercentage);
@@ -49,29 +42,27 @@ export class RgbColor implements Color<RgbColor> {
         rawPercentage: number,
     ): RgbColor {
         const otherRgbColor = otherColor.toRgbColor();
-        const partialPrivateInterpolateRgbChannelParameter: Omit<
-            PrivateInterpolateRgbChannelOrAlphaParameter,
-            'rgbChannelOrAlphaName'
-        > = {
-            otherColor: otherRgbColor,
-            percentage: getClampedPercentage(rawPercentage),
-        };
+        const percentage = getClampedPercentage(rawPercentage);
 
         return new RgbColor({
             alphaPercentage: this.#interpolateRgbChannelOrAlpha({
-                ...partialPrivateInterpolateRgbChannelParameter,
+                otherRgbColor,
+                percentage,
                 rgbChannelOrAlphaName: 'alpha',
             }),
             bluePercentage: this.#interpolateRgbChannelOrAlpha({
-                ...partialPrivateInterpolateRgbChannelParameter,
+                otherRgbColor,
+                percentage,
                 rgbChannelOrAlphaName: 'blue',
             }),
             greenPercentage: this.#interpolateRgbChannelOrAlpha({
-                ...partialPrivateInterpolateRgbChannelParameter,
+                otherRgbColor,
+                percentage,
                 rgbChannelOrAlphaName: 'green',
             }),
             redPercentage: this.#interpolateRgbChannelOrAlpha({
-                ...partialPrivateInterpolateRgbChannelParameter,
+                otherRgbColor,
+                percentage,
                 rgbChannelOrAlphaName: 'red',
             }),
         });
@@ -179,19 +170,23 @@ export class RgbColor implements Color<RgbColor> {
     }
 
     #interpolateRgbChannelOrAlpha({
-        otherColor,
+        otherRgbColor,
         percentage,
         rgbChannelOrAlphaName,
-    }: PrivateInterpolateRgbChannelOrAlphaParameter) {
+    }: {
+        otherRgbColor: RgbColor;
+        percentage: number;
+        rgbChannelOrAlphaName: RgbChannelOrAlphaName;
+    }) {
         const thisColorComponent = this.#getRgbChannelOrAlpha(
             rgbChannelOrAlphaName,
         );
-        const otherColorComponent = otherColor.#getRgbChannelOrAlpha(
+        const otherRgbColorComponent = otherRgbColor.#getRgbChannelOrAlpha(
             rgbChannelOrAlphaName,
         );
 
         return (
-            (otherColorComponent - thisColorComponent) * percentage +
+            (otherRgbColorComponent - thisColorComponent) * percentage +
             thisColorComponent
         );
     }

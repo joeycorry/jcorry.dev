@@ -4,9 +4,8 @@ import {
     getClampedPercentage,
 } from '~/common/utils/bounded';
 import type {
-    RendererAnimationIterationCount,
-    RendererOptions,
-    RendererStartingAnimationDirection,
+    RendererAnimationProgressingDirection,
+    RendererAnimationStartingDirection,
 } from '~/common/utils/renderer';
 
 import type { Renderable, RenderableObject } from './renderable';
@@ -20,20 +19,16 @@ type GetNextRenderables = (
     currentAnimationData: CurrentAnimationData,
 ) => Renderable[];
 
-type SetAnimationPercentageOptions = {
-    shouldConvertPercentageForDirection?: boolean;
-};
-
 export class Renderer implements RenderableObject {
     #animationDuration: number;
-    #currentAnimationDirection: 'forward' | 'backward';
+    #currentAnimationDirection: RendererAnimationProgressingDirection;
     #currentAnimationTime: number;
-    #elapsedAnimationIterationCount: RendererAnimationIterationCount = 0;
+    #elapsedAnimationIterationCount: number = 0;
     #getNextRenderables: GetNextRenderables;
     #lastRenderables: Renderable[] = [];
     #lastTimestamp?: number;
-    #startingAnimationIterationCount: RendererAnimationIterationCount;
-    #startingAnimationDirection: RendererStartingAnimationDirection;
+    #startingAnimationIterationCount: number;
+    #startingAnimationDirection: RendererAnimationStartingDirection;
 
     public constructor(
         getNextRenderables: GetNextRenderables,
@@ -41,7 +36,11 @@ export class Renderer implements RenderableObject {
             animationDuration,
             animationIterationCount,
             animationStartingDirection,
-        }: RendererOptions,
+        }: {
+            animationDuration: number;
+            animationIterationCount?: number;
+            animationStartingDirection?: RendererAnimationStartingDirection;
+        },
     ) {
         this.#getNextRenderables = getNextRenderables;
         this.#startingAnimationDirection =
@@ -126,7 +125,9 @@ export class Renderer implements RenderableObject {
         rawAnimationPercentage: number,
         {
             shouldConvertPercentageForDirection = true,
-        }: SetAnimationPercentageOptions = {},
+        }: {
+            shouldConvertPercentageForDirection?: boolean;
+        } = {},
     ) {
         const unconvertedAnimationPercentage = getClampedPercentage(
             rawAnimationPercentage,

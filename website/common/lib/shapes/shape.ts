@@ -1,25 +1,22 @@
-import type { MutableRefObject } from 'react';
-
 import type { Point } from '~/common/lib/point';
 import type { RenderableObject } from '~/common/lib/renderable';
-import { getValueFromMutableRefOrRaw } from '~/common/utils/react';
-
-export type ShapeConstructorParameter = {
-    canvasContext: CanvasRenderingContext2D;
-    fillStyle?: string | MutableRefObject<string>;
-    lineWidth?: number | MutableRefObject<number>;
-    strokeStyle?: string | MutableRefObject<string>;
-};
+import type { ValueOrMutableRef } from '~/common/utils/react';
+import { getValueFromValueOrMutableRef } from '~/common/utils/react';
 
 export abstract class Shape implements RenderableObject {
     protected _canvasContext: CanvasRenderingContext2D;
     protected _lastPath: Path2D | null;
 
-    #fillStyle?: string | MutableRefObject<string>;
-    #lineWidth?: number | MutableRefObject<number>;
-    #strokeStyle?: string | MutableRefObject<string>;
+    #fillStyle?: ValueOrMutableRef<string>;
+    #lineWidth?: ValueOrMutableRef<number>;
+    #strokeStyle?: ValueOrMutableRef<string>;
 
-    public constructor(parameter: ShapeConstructorParameter) {
+    public constructor(parameter: {
+        canvasContext: CanvasRenderingContext2D;
+        fillStyle?: ValueOrMutableRef<string>;
+        lineWidth?: ValueOrMutableRef<number>;
+        strokeStyle?: ValueOrMutableRef<string>;
+    }) {
         this._canvasContext = parameter.canvasContext;
         this._lastPath = null;
         this.#fillStyle = parameter.fillStyle;
@@ -76,18 +73,18 @@ export abstract class Shape implements RenderableObject {
     #getFillStyle() {
         return this.#fillStyle === undefined
             ? null
-            : getValueFromMutableRefOrRaw(this.#fillStyle);
+            : getValueFromValueOrMutableRef(this.#fillStyle);
     }
 
     #getLineWidth() {
         return this.#lineWidth === undefined
             ? null
-            : getValueFromMutableRefOrRaw(this.#lineWidth);
+            : getValueFromValueOrMutableRef(this.#lineWidth);
     }
 
     #getStrokeStyle() {
         return this.#strokeStyle === undefined
             ? null
-            : getValueFromMutableRefOrRaw(this.#strokeStyle);
+            : getValueFromValueOrMutableRef(this.#strokeStyle);
     }
 }

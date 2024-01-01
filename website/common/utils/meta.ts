@@ -18,19 +18,19 @@ function createKeywordsMetaElementString(): string {
     return `<meta name="keywords" content="${keywords.join(', ')}">`;
 }
 
-type CreateThemeColorMetaElementStringParameter = { color: Color };
-
 function createThemeColorMetaElementString({
     color,
-}: CreateThemeColorMetaElementStringParameter): string {
+}: {
+    color: Color;
+}): string {
     return `<meta name="theme-color" content="${color.toString()}">`;
 }
 
-type CreateMetaElementStringsParameter = { color: Color };
-
 export function createMetaElementStrings({
     color,
-}: CreateMetaElementStringsParameter): string[] {
+}: {
+    color: Color;
+}): string[] {
     return [
         descriptionMetaElementString,
         createKeywordsMetaElementString(),

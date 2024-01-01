@@ -1,12 +1,10 @@
 import type { CustomPageContext } from './types';
 
-type CreateHtmlAttributesStringParameter = {
-    pageContext: CustomPageContext;
-};
-
 export function createHtmlAttributesString({
     pageContext: { documentProps },
-}: CreateHtmlAttributesStringParameter): string {
+}: {
+    pageContext: CustomPageContext;
+}): string {
     const htmlAttributes = documentProps?.htmlAttributes ?? {};
 
     return Object.entries(htmlAttributes)
@@ -16,26 +14,22 @@ export function createHtmlAttributesString({
         .join(' ');
 }
 
-type CreateFaviconElementStringParameter = {
-    pageContext: CustomPageContext;
-};
-
 export function createFaviconElementString({
     pageContext: { documentProps },
-}: CreateFaviconElementStringParameter): string {
+}: {
+    pageContext: CustomPageContext;
+}): string {
     return (
         documentProps?.faviconElementString ??
         '<link rel="icon" href="data:image/x-icon;," type="image/x-icon">'
     );
 }
 
-type CreateMetaElementStringsParameter = {
-    pageContext: CustomPageContext;
-};
-
 export function createMetaElementStrings({
     pageContext: { documentProps },
-}: CreateMetaElementStringsParameter): string[] {
+}: {
+    pageContext: CustomPageContext;
+}): string[] {
     return [
         '<meta charset="UTF-8" />',
         '<meta name="viewport" content="width=device-width, initial-scale=1.0" />',
@@ -43,13 +37,11 @@ export function createMetaElementStrings({
     ];
 }
 
-type CreateTitleElementStringParameter = {
-    pageContext: CustomPageContext;
-};
-
 export function createTitleElementString({
     pageContext: { documentProps },
-}: CreateTitleElementStringParameter): string {
+}: {
+    pageContext: CustomPageContext;
+}): string {
     const title = documentProps?.title ?? '';
 
     return `<title>${title}</title>`;

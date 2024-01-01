@@ -7,14 +7,12 @@ import type { Renderer } from '~/common/lib/renderer';
 import { getRendererManager } from '~/common/lib/rendererManager';
 import { Subject } from '~/common/lib/subject';
 import { createMovingRibbonRenderer } from '~/common/renderers/shape';
-import { getArrayElementAtIndex } from '~/common/utils/array';
 import {
     getBackgroundRendererAnimationDurationScalar,
     getBackgroundRendererMappedStyleSubject,
     getBackgroundRendererRibbonsEdgeGutter,
     getBackgroundRendererRibbonsHeight,
 } from '~/common/utils/background';
-import type { Bounds } from '~/common/utils/bounded';
 import { getBoundedRandomInteger } from '~/common/utils/bounded';
 import type {
     ColorVariantName,
@@ -27,23 +25,22 @@ import type { Viewport } from '~/common/utils/viewport';
 
 import { createNumberTransitionRenderer } from './math';
 
-const ribbonWidthBounds: Bounds = { minimum: 20, maximum: 80 };
+const ribbonWidthMaximum = 80;
+const ribbonWidthMinimum = 20;
 const xAxisAdjacentAngle = 0.35 * Math.PI;
 const ribbonsInterstitialGutter = 5;
-
-type SetupBackgroundRendererParameter = {
-    canvasElementRef: RefObject<HTMLCanvasElement>;
-    colorVariantSubjectsByName: Record<ColorVariantName, Subject<Color>>;
-    setBackgroundIsVisible: (value: SetStateAction<boolean>) => void;
-    viewport: Viewport;
-};
 
 export function setupBackgroundRenderer({
     canvasElementRef,
     colorVariantSubjectsByName,
     setBackgroundIsVisible,
     viewport,
-}: SetupBackgroundRendererParameter) {
+}: {
+    canvasElementRef: RefObject<HTMLCanvasElement>;
+    colorVariantSubjectsByName: Record<ColorVariantName, Subject<Color>>;
+    setBackgroundIsVisible: (value: SetStateAction<boolean>) => void;
+    viewport: Viewport;
+}) {
     if (canvasElementRef.current === null) {
         return;
     }
@@ -84,14 +81,16 @@ export function setupBackgroundRenderer({
         const leftYLimit = ribbonsHeight;
 
         while (
-            ribbonsInterstitialGutter +
-                getArrayElementAtIndex(leftStartingYs, -1)! <=
+            ribbonsInterstitialGutter + leftStartingYs.at(-1)! <=
             leftYLimit
         ) {
             leftStartingYs.push(
                 ribbonsInterstitialGutter +
-                    getArrayElementAtIndex(leftStartingYs, -1)! +
-                    getBoundedRandomInteger(ribbonWidthBounds),
+                    leftStartingYs.at(-1)! +
+                    getBoundedRandomInteger({
+                        maximum: ribbonWidthMaximum,
+                        minimum: ribbonWidthMinimum,
+                    }),
             );
         }
 
@@ -132,8 +131,9 @@ export function setupBackgroundRenderer({
                 animationDuration: 1500 + Math.random() * 2000,
                 animationIterationCount: Number.POSITIVE_INFINITY,
                 animationStartingDirection: 'alternate',
+                maximum: 1,
+                minimum: 0,
                 numberSubject: interpolationPercentageSubject,
-                range: { minimum: 0, maximum: 1 },
             });
 
             renderersByStartingTimeEntries.push([
@@ -151,14 +151,16 @@ export function setupBackgroundRenderer({
         const rightYLimit = viewport.height - ribbonsEdgeGutter;
 
         while (
-            ribbonsInterstitialGutter +
-                getArrayElementAtIndex(rightStartingYs, -1)! <=
+            ribbonsInterstitialGutter + rightStartingYs.at(-1)! <=
             rightYLimit
         ) {
             rightStartingYs.push(
                 ribbonsInterstitialGutter +
-                    getArrayElementAtIndex(rightStartingYs, -1)! +
-                    getBoundedRandomInteger(ribbonWidthBounds),
+                    rightStartingYs.at(-1)! +
+                    getBoundedRandomInteger({
+                        maximum: ribbonWidthMaximum,
+                        minimum: ribbonWidthMinimum,
+                    }),
             );
         }
 
@@ -199,8 +201,9 @@ export function setupBackgroundRenderer({
                 animationDuration: 1500 + Math.random() * 2000,
                 animationIterationCount: Number.POSITIVE_INFINITY,
                 animationStartingDirection: 'alternate',
+                maximum: 1,
+                minimum: 0,
                 numberSubject: interpolationPercentageSubject,
-                range: { minimum: 0, maximum: 1 },
             });
 
             renderersByStartingTimeEntries.push([

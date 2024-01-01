@@ -1,3 +1,10 @@
+import type { Point } from '~/common/lib/point';
+
+export type LineData = {
+    length: number;
+    point: Point;
+};
+
 const cosineValuesByRadians = new Map<number, number>();
 
 export function getCosineOfRadians(radians: number) {

@@ -1,12 +1,10 @@
-type SetRootElementCssVariableParameter = {
-    cssVariableName: string;
-    cssValue: string;
-};
-
 export function setRootElementCssVariable({
     cssVariableName,
     cssValue,
-}: SetRootElementCssVariableParameter) {
+}: {
+    cssVariableName: string;
+    cssValue: string;
+}) {
     window.document.documentElement.style.setProperty(
         cssVariableName,
         cssValue,

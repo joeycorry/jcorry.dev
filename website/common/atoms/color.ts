@@ -1,8 +1,10 @@
 import { atom } from 'jotai';
 
-import type { Color } from '~/common/lib/colors/color';
 import { Subject } from '~/common/lib/subject';
-import type { ColorScheme, ColorVariantName } from '~/common/utils/color';
+import type {
+    ColorScheme,
+    ColorVariantSubjectsByName,
+} from '~/common/utils/color';
 import { getColorVariantNames } from '~/common/utils/color';
 
 export const colorSchemeAtom = atom<ColorScheme>('normal');
@@ -15,7 +17,7 @@ export const colorVariantSubjectsByNameAtom = atom(
             colorVariantName,
             new Subject(),
         ]),
-    ) as Record<ColorVariantName, Subject<Color>>,
+    ) as ColorVariantSubjectsByName,
 );
 
 colorVariantSubjectsByNameAtom.debugLabel = 'colorVariantSubjectsByNameAtom';

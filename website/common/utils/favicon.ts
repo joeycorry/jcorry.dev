@@ -1,12 +1,6 @@
 import type { Color } from '~/common/lib/colors/color';
 
-type CreateFaviconDataUrlParameter = {
-    color: Color;
-};
-
-function createFaviconDataUrl({
-    color,
-}: CreateFaviconDataUrlParameter): string {
+function createFaviconDataUrl({ color }: { color: Color }): string {
     const canvasElement = window.document.createElement('canvas');
     const canvasContext = canvasElement.getContext('2d')!;
     const raindropPath = new Path2D('M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z');
@@ -20,11 +14,11 @@ function createFaviconDataUrl({
     return canvasElement.toDataURL('image/png');
 }
 
-type CreateFaviconElementStringParameter = { color: Color };
-
 export function createFaviconElementString({
     color,
-}: CreateFaviconElementStringParameter): string {
+}: {
+    color: Color;
+}): string {
     if (import.meta.env.SSR) {
         return `<link rel="icon" type="image/x-icon" href="data:image/x-icon;,">`;
     }

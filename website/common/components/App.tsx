@@ -7,11 +7,7 @@ import type { JotaiStore } from '~/common/utils/jotaiStore';
 
 import { AppContent } from './AppContent';
 
-type UnmemoizedAppProps = {
-    jotaiStore: JotaiStore;
-};
-
-function UnmemoizedApp({ jotaiStore }: UnmemoizedAppProps) {
+function UnmemoizedApp({ jotaiStore }: { jotaiStore: JotaiStore }) {
     return (
         <StrictMode>
             <JotaiProvider store={jotaiStore}>

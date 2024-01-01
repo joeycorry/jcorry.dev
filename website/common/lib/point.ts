@@ -1,7 +1,4 @@
-import type { VectorStaticFromAngleAndLengthParameter } from './vector';
 import { Vector } from './vector';
-
-type PointAddAngleAndLengthParameter = VectorStaticFromAngleAndLengthParameter;
 
 export class Point {
     public constructor(
@@ -9,7 +6,11 @@ export class Point {
         public y: number,
     ) {}
 
-    public addAngleAndLength(parameter: PointAddAngleAndLengthParameter) {
+    public addAngleAndLength(parameter: {
+        angle: number;
+        counterClockwise?: boolean;
+        length: number;
+    }) {
         return this.addVector(Vector.fromAngleAndLength(parameter));
     }
 

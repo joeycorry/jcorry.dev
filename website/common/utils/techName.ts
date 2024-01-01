@@ -11,26 +11,26 @@ export const techNames = [
 
 export type TechName = (typeof techNames)[number];
 
-type GetTechNameIndexParameter = { techName: TechName };
-
-export function getTechNameIndex({ techName }: GetTechNameIndexParameter) {
+export function getTechNameIndex({ techName }: { techName: TechName }) {
     return techNames.indexOf(techName);
 }
 
-type GetNextTechNameIndexParameter = { currentTechName: TechName };
-
 function getNextTechNameIndex({
     currentTechName,
-}: GetNextTechNameIndexParameter) {
+}: {
+    currentTechName: TechName;
+}) {
     return modulo(
         getTechNameIndex({ techName: currentTechName }) + 1,
         techNames.length,
     );
 }
 
-type GetNextTechNameParameter = { currentTechName: TechName };
-
-export function getNextTechName({ currentTechName }: GetNextTechNameParameter) {
+export function getNextTechName({
+    currentTechName,
+}: {
+    currentTechName: TechName;
+}) {
     return techNames[getNextTechNameIndex({ currentTechName })];
 }
 

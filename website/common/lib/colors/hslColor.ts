@@ -1,16 +1,10 @@
 import { getClampedFloat, getClampedPercentage } from '~/common/utils/bounded';
-import type { RgbChannelName } from '~/common/utils/color';
 
 import type { Color } from './color';
 // eslint-disable-next-line import/no-cycle
 import { RgbColor } from './rgbColor';
 
-type HslColorConstructorParameter = {
-    alphaPercentage?: number;
-    hueDegrees: number;
-    lightnessPercentage: number;
-    saturationPercentage: number;
-};
+type RgbChannelName = 'blue' | 'green' | 'red';
 
 export class HslColor implements Color<HslColor> {
     #alphaPercentage: number;
@@ -23,7 +17,12 @@ export class HslColor implements Color<HslColor> {
         hueDegrees,
         lightnessPercentage,
         saturationPercentage,
-    }: HslColorConstructorParameter) {
+    }: {
+        alphaPercentage?: number;
+        hueDegrees: number;
+        lightnessPercentage: number;
+        saturationPercentage: number;
+    }) {
         this.#alphaPercentage = getClampedPercentage(alphaPercentage);
         this.#hueDegrees = hueDegrees;
         this.#lightnessPercentage = getClampedPercentage(lightnessPercentage);

@@ -7,10 +7,6 @@ import { setRootElementCssVariable } from './style';
 import type { TechName } from './techName';
 import { techNames } from './techName';
 
-export type RgbChannelName = 'blue' | 'green' | 'red';
-
-export type RgbChannelOrAlphaName = 'alpha' | RgbChannelName;
-
 export type ColorScheme = 'dark' | 'light' | 'normal';
 
 type ColorVariantKey =
@@ -30,7 +26,7 @@ export type PrimaryColorVariantName = Exclude<
     `secondary${string}`
 >;
 
-export type ColorVariantsByName = Record<ColorVariantName, Color>;
+type ColorVariantsByName = Record<ColorVariantName, Color>;
 
 export type ColorVariantSubjectsByName = Record<
     ColorVariantName,
@@ -65,13 +61,11 @@ function convertColorVariantNameToCssName(
     throw new Error(`Invalid color variant name: ${colorVariantName}`);
 }
 
-type CreateColorVariantCssVariableSetterParameter = {
-    colorVariantName: ColorVariantName;
-};
-
 export function createColorVariantCssVariableSetter({
     colorVariantName,
-}: CreateColorVariantCssVariableSetterParameter) {
+}: {
+    colorVariantName: ColorVariantName;
+}) {
     const colorVariantCssName =
         convertColorVariantNameToCssName(colorVariantName);
 
@@ -95,13 +89,11 @@ export function getColorVariantNames(): ColorVariantName[] {
     ];
 }
 
-type GetComplementaryColorVariantNameParameter = {
-    colorVariantName: PrimaryColorVariantName;
-};
-
 export function getComplementaryColorVariantName({
     colorVariantName,
-}: GetComplementaryColorVariantNameParameter): ColorVariantName {
+}: {
+    colorVariantName: PrimaryColorVariantName;
+}): ColorVariantName {
     if (colorVariantName === 'accentColor') {
         return 'secondaryAccentColor';
     } else if (colorVariantName === 'backgroundColor') {
@@ -115,15 +107,13 @@ export function getComplementaryColorVariantName({
     throw new Error(`Invalid color variant name: ${colorVariantName}`);
 }
 
-type GetColorVariantsByNameParameter = {
-    colorScheme: ColorScheme;
-    techName: TechName;
-};
-
 export function getColorVariantsByName({
     colorScheme,
     techName,
-}: GetColorVariantsByNameParameter): ColorVariantsByName {
+}: {
+    colorScheme: ColorScheme;
+    techName: TechName;
+}): ColorVariantsByName {
     const color = getColorForTechName(techName);
 
     if (colorScheme === 'normal') {
@@ -168,8 +158,6 @@ export function getColorVariantsByName({
     };
 }
 
-type GetColorVariantCssValuesByNameParameter = ColorVariantsByName;
-
 export function getColorVariantCssValuesByName({
     accentColor,
     backgroundColor,
@@ -179,7 +167,7 @@ export function getColorVariantCssValuesByName({
     secondaryBackgroundColor,
     secondaryForegroundColor,
     secondaryNeutralColor,
-}: GetColorVariantCssValuesByNameParameter): ColorVariantCssValuesByName {
+}: ColorVariantsByName): ColorVariantCssValuesByName {
     return {
         '--accent-color': accentColor.toString(),
         '--background-color': backgroundColor.toString(),

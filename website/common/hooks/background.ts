@@ -8,13 +8,11 @@ import { viewportAtom } from '~/common/atoms/viewport';
 import { setupBackgroundRenderer } from '~/common/renderers/background';
 import { setBackgroundCanvasDimensions } from '~/common/utils/background';
 
-type UseBackgroundEffectsParameter = {
-    canvasElementRef: RefObject<HTMLCanvasElement>;
-};
-
 export function useBackgroundEffects({
     canvasElementRef,
-}: UseBackgroundEffectsParameter) {
+}: {
+    canvasElementRef: RefObject<HTMLCanvasElement>;
+}) {
     const setBackgroundIsVisible = useSetAtom(backgroundIsVisibleAtom);
     const viewport = useAtomValue(viewportAtom);
     const colorVariantSubjectsByName = useAtomValue(

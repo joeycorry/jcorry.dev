@@ -1,14 +1,15 @@
 import { Point } from '~/common/lib/point';
 import { Renderer } from '~/common/lib/renderer';
-import type { ShapeConstructorParameter } from '~/common/lib/shapes/shape';
-import type { TrapezoidConstructorParameter } from '~/common/lib/shapes/trapezoid';
 import { Trapezoid } from '~/common/lib/shapes/trapezoid';
+import type { FixedArray } from '~/common/utils/array';
 import { easeLinear } from '~/common/utils/easing';
+import type { LineData } from '~/common/utils/geometry';
 import { getSineOfRadians } from '~/common/utils/geometry';
-import type { RendererOptions } from '~/common/utils/renderer';
-
-type CreateMovingTrapezoidRendererParameter = RendererOptions &
-    TrapezoidConstructorParameter;
+import type { ValueOrMutableRef } from '~/common/utils/react';
+import type {
+    RendererAnimationMountingDirection,
+    RendererAnimationStartingDirection,
+} from '~/common/utils/renderer';
 
 export function createMovingTrapezoidRenderer({
     angle,
@@ -19,17 +20,28 @@ export function createMovingTrapezoidRenderer({
     parallelLineDataPair,
     strokeStyle,
     ...rendererOptions
-}: CreateMovingTrapezoidRendererParameter) {
+}: {
+    angle: number;
+    animationDuration: number;
+    animationIterationCount?: number;
+    animationStartingDirection?: RendererAnimationStartingDirection;
+    canvasContext: CanvasRenderingContext2D;
+    counterClockwise?: boolean;
+    fillStyle?: ValueOrMutableRef<string>;
+    lineWidth?: ValueOrMutableRef<number>;
+    parallelLineDataPair: FixedArray<LineData, 2>;
+    strokeStyle?: ValueOrMutableRef<string>;
+}) {
     const [firstStartingPoint, secondStartingPoint] = parallelLineDataPair.map(
-        data => data.startingPoint,
+        data => data.point,
     );
     const maxLength = Math.max(
         ...parallelLineDataPair.map(data => data.length),
     );
     const [firstLength, secondLength] = Array(2).fill(maxLength);
     const [firstEndPoint, secondEndPoint] = parallelLineDataPair.map(
-        ({ startingPoint }) =>
-            startingPoint.addAngleAndLength({
+        ({ point }) =>
+            point.addAngleAndLength({
                 angle,
                 counterClockwise,
                 length: maxLength,
@@ -55,7 +67,7 @@ export function createMovingTrapezoidRenderer({
                                   distancePercentage * firstYDistance,
                           ),
                       ),
-                      startingPoint: firstStartingPoint,
+                      point: firstStartingPoint,
                   }
                 : distancePercentage > 1
                   ? {
@@ -66,7 +78,7 @@ export function createMovingTrapezoidRenderer({
                             firstEndPoint.y -
                                 (2 - distancePercentage) * firstYDistance,
                         ).calculateDistance(firstEndPoint),
-                        startingPoint: new Point(
+                        point: new Point(
                             firstEndPoint.x -
                                 (2 - distancePercentage) * firstXDistance,
                             firstEndPoint.y -
@@ -75,7 +87,7 @@ export function createMovingTrapezoidRenderer({
                     }
                   : {
                         length: firstLength,
-                        startingPoint: firstStartingPoint,
+                        point: firstStartingPoint,
                     };
         const secondLineData =
             distancePercentage < 1
@@ -88,7 +100,7 @@ export function createMovingTrapezoidRenderer({
                                   distancePercentage * secondYDistance,
                           ),
                       ),
-                      startingPoint: secondStartingPoint,
+                      point: secondStartingPoint,
                   }
                 : distancePercentage > 1
                   ? {
@@ -98,7 +110,7 @@ export function createMovingTrapezoidRenderer({
                             secondEndPoint.y -
                                 (2 - distancePercentage) * secondYDistance,
                         ).calculateDistance(secondEndPoint),
-                        startingPoint: new Point(
+                        point: new Point(
                             secondEndPoint.x -
                                 (2 - distancePercentage) * secondXDistance,
                             secondEndPoint.y -
@@ -107,7 +119,7 @@ export function createMovingTrapezoidRenderer({
                     }
                   : {
                         length: secondLength,
-                        startingPoint: secondStartingPoint,
+                        point: secondStartingPoint,
                     };
 
         return [
@@ -124,19 +136,6 @@ export function createMovingTrapezoidRenderer({
     }, rendererOptions);
 }
 
-type CreateMovingRibbonRendererParameter = {
-    animationDurationScalar: number;
-    animationStartingDirection: 'alternate' | 'alternate-reverse';
-    canvasContext: CanvasRenderingContext2D;
-    directionAngle: number;
-    fillStyle: NonNullable<ShapeConstructorParameter['fillStyle']>;
-    firstRibbonLineStartingPoint: Point;
-    getYLength: (point: Point) => number;
-    secondRibbonLineStartingPoint: Point;
-    strokeStyle: NonNullable<ShapeConstructorParameter['strokeStyle']>;
-    xAxisAdjacentAngle: number;
-};
-
 export function createMovingRibbonRenderer({
     animationDurationScalar,
     animationStartingDirection,
@@ -148,7 +147,18 @@ export function createMovingRibbonRenderer({
     secondRibbonLineStartingPoint,
     strokeStyle,
     xAxisAdjacentAngle,
-}: CreateMovingRibbonRendererParameter) {
+}: {
+    animationDurationScalar: number;
+    animationStartingDirection: RendererAnimationMountingDirection;
+    canvasContext: CanvasRenderingContext2D;
+    directionAngle: number;
+    fillStyle: ValueOrMutableRef<string>;
+    firstRibbonLineStartingPoint: Point;
+    getYLength: (point: Point) => number;
+    secondRibbonLineStartingPoint: Point;
+    strokeStyle: ValueOrMutableRef<string>;
+    xAxisAdjacentAngle: number;
+}) {
     const sineOfXAxisAdjacentAngle = getSineOfRadians(xAxisAdjacentAngle);
     const firstLength =
         getYLength(firstRibbonLineStartingPoint) / sineOfXAxisAdjacentAngle;
@@ -166,11 +176,11 @@ export function createMovingRibbonRenderer({
         parallelLineDataPair: [
             {
                 length: firstLength,
-                startingPoint: firstRibbonLineStartingPoint,
+                point: firstRibbonLineStartingPoint,
             },
             {
                 length: secondLength,
-                startingPoint: secondRibbonLineStartingPoint,
+                point: secondRibbonLineStartingPoint,
             },
         ],
         strokeStyle,

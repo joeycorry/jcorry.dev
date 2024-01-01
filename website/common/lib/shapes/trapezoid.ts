@@ -1,35 +1,30 @@
 import type { Point } from '~/common/lib/point';
 import type { FixedArray } from '~/common/utils/array';
+import type { LineData } from '~/common/utils/geometry';
+import type { ValueOrMutableRef } from '~/common/utils/react';
 
-import type { ShapeConstructorParameter } from './shape';
 import { Shape } from './shape';
-
-type ParallelLineDataPair = FixedArray<
-    {
-        startingPoint: Point;
-        length: number;
-    },
-    2
->;
-
-export type TrapezoidConstructorParameter = ShapeConstructorParameter & {
-    angle: number;
-    counterClockwise?: boolean;
-    parallelLineDataPair: ParallelLineDataPair;
-};
 
 export class Trapezoid extends Shape {
     #angle: number;
     #cachedBoundingPoints?: FixedArray<Point, 4>;
     #counterClockwise: boolean;
-    #parallelLineDataPair: ParallelLineDataPair;
+    #parallelLineDataPair: FixedArray<LineData, 2>;
 
     public constructor({
         angle,
         counterClockwise,
         parallelLineDataPair,
         ...shapeConstructorParameter
-    }: TrapezoidConstructorParameter) {
+    }: {
+        angle: number;
+        canvasContext: CanvasRenderingContext2D;
+        counterClockwise?: boolean;
+        fillStyle?: ValueOrMutableRef<string>;
+        lineWidth?: ValueOrMutableRef<number>;
+        parallelLineDataPair: FixedArray<LineData, 2>;
+        strokeStyle?: ValueOrMutableRef<string>;
+    }) {
         super(shapeConstructorParameter);
 
         this.#angle = angle;
@@ -59,9 +54,9 @@ export class Trapezoid extends Shape {
             firstComputedPoint,
             secondOriginalPoint,
             secondComputedPoint,
-        ] = this.#parallelLineDataPair.flatMap(({ length, startingPoint }) => [
-            startingPoint,
-            startingPoint.addAngleAndLength({
+        ] = this.#parallelLineDataPair.flatMap(({ length, point }) => [
+            point,
+            point.addAngleAndLength({
                 angle: this.#angle,
                 counterClockwise: this.#counterClockwise,
                 length,

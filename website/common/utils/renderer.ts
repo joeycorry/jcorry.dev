@@ -1,30 +1,22 @@
 import { Renderer } from '~/common/lib/renderer';
 
-export type RendererAnimationIterationCount = number;
+export type RendererAnimationProgressingDirection = 'backward' | 'forward';
 
-export type RendererStartingAnimationDirection =
+export type RendererAnimationMountingDirection =
     | 'alternate'
-    | 'alternate-reverse'
-    | 'backward'
-    | 'forward';
+    | 'alternate-reverse';
 
-export type RendererOptions = {
-    animationDuration: number;
-    animationIterationCount?: RendererAnimationIterationCount;
-    animationStartingDirection?: RendererStartingAnimationDirection;
-};
-
-type CreateCompositeRendererParameter = Pick<
-    RendererOptions,
-    'animationIterationCount'
-> & {
-    renderersByStartingTimeEntries: Iterable<[number, Renderer]>;
-};
+export type RendererAnimationStartingDirection =
+    | RendererAnimationMountingDirection
+    | RendererAnimationProgressingDirection;
 
 export function createCompositeRenderer({
+    animationIterationCount,
     renderersByStartingTimeEntries,
-    ...rendererOptions
-}: CreateCompositeRendererParameter) {
+}: {
+    animationIterationCount?: number;
+    renderersByStartingTimeEntries: Iterable<[number, Renderer]>;
+}) {
     const compositeRendererTotalDuration = Array.from(
         renderersByStartingTimeEntries,
     ).reduce(
@@ -74,8 +66,8 @@ export function createCompositeRenderer({
             return currentlyAnimatingRenderers;
         },
         {
-            ...rendererOptions,
             animationDuration: compositeRendererTotalDuration,
+            animationIterationCount,
         },
     );
 }

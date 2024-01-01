@@ -10,25 +10,20 @@ import {
     getColorVariantsByName,
 } from '~/common/utils/color';
 import { easeOutQuint } from '~/common/utils/easing';
-import type { RendererOptions } from '~/common/utils/renderer';
 import { createCompositeRenderer } from '~/common/utils/renderer';
 import type { TechName } from '~/common/utils/techName';
-
-type CreateColorSubjectTransitionRendererParameter = Pick<
-    RendererOptions,
-    'animationDuration'
-> & {
-    colorSubject: Subject<Color>;
-    newColor: Color;
-    previousColor: Color;
-};
 
 export function createColorSubjectTransitionRenderer({
     animationDuration,
     colorSubject,
     newColor,
     previousColor,
-}: CreateColorSubjectTransitionRendererParameter) {
+}: {
+    animationDuration: number;
+    colorSubject: Subject<Color>;
+    newColor: Color;
+    previousColor: Color;
+}) {
     return new Renderer(
         ({ currentAnimationPercentage }) => {
             const percentage = easeOutQuint(currentAnimationPercentage);
@@ -43,17 +38,6 @@ export function createColorSubjectTransitionRenderer({
     );
 }
 
-type CreateColorVariantSubjectsByNameTransitionRendererParameter = Pick<
-    RendererOptions,
-    'animationDuration'
-> & {
-    colorVariantSubjectsByName: ColorVariantSubjectsByName;
-    newColorScheme: ColorScheme;
-    newTechName: TechName;
-    previousColorScheme: ColorScheme;
-    previousTechName: TechName;
-};
-
 export function createColorVariantSubjectsByNameTransitionRenderer({
     animationDuration,
     colorVariantSubjectsByName,
@@ -61,7 +45,14 @@ export function createColorVariantSubjectsByNameTransitionRenderer({
     newTechName,
     previousColorScheme,
     previousTechName,
-}: CreateColorVariantSubjectsByNameTransitionRendererParameter) {
+}: {
+    animationDuration: number;
+    colorVariantSubjectsByName: ColorVariantSubjectsByName;
+    newColorScheme: ColorScheme;
+    newTechName: TechName;
+    previousColorScheme: ColorScheme;
+    previousTechName: TechName;
+}) {
     const colorVariantNames = getColorVariantNames();
     const previousColorVariantsByName = getColorVariantsByName({
         colorScheme: previousColorScheme,
