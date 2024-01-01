@@ -4,7 +4,7 @@
 
 jcorry.dev {
 	tls /etc/ssl/bare.pem /etc/ssl/bare.key.pem
-
+	encode zstd gzip
 	header -Server
 
 	reverse_proxy http://live:3000 {

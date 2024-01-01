@@ -4,7 +4,7 @@
 
 jcorry-dev.local {
 	tls /etc/ssl/bare.pem /etc/ssl/bare.key.pem
-
+	encode zstd gzip
 	header -Server
 
 	reverse_proxy http://local:3000 {
