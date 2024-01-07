@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { memo } from 'react';
 
 import { useColorEffects } from '~/common/hooks/color';
@@ -11,7 +12,7 @@ import { Intro } from './Intro';
 
 const AppContent = memo(UnmemoizedAppContent);
 
-function UnmemoizedAppContent() {
+function UnmemoizedAppContent(): ReactNode {
     useColorEffects();
     useTechNameEffects();
     useViewportEffects();

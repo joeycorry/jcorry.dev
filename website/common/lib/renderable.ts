@@ -3,7 +3,7 @@ type Renderable = RenderableFunction | RenderableObject;
 type RenderableFunction = () => void;
 
 type RenderableObject = {
-    onBeforeFrameRender(): void;
+    clearLastRender(): void;
     render(): void;
 };
 

@@ -1,10 +1,11 @@
+import type { ReactNode } from 'react';
 import { memo } from 'react';
 
 import styles from '~/common/styles/Intro.module.css';
 
 const Intro = memo(UnmemoizedIntro);
 
-function UnmemoizedIntro() {
+function UnmemoizedIntro(): ReactNode {
     return (
         <section className={styles.intro}>
             <h1>

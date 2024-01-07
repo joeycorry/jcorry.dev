@@ -11,28 +11,18 @@ const techNames = [
     'Rails',
 ] as const;
 
-function getNextTechNameIndex({
-    currentTechName,
-}: {
-    currentTechName: TechName;
-}) {
-    return modulo(
-        getTechNameIndex({ techName: currentTechName }) + 1,
+function getNextTechName(currentTechName: TechName): TechName {
+    const nextTechNameIndex = modulo(
+        techNames.indexOf(currentTechName) + 1,
         techNames.length,
     );
+
+    return techNames[nextTechNameIndex];
 }
 
-function getNextTechName({ currentTechName }: { currentTechName: TechName }) {
-    return techNames[getNextTechNameIndex({ currentTechName })];
-}
-
-function getRandomTechName() {
+function getRandomTechName(): TechName {
     return getRandomArrayElement(techNames);
 }
 
-function getTechNameIndex({ techName }: { techName: TechName }) {
-    return techNames.indexOf(techName);
-}
-
 export type { TechName };
-export { getNextTechName, getRandomTechName, getTechNameIndex, techNames };
+export { getNextTechName, getRandomTechName, techNames };

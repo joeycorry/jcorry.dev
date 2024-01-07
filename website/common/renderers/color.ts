@@ -6,8 +6,8 @@ import type {
     ColorVariantSubjectsByName,
 } from '~/common/utils/color';
 import {
+    createColorVariantsByName,
     getColorVariantNames,
-    getColorVariantsByName,
 } from '~/common/utils/color';
 import { easeOutQuint } from '~/common/utils/easing';
 import { createCompositeRenderer } from '~/common/utils/renderer';
@@ -23,19 +23,19 @@ function createColorSubjectTransitionRenderer({
     colorSubject: Subject<Color>;
     newColor: Color;
     previousColor: Color;
-}) {
-    return new Renderer(
-        ({ currentAnimationPercentage }) => {
+}): Renderer {
+    return new Renderer({
+        animationDuration,
+        computeNextRenderables({ currentAnimationPercentage }) {
             const percentage = easeOutQuint(currentAnimationPercentage);
-            const interpolatedColor = previousColor.interpolate(
+            const interpolatedColor = previousColor.toInterpolated(
                 newColor,
                 percentage,
             );
 
             return [() => colorSubject.set(interpolatedColor)];
         },
-        { animationDuration },
-    );
+    });
 }
 
 function createColorVariantSubjectsByNameTransitionRenderer({
@@ -52,30 +52,31 @@ function createColorVariantSubjectsByNameTransitionRenderer({
     newTechName: TechName;
     previousColorScheme: ColorScheme;
     previousTechName: TechName;
-}) {
+}): Renderer {
     const colorVariantNames = getColorVariantNames();
-    const previousColorVariantsByName = getColorVariantsByName({
+    const previousColorVariantsByName = createColorVariantsByName({
         colorScheme: previousColorScheme,
         techName: previousTechName,
     });
-    const newColorVariantsByName = getColorVariantsByName({
+    const newColorVariantsByName = createColorVariantsByName({
         colorScheme: newColorScheme,
         techName: newTechName,
     });
+    const renderersByStartingTimeEntries: Array<[number, Renderer]> = [];
+
+    for (const colorVariantName of colorVariantNames) {
+        const renderer = createColorSubjectTransitionRenderer({
+            animationDuration,
+            colorSubject: colorVariantSubjectsByName[colorVariantName],
+            newColor: newColorVariantsByName[colorVariantName],
+            previousColor: previousColorVariantsByName[colorVariantName],
+        });
+
+        renderersByStartingTimeEntries.push([0, renderer]);
+    }
 
     return createCompositeRenderer({
-        renderersByStartingTimeEntries: colorVariantNames.map(
-            colorVariantName => [
-                0,
-                createColorSubjectTransitionRenderer({
-                    animationDuration,
-                    colorSubject: colorVariantSubjectsByName[colorVariantName],
-                    newColor: newColorVariantsByName[colorVariantName],
-                    previousColor:
-                        previousColorVariantsByName[colorVariantName],
-                }),
-            ],
-        ),
+        renderersByStartingTimeEntries,
     });
 }
 

@@ -6,7 +6,7 @@ function createNumberTransitionRenderer({
     numberSubject,
     maximum,
     minimum,
-    ...rendererOptions
+    ...animationOptions
 }: {
     animationDuration: number;
     animationIterationCount?: number;
@@ -14,18 +14,16 @@ function createNumberTransitionRenderer({
     maximum: number;
     minimum: number;
     numberSubject: Subject<number>;
-}) {
-    const intervalMagnitude = maximum - minimum;
+}): Renderer {
+    return new Renderer({
+        ...animationOptions,
+        computeNextRenderables({ currentAnimationPercentage }) {
+            const newNumber =
+                currentAnimationPercentage * (maximum - minimum) + minimum;
 
-    return new Renderer(
-        ({ currentAnimationPercentage }) => [
-            () =>
-                numberSubject.set(
-                    currentAnimationPercentage * intervalMagnitude + minimum,
-                ),
-        ],
-        rendererOptions,
-    );
+            return [() => numberSubject.set(newNumber)];
+        },
+    });
 }
 
 export { createNumberTransitionRenderer };

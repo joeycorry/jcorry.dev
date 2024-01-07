@@ -1,13 +1,11 @@
-import { getHeader } from 'h3';
+import { getCookie } from 'h3';
 
 import { colorSchemeAtom } from '~/common/atoms/color';
 import { techNameAtom } from '~/common/atoms/techName';
 import {
-    getColorForTechName,
-    getColorVariantCssValuesByName,
-    getColorVariantsByName,
+    createColorVariantCssValuesByName,
+    getColor,
 } from '~/common/utils/color';
-import { getCookie } from '~/common/utils/cookie';
 import { createFaviconElementString } from '~/common/utils/favicon';
 import type { JotaiStoreAtomSetValueParametersByName } from '~/common/utils/jotaiStore';
 import { createJotaiStore } from '~/common/utils/jotaiStore';
@@ -25,30 +23,27 @@ const title = process.env.JCORRY_DEV_DOCUMENT_TITLE || 'Joey Corry';
 async function onBeforeRender({
     originalEvent,
 }: ServerPageContext): Promise<ServerOnBeforeRenderResult<PageProps>> {
-    const requestCookie = getHeader(originalEvent, 'cookie') || '';
-    const colorSchemeCookie = getCookie({
-        getCookies: () => requestCookie,
-        key: 'colorScheme',
-    });
+    const colorSchemeCookie = getCookie(originalEvent, 'colorScheme');
     const jotaiStoreAtomSetValueParametersByName: JotaiStoreAtomSetValueParametersByName =
         {
             colorScheme: [
                 colorSchemeCookie !== 'dark' && colorSchemeCookie !== 'light'
-                    ? 'normal'
+                    ? 'unknown'
                     : colorSchemeCookie,
             ],
             techName: [getRandomTechName()],
         };
-    const jotaiStore = createJotaiStore(jotaiStoreAtomSetValueParametersByName);
+    const jotaiStore = createJotaiStore({
+        atomSetValueParametersByName: jotaiStoreAtomSetValueParametersByName,
+    });
+    const colorScheme = jotaiStore.get(colorSchemeAtom);
     const techName = jotaiStore.get(techNameAtom);
-    const color = getColorForTechName(techName);
-    const colorVariantsByName = getColorVariantsByName({
-        colorScheme: jotaiStore.get(colorSchemeAtom),
+    const color = getColor(techName);
+    const faviconElementString = createFaviconElementString(color);
+    const colorVariantCssValuesByName = createColorVariantCssValuesByName({
+        colorScheme,
         techName,
     });
-    const faviconElementString = createFaviconElementString({ color });
-    const colorVariantCssValuesByName =
-        getColorVariantCssValuesByName(colorVariantsByName);
     const htmlStyle = `${Object.entries(colorVariantCssValuesByName)
         .map(([name, value]) => `${name}:${value}`)
         .join('; ')};`;

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { memo } from 'react';
 import { GitHub } from 'react-feather';
 
@@ -5,7 +6,7 @@ import styles from '~/common/styles/GitHubLink.module.css';
 
 const GitHubLink = memo(UnmemoizedGitHubLink);
 
-function UnmemoizedGitHubLink() {
+function UnmemoizedGitHubLink(): ReactNode {
     return (
         <a
             className={styles['icon-button']}

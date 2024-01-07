@@ -1,4 +1,6 @@
-function Page() {
+import type { ReactNode } from 'react';
+
+function Page(): ReactNode {
     return 'Nothing to see here...';
 }
 

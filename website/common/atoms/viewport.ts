@@ -1,17 +1,15 @@
-import { atomWithNoArgumentSetter } from '~/common/utils/atom';
+import { atom, type WritableAtom } from 'jotai';
+
 import type { Viewport } from '~/common/utils/viewport';
+import { createViewport } from '~/common/utils/viewport';
 
-const getViewportValue = import.meta.env.SSR
-    ? () => ({ devicePixelRatio: 1, width: 0, height: 0 })
-    : () => ({
-          devicePixelRatio: window.devicePixelRatio,
-          width: window.innerWidth,
-          height: window.innerHeight,
-      });
-
-const viewportAtom = atomWithNoArgumentSetter<Viewport>(
-    getViewportValue(),
-    getViewportValue,
+const viewportAtom: WritableAtom<Viewport, [undefined], void> = atom(
+    createViewport(),
+    (_, set) =>
+        set(
+            viewportAtom as unknown as WritableAtom<Viewport, [Viewport], void>,
+            createViewport(),
+        ),
 );
 
 viewportAtom.debugLabel = 'viewportAtom';

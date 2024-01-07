@@ -1,4 +1,4 @@
-import { getClampedPercentage } from '~/common/utils/bounded';
+import { clampPercentage } from '~/common/utils/math';
 
 import type { Color } from './color';
 // eslint-disable-next-line import/no-cycle
@@ -23,60 +23,25 @@ class RgbColor implements Color<RgbColor> {
         greenPercentage: number;
         redPercentage: number;
     }) {
-        this.#alphaPercentage = getClampedPercentage(alphaPercentage);
-        this.#bluePercentage = getClampedPercentage(bluePercentage);
-        this.#greenPercentage = getClampedPercentage(greenPercentage);
-        this.#redPercentage = getClampedPercentage(redPercentage);
+        this.#alphaPercentage = clampPercentage(alphaPercentage);
+        this.#bluePercentage = clampPercentage(bluePercentage);
+        this.#greenPercentage = clampPercentage(greenPercentage);
+        this.#redPercentage = clampPercentage(redPercentage);
     }
 
-    public darken(rawPercentage: number) {
-        return this.toHslColor().darken(rawPercentage).toRgbColor();
+    public toDarkened(darkeningPercentage: number): RgbColor {
+        return this.toHslColor().toDarkened(darkeningPercentage).toRgbColor();
     }
 
-    public desaturate(rawPercentage: number): RgbColor {
-        return this.toHslColor().desaturate(rawPercentage).toRgbColor();
+    public toDesaturated(desaturatingPercentage: number): RgbColor {
+        return this.toHslColor()
+            .toDesaturated(desaturatingPercentage)
+            .toRgbColor();
     }
 
-    public interpolate<OtherColor extends Color>(
-        otherColor: OtherColor,
-        rawPercentage: number,
-    ): RgbColor {
-        const otherRgbColor = otherColor.toRgbColor();
-        const percentage = getClampedPercentage(rawPercentage);
-
-        return new RgbColor({
-            alphaPercentage: this.#interpolateRgbChannelOrAlpha({
-                otherRgbColor,
-                percentage,
-                rgbChannelOrAlphaName: 'alpha',
-            }),
-            bluePercentage: this.#interpolateRgbChannelOrAlpha({
-                otherRgbColor,
-                percentage,
-                rgbChannelOrAlphaName: 'blue',
-            }),
-            greenPercentage: this.#interpolateRgbChannelOrAlpha({
-                otherRgbColor,
-                percentage,
-                rgbChannelOrAlphaName: 'green',
-            }),
-            redPercentage: this.#interpolateRgbChannelOrAlpha({
-                otherRgbColor,
-                percentage,
-                rgbChannelOrAlphaName: 'red',
-            }),
-        });
-    }
-
-    public lighten(rawPercentage: number) {
-        return this.toHslColor().lighten(rawPercentage).toRgbColor();
-    }
-
-    public saturate(rawPercentage: number): RgbColor {
-        return this.toHslColor().saturate(rawPercentage).toRgbColor();
-    }
-
-    public toHslColor() {
+    // This method is derived from the algorithm proposed by
+    // https://en.wikipedia.org/wiki/HSL_and_HSV#From_RGB.
+    public toHslColor(): HslColor {
         const alphaPercentage = this.#alphaPercentage;
         const redPercentage = this.#redPercentage;
         const greenPercentage = this.#greenPercentage;
@@ -131,7 +96,41 @@ class RgbColor implements Color<RgbColor> {
         });
     }
 
-    public toRgbColor() {
+    public toInterpolated<OtherColor extends Color>(
+        otherColor: OtherColor,
+        interpolatingPercentage: number,
+    ): RgbColor {
+        const otherRgbColor = otherColor.toRgbColor();
+
+        return new RgbColor({
+            alphaPercentage: this.#getInterpolatedRgbChannelOrAlpha({
+                interpolatingPercentage,
+                otherRgbColor,
+                rgbChannelOrAlphaName: 'alpha',
+            }),
+            bluePercentage: this.#getInterpolatedRgbChannelOrAlpha({
+                interpolatingPercentage,
+                otherRgbColor,
+                rgbChannelOrAlphaName: 'blue',
+            }),
+            greenPercentage: this.#getInterpolatedRgbChannelOrAlpha({
+                interpolatingPercentage,
+                otherRgbColor,
+                rgbChannelOrAlphaName: 'green',
+            }),
+            redPercentage: this.#getInterpolatedRgbChannelOrAlpha({
+                interpolatingPercentage,
+                otherRgbColor,
+                rgbChannelOrAlphaName: 'red',
+            }),
+        });
+    }
+
+    public toLightened(rawPercentage: number): RgbColor {
+        return this.toHslColor().toLightened(rawPercentage).toRgbColor();
+    }
+
+    public toRgbColor(): RgbColor {
         return new RgbColor({
             alphaPercentage: this.#alphaPercentage,
             bluePercentage: this.#bluePercentage,
@@ -140,7 +139,11 @@ class RgbColor implements Color<RgbColor> {
         });
     }
 
-    public toString() {
+    public toSaturated(rawPercentage: number): RgbColor {
+        return this.toHslColor().toSaturated(rawPercentage).toRgbColor();
+    }
+
+    public toString(): string {
         const formattedRedPercentage = parseFloat(
             (this.#redPercentage * 100).toFixed(3),
         );
@@ -157,7 +160,32 @@ class RgbColor implements Color<RgbColor> {
         return `rgb(${formattedRedPercentage}% ${formattedGreenPercentage}% ${formattedBluePercentage}% / ${formattedAlphaPercentage})`;
     }
 
-    #getRgbChannelOrAlpha(rgbChannelOrAlphaName: RgbChannelOrAlphaName) {
+    #getInterpolatedRgbChannelOrAlpha({
+        interpolatingPercentage,
+        otherRgbColor,
+        rgbChannelOrAlphaName,
+    }: {
+        interpolatingPercentage: number;
+        otherRgbColor: RgbColor;
+        rgbChannelOrAlphaName: RgbChannelOrAlphaName;
+    }): number {
+        const percentage = clampPercentage(interpolatingPercentage);
+        const thisRgbChannelOrAlpha = this.#getRgbChannelOrAlpha(
+            rgbChannelOrAlphaName,
+        );
+        const otherRgbChannelOrAlpha = otherRgbColor.#getRgbChannelOrAlpha(
+            rgbChannelOrAlphaName,
+        );
+
+        return (
+            (otherRgbChannelOrAlpha - thisRgbChannelOrAlpha) * percentage +
+            thisRgbChannelOrAlpha
+        );
+    }
+
+    #getRgbChannelOrAlpha(
+        rgbChannelOrAlphaName: RgbChannelOrAlphaName,
+    ): number {
         if (rgbChannelOrAlphaName === 'alpha') {
             return this.#alphaPercentage;
         } else if (rgbChannelOrAlphaName === 'blue') {
@@ -167,28 +195,6 @@ class RgbColor implements Color<RgbColor> {
         }
 
         return this.#redPercentage;
-    }
-
-    #interpolateRgbChannelOrAlpha({
-        otherRgbColor,
-        percentage,
-        rgbChannelOrAlphaName,
-    }: {
-        otherRgbColor: RgbColor;
-        percentage: number;
-        rgbChannelOrAlphaName: RgbChannelOrAlphaName;
-    }) {
-        const thisColorComponent = this.#getRgbChannelOrAlpha(
-            rgbChannelOrAlphaName,
-        );
-        const otherRgbColorComponent = otherRgbColor.#getRgbChannelOrAlpha(
-            rgbChannelOrAlphaName,
-        );
-
-        return (
-            (otherRgbColorComponent - thisColorComponent) * percentage +
-            thisColorComponent
-        );
     }
 }
 

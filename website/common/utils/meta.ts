@@ -34,7 +34,7 @@ function createThemeColorMetaElementString({
     return `<meta name="theme-color" content="${color.toString()}">`;
 }
 
-function setThemeColor(color: Color) {
+function setThemeColor(color: Color): void {
     const themeColorMetaElement =
         window.document.head.querySelector<HTMLMetaElement>(
             'meta[name="theme-color"]',

@@ -1,10 +1,7 @@
-function setRootElementCssVariable({
-    cssValue,
-    cssVariableName,
-}: {
-    cssValue: string;
-    cssVariableName: string;
-}) {
+function setRootElementCssVariable(
+    cssVariableName: string,
+    cssValue: string,
+): void {
     window.document.documentElement.style.setProperty(
         cssVariableName,
         cssValue,

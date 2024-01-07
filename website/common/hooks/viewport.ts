@@ -1,39 +1,19 @@
 import { useSetAtom } from 'jotai';
-import { useCallback, useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { backgroundIsVisibleAtom } from '~/common/atoms/background';
 import { viewportAtom } from '~/common/atoms/viewport';
-import { debounceFunction, throttleFunction } from '~/common/utils/function';
+import {
+    createDebouncedFunction,
+    createThrottledFunction,
+} from '~/common/utils/function';
 
 import { useNoArgumentSetAtom } from './atom';
 
-function useDebouncedSetViewport() {
-    const setViewport = useNoArgumentSetAtom(viewportAtom);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    return useCallback(debounceFunction(setViewport, { milliseconds: 400 }), [
-        setViewport,
-    ]);
-}
-
-function useViewportEffects() {
-    const handleWindowResizeOrMediaQueryListResolutionChange =
-        useWindowResizeOrMediaQueryListResolutionChangeHandler();
+function useSynchronizeMediaQueryResolutionEffect(): void {
+    const handleMediaQueryResolutionChange = useSynchronizeViewport();
     const devicePixelRatio =
         typeof window !== 'undefined' ? window.devicePixelRatio : 1;
-
-    useEffect(() => {
-        window.addEventListener(
-            'resize',
-            handleWindowResizeOrMediaQueryListResolutionChange,
-        );
-
-        return () =>
-            window.removeEventListener(
-                'resize',
-                handleWindowResizeOrMediaQueryListResolutionChange,
-            );
-    }, [handleWindowResizeOrMediaQueryListResolutionChange]);
 
     useEffect(() => {
         const mediaQueryList = window.matchMedia(
@@ -42,29 +22,63 @@ function useViewportEffects() {
 
         mediaQueryList.addEventListener(
             'change',
-            handleWindowResizeOrMediaQueryListResolutionChange,
+            handleMediaQueryResolutionChange,
         );
 
         return () =>
             mediaQueryList.removeEventListener(
                 'change',
-                handleWindowResizeOrMediaQueryListResolutionChange,
+                handleMediaQueryResolutionChange,
             );
-    }, [handleWindowResizeOrMediaQueryListResolutionChange, devicePixelRatio]);
+    }, [handleMediaQueryResolutionChange, devicePixelRatio]);
 }
 
-function useWindowResizeOrMediaQueryListResolutionChangeHandler() {
-    const debouncedSetViewport = useDebouncedSetViewport();
+function useSetViewportAndShowBackground(): () => void {
     const setBackgroundIsVisible = useSetAtom(backgroundIsVisibleAtom);
+    const setViewport = useNoArgumentSetAtom(viewportAtom);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    return useCallback(
-        throttleFunction(() => {
-            setBackgroundIsVisible(false);
-            debouncedSetViewport();
-        }),
-        [debouncedSetViewport, setBackgroundIsVisible],
+    return useMemo(
+        () =>
+            createDebouncedFunction({
+                callback() {
+                    setViewport();
+                    setBackgroundIsVisible(true);
+                },
+                milliseconds: 400,
+            }),
+        [setBackgroundIsVisible, setViewport],
     );
+}
+
+function useSynchronizeViewport(): () => void {
+    const setBackgroundIsVisible = useSetAtom(backgroundIsVisibleAtom);
+    const setViewportAndShowBackground = useSetViewportAndShowBackground();
+
+    return useMemo(
+        () =>
+            createThrottledFunction({
+                callback() {
+                    setBackgroundIsVisible(false);
+                    setViewportAndShowBackground();
+                },
+            }),
+        [setBackgroundIsVisible, setViewportAndShowBackground],
+    );
+}
+
+function useSynchronizeResizeEffect(): void {
+    const handleResize = useSynchronizeViewport();
+
+    useEffect(() => {
+        window.addEventListener('resize', handleResize);
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, [handleResize]);
+}
+
+function useViewportEffects(): void {
+    useSynchronizeMediaQueryResolutionEffect();
+    useSynchronizeResizeEffect();
 }
 
 export { useViewportEffects };

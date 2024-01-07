@@ -1,4 +1,5 @@
 import { useAtom, useAtomValue } from 'jotai';
+import type { ReactNode } from 'react';
 import { memo, useCallback } from 'react';
 import { Moon, Sun } from 'react-feather';
 
@@ -8,7 +9,7 @@ import styles from '~/common/styles/ColorSchemeButton.module.css';
 
 const ColorSchemeButton = memo(UnmemoizedColorSchemeButton);
 
-function useColorSchemeButtonClickHandler() {
+function useColorSchemeButtonClickHandler(): () => void {
     const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
 
     return useCallback(() => {
@@ -16,7 +17,7 @@ function useColorSchemeButtonClickHandler() {
     }, [colorScheme, setColorScheme]);
 }
 
-function UnmemoizedColorSchemeButton() {
+function UnmemoizedColorSchemeButton(): ReactNode {
     const backgroundIsVisible = useAtomValue(backgroundIsVisibleAtom);
     const colorScheme = useAtomValue(colorSchemeAtom);
     const handleColorSchemeButtonClick = useColorSchemeButtonClickHandler();

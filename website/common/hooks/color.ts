@@ -6,31 +6,30 @@ import {
     colorVariantSubjectsByNameAtom,
 } from '~/common/atoms/color';
 import { techNameAtom } from '~/common/atoms/techName';
-import { getRendererManager } from '~/common/lib/rendererManager';
 import { createColorVariantSubjectsByNameTransitionRenderer } from '~/common/renderers/color';
 import {
     createColorVariantCssVariableSetter,
     getColorVariantNames,
 } from '~/common/utils/color';
-import { removeCookie, setCookie } from '~/common/utils/cookie';
+import { setCookie } from '~/common/utils/cookie';
 import { setFaviconColor } from '~/common/utils/favicon';
 import { setThemeColor } from '~/common/utils/meta';
+import { getRendererManager } from '~/common/utils/rendererManager';
 import type { UnregisterObserverCallback } from '~/common/utils/subject';
 
-function useColorEffects() {
-    const rendererManager = getRendererManager();
+function useColorEffects(): void {
+    useHandleUnknownColorSchemeEffect();
+    useSynchronizeColorSchemeCookieEffect();
+    useSynchronizeColorVariantSubjectsByNameAnimationEffect();
+    useSynchronizeColorVariantSubjectsByNameObserversEffect();
+    useSynchronizeMediaQueryPrefersColorSchemeEffect();
+}
+
+function useHandleUnknownColorSchemeEffect(): void {
     const [colorScheme, setColorScheme] = useAtom(colorSchemeAtom);
-    const previousColorSchemeRef = useRef(colorScheme);
-    const colorVariantSubjectsByName = useAtomValue(
-        colorVariantSubjectsByNameAtom,
-    );
-    const techName = useAtomValue(techNameAtom);
-    const previousTechNameRef = useRef(techName);
-    const handleMediaQueryListPrefersColorSchemeChange =
-        useMediaQueryListPrefersColorSchemeChangeHandler();
 
     useEffect(() => {
-        if (colorScheme === 'normal') {
+        if (colorScheme === 'unknown') {
             setColorScheme(
                 window.matchMedia('(prefers-color-scheme: dark)').matches
                     ? 'dark'
@@ -38,62 +37,48 @@ function useColorEffects() {
             );
         }
     }, [setColorScheme, colorScheme]);
+}
+
+function useSynchronizeColorSchemeCookieEffect(): void {
+    const colorScheme = useAtomValue(colorSchemeAtom);
 
     useEffect(() => {
-        const mediaQueryList = window.matchMedia(
-            '(prefers-color-scheme: dark)',
-        );
-
-        mediaQueryList.addEventListener(
-            'change',
-            handleMediaQueryListPrefersColorSchemeChange,
-        );
-
-        return () =>
-            mediaQueryList.removeEventListener(
-                'change',
-                handleMediaQueryListPrefersColorSchemeChange,
-            );
-    }, [setColorScheme, handleMediaQueryListPrefersColorSchemeChange]);
-
-    useEffect(() => {
-        if (colorScheme === undefined) {
-            removeCookie({
-                key: 'colorScheme',
-                setCookies: cookie => {
-                    window.document.cookie = cookie;
-                },
-            });
-        } else {
-            setCookie({
-                key: 'colorScheme',
-                setCookies: cookie => {
-                    window.document.cookie = cookie;
-                },
-                value: colorScheme,
-            });
-        }
+        setCookie('colorScheme', colorScheme);
     }, [colorScheme]);
+}
+
+function useSynchronizeColorVariantSubjectsByNameAnimationEffect(): void {
+    const rendererManager = getRendererManager();
+    const colorScheme = useAtomValue(colorSchemeAtom);
+    const previousColorSchemeRef = useRef(colorScheme);
+    const colorVariantSubjectsByName = useAtomValue(
+        colorVariantSubjectsByNameAtom,
+    );
+    const techName = useAtomValue(techNameAtom);
+    const previousTechNameRef = useRef(techName);
 
     useEffect(() => {
         const previousColorScheme = previousColorSchemeRef.current;
         previousColorSchemeRef.current = colorScheme;
         const previousTechName = previousTechNameRef.current;
         previousTechNameRef.current = techName;
-        const colorVariantSubjectsByNameTransitionRenderer =
-            createColorVariantSubjectsByNameTransitionRenderer({
-                animationDuration: 800,
-                colorVariantSubjectsByName,
-                newColorScheme: colorScheme,
-                newTechName: techName,
-                previousColorScheme,
-                previousTechName,
-            });
+        const renderer = createColorVariantSubjectsByNameTransitionRenderer({
+            animationDuration: 800,
+            colorVariantSubjectsByName,
+            newColorScheme: colorScheme,
+            newTechName: techName,
+            previousColorScheme,
+            previousTechName,
+        });
 
-        return rendererManager.registerRenderer(
-            colorVariantSubjectsByNameTransitionRenderer,
-        );
+        return rendererManager.registerRenderer(renderer);
     }, [rendererManager, colorScheme, colorVariantSubjectsByName, techName]);
+}
+
+function useSynchronizeColorVariantSubjectsByNameObserversEffect(): void {
+    const colorVariantSubjectsByName = useAtomValue(
+        colorVariantSubjectsByNameAtom,
+    );
 
     useEffect(() => {
         const colorVariantNames = getColorVariantNames();
@@ -104,9 +89,7 @@ function useColorEffects() {
             const colorVariantSubject =
                 colorVariantSubjectsByName[colorVariantName];
             const setColorVariantCssVariable =
-                createColorVariantCssVariableSetter({
-                    colorVariantName,
-                });
+                createColorVariantCssVariableSetter(colorVariantName);
 
             unregisterObserverCallbacks.push(
                 colorVariantSubject.registerObserver(
@@ -126,22 +109,38 @@ function useColorEffects() {
         );
 
         return () => {
-            for (const unregisterObserver of unregisterObserverCallbacks) {
+            for (const unregisterObserver of unregisterObserverCallbacks.toReversed()) {
                 unregisterObserver();
             }
         };
     }, [colorVariantSubjectsByName]);
 }
 
-function useMediaQueryListPrefersColorSchemeChangeHandler() {
+function useSynchronizeMediaQueryPrefersColorSchemeEffect(): void {
     const setColorScheme = useSetAtom(colorSchemeAtom);
-
-    return useCallback(
+    const handleMediaQueryPrefersColorSchemeChange = useCallback(
         ({ matches }: MediaQueryListEvent) => {
             setColorScheme(matches ? 'dark' : 'light');
         },
         [setColorScheme],
     );
+
+    useEffect(() => {
+        const mediaQueryList = window.matchMedia(
+            '(prefers-color-scheme: dark)',
+        );
+
+        mediaQueryList.addEventListener(
+            'change',
+            handleMediaQueryPrefersColorSchemeChange,
+        );
+
+        return () =>
+            mediaQueryList.removeEventListener(
+                'change',
+                handleMediaQueryPrefersColorSchemeChange,
+            );
+    }, [setColorScheme, handleMediaQueryPrefersColorSchemeChange]);
 }
 
 export { useColorEffects };

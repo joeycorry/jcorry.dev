@@ -14,6 +14,7 @@ type CustomPageContext<
     PageProps extends Record<string, unknown> = Record<string, unknown>,
 > = {
     Page: Page<PageProps>;
+    cookiesToSet: Map<string, string>;
     documentProps?: DocumentProps;
     pageProps?: PageProps;
 };

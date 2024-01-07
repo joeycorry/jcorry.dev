@@ -5,9 +5,12 @@ import type {
     ColorScheme,
     ColorVariantSubjectsByName,
 } from '~/common/utils/color';
-import { getColorVariantNames } from '~/common/utils/color';
+import {
+    createTransparentColor,
+    getColorVariantNames,
+} from '~/common/utils/color';
 
-const colorSchemeAtom = atom<ColorScheme>('normal');
+const colorSchemeAtom = atom<ColorScheme>('unknown');
 
 colorSchemeAtom.debugLabel = 'colorSchemeAtom';
 
@@ -15,7 +18,7 @@ const colorVariantSubjectsByNameAtom = atom(
     Object.fromEntries(
         getColorVariantNames().map(colorVariantName => [
             colorVariantName,
-            new Subject(),
+            new Subject(createTransparentColor()),
         ]),
     ) as ColorVariantSubjectsByName,
 );

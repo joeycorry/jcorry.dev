@@ -1,15 +1,14 @@
-import { Point } from '~/common/lib/point';
+import type { Angle } from '~/common/lib/angle';
+import type { Point } from '~/common/lib/point';
 import { Renderer } from '~/common/lib/renderer';
 import { Trapezoid } from '~/common/lib/shapes/trapezoid';
+import { Vector } from '~/common/lib/vector';
 import type { FixedArray } from '~/common/utils/array';
 import { easeLinear } from '~/common/utils/easing';
-import type { LineData } from '~/common/utils/geometry';
-import { getSineOfRadians } from '~/common/utils/geometry';
-import type { ValueOrMutableRef } from '~/common/utils/react';
-import type {
-    RendererAnimationMountingDirection,
-    RendererAnimationStartingDirection,
-} from '~/common/utils/renderer';
+import type { Line } from '~/common/utils/line';
+import { sine } from '~/common/utils/math';
+import type { RendererAnimationStartingDirection } from '~/common/utils/renderer';
+import type { ValueOrSubject } from '~/common/utils/subject';
 
 function createMovingRibbonRenderer({
     animationDurationScalar,
@@ -17,174 +16,109 @@ function createMovingRibbonRenderer({
     canvasContext,
     directionAngle,
     fillStyle,
-    firstRibbonLineStartingPoint,
     getYLength,
-    secondRibbonLineStartingPoint,
+    startingPointPair,
     strokeStyle,
     xAxisAdjacentAngle,
 }: {
     animationDurationScalar: number;
-    animationStartingDirection: RendererAnimationMountingDirection;
+    animationStartingDirection?: RendererAnimationStartingDirection;
     canvasContext: CanvasRenderingContext2D;
-    directionAngle: number;
-    fillStyle: ValueOrMutableRef<string>;
-    firstRibbonLineStartingPoint: Point;
+    directionAngle: Angle;
+    fillStyle: ValueOrSubject<string>;
     getYLength: (point: Point) => number;
-    secondRibbonLineStartingPoint: Point;
-    strokeStyle: ValueOrMutableRef<string>;
-    xAxisAdjacentAngle: number;
-}) {
-    const sineOfXAxisAdjacentAngle = getSineOfRadians(xAxisAdjacentAngle);
+    startingPointPair: FixedArray<Point, 2>;
+    strokeStyle: ValueOrSubject<string>;
+    xAxisAdjacentAngle: Angle;
+}): Renderer {
+    const sineOfXAxisAdjacentAngle = sine(xAxisAdjacentAngle);
+    const [firstStartingPoint, secondStartingPoint] = startingPointPair;
     const firstLength =
-        getYLength(firstRibbonLineStartingPoint) / sineOfXAxisAdjacentAngle;
+        getYLength(firstStartingPoint) / sineOfXAxisAdjacentAngle;
     const secondLength =
-        getYLength(secondRibbonLineStartingPoint) / sineOfXAxisAdjacentAngle;
-
-    return createMovingTrapezoidRenderer({
+        getYLength(secondStartingPoint) / sineOfXAxisAdjacentAngle;
+    const animationDuration =
+        Math.max(firstLength, secondLength) * animationDurationScalar;
+    const maxLength = Math.max(firstLength, secondLength);
+    const firstEndingPoint = firstStartingPoint.toSummed({
         angle: directionAngle,
-        animationDuration:
-            Math.max(firstLength, secondLength) * animationDurationScalar,
+        length: maxLength,
+    });
+    const secondEndingPoint = secondStartingPoint.toSummed({
+        angle: directionAngle,
+        length: maxLength,
+    });
+    const firstXDistance =
+        firstEndingPoint.calculateXDistanceTo(firstStartingPoint);
+    const firstYDistance =
+        firstEndingPoint.calculateYDistanceTo(firstStartingPoint);
+    const secondXDistance =
+        secondEndingPoint.calculateXDistanceTo(secondStartingPoint);
+    const secondYDistance =
+        secondEndingPoint.calculateYDistanceTo(secondStartingPoint);
+
+    return new Renderer({
+        animationDuration,
         animationIterationCount: Number.POSITIVE_INFINITY,
         animationStartingDirection,
-        canvasContext,
-        fillStyle,
-        parallelLineDataPair: [
-            {
-                length: firstLength,
-                point: firstRibbonLineStartingPoint,
-            },
-            {
-                length: secondLength,
-                point: secondRibbonLineStartingPoint,
-            },
-        ],
-        strokeStyle,
+        computeNextRenderables({ currentAnimationPercentage }) {
+            const distancePercentage =
+                2 * easeLinear(currentAnimationPercentage);
+            const firstLine: Line =
+                distancePercentage < 1
+                    ? [
+                          firstStartingPoint,
+                          firstStartingPoint.toSummed(
+                              new Vector(
+                                  distancePercentage * firstXDistance,
+                                  distancePercentage * firstYDistance,
+                              ),
+                          ),
+                      ]
+                    : distancePercentage > 1
+                      ? [
+                            firstEndingPoint.toSubtracted(
+                                new Vector(
+                                    (2 - distancePercentage) * firstXDistance,
+                                    (2 - distancePercentage) * firstYDistance,
+                                ),
+                            ),
+                            firstEndingPoint,
+                        ]
+                      : [firstStartingPoint, firstEndingPoint];
+            const secondLine: Line =
+                distancePercentage < 1
+                    ? [
+                          secondStartingPoint,
+                          secondStartingPoint.toSummed(
+                              new Vector(
+                                  distancePercentage * secondXDistance,
+                                  distancePercentage * secondYDistance,
+                              ),
+                          ),
+                      ]
+                    : distancePercentage > 1
+                      ? [
+                            secondEndingPoint.toSubtracted(
+                                new Vector(
+                                    (2 - distancePercentage) * secondXDistance,
+                                    (2 - distancePercentage) * secondYDistance,
+                                ),
+                            ),
+                            secondEndingPoint,
+                        ]
+                      : [secondStartingPoint, secondEndingPoint];
+
+            return [
+                new Trapezoid({
+                    canvasContext,
+                    fillStyle,
+                    linePair: [firstLine, secondLine],
+                    strokeStyle,
+                }),
+            ];
+        },
     });
 }
 
-function createMovingTrapezoidRenderer({
-    angle,
-    canvasContext,
-    counterClockwise,
-    fillStyle,
-    lineWidth,
-    parallelLineDataPair,
-    strokeStyle,
-    ...rendererOptions
-}: {
-    angle: number;
-    animationDuration: number;
-    animationIterationCount?: number;
-    animationStartingDirection?: RendererAnimationStartingDirection;
-    canvasContext: CanvasRenderingContext2D;
-    counterClockwise?: boolean;
-    fillStyle?: ValueOrMutableRef<string>;
-    lineWidth?: ValueOrMutableRef<number>;
-    parallelLineDataPair: FixedArray<LineData, 2>;
-    strokeStyle?: ValueOrMutableRef<string>;
-}) {
-    const [firstStartingPoint, secondStartingPoint] = parallelLineDataPair.map(
-        data => data.point,
-    );
-    const maxLength = Math.max(
-        ...parallelLineDataPair.map(data => data.length),
-    );
-    const [firstLength, secondLength] = Array(2).fill(maxLength);
-    const [firstEndPoint, secondEndPoint] = parallelLineDataPair.map(
-        ({ point }) =>
-            point.addAngleAndLength({
-                angle,
-                counterClockwise,
-                length: maxLength,
-            }),
-    );
-    const firstXDistance = firstEndPoint.calculateXDistance(firstStartingPoint);
-    const firstYDistance = firstEndPoint.calculateYDistance(firstStartingPoint);
-    const secondXDistance =
-        secondEndPoint.calculateXDistance(secondStartingPoint);
-    const secondYDistance =
-        secondEndPoint.calculateYDistance(secondStartingPoint);
-
-    return new Renderer(({ currentAnimationPercentage }) => {
-        const distancePercentage = 2 * easeLinear(currentAnimationPercentage);
-        const firstLineData =
-            distancePercentage < 1
-                ? {
-                      length: firstStartingPoint.calculateDistance(
-                          new Point(
-                              firstStartingPoint.x +
-                                  distancePercentage * firstXDistance,
-                              firstStartingPoint.y +
-                                  distancePercentage * firstYDistance,
-                          ),
-                      ),
-                      point: firstStartingPoint,
-                  }
-                : distancePercentage > 1
-                  ? {
-                        length: new Point(
-                            firstEndPoint.x -
-                                (2 - distancePercentage) * firstXDistance,
-
-                            firstEndPoint.y -
-                                (2 - distancePercentage) * firstYDistance,
-                        ).calculateDistance(firstEndPoint),
-                        point: new Point(
-                            firstEndPoint.x -
-                                (2 - distancePercentage) * firstXDistance,
-                            firstEndPoint.y -
-                                (2 - distancePercentage) * firstYDistance,
-                        ),
-                    }
-                  : {
-                        length: firstLength,
-                        point: firstStartingPoint,
-                    };
-        const secondLineData =
-            distancePercentage < 1
-                ? {
-                      length: secondStartingPoint.calculateDistance(
-                          new Point(
-                              secondStartingPoint.x +
-                                  distancePercentage * secondXDistance,
-                              secondStartingPoint.y +
-                                  distancePercentage * secondYDistance,
-                          ),
-                      ),
-                      point: secondStartingPoint,
-                  }
-                : distancePercentage > 1
-                  ? {
-                        length: new Point(
-                            secondEndPoint.x -
-                                (2 - distancePercentage) * secondXDistance,
-                            secondEndPoint.y -
-                                (2 - distancePercentage) * secondYDistance,
-                        ).calculateDistance(secondEndPoint),
-                        point: new Point(
-                            secondEndPoint.x -
-                                (2 - distancePercentage) * secondXDistance,
-                            secondEndPoint.y -
-                                (2 - distancePercentage) * secondYDistance,
-                        ),
-                    }
-                  : {
-                        length: secondLength,
-                        point: secondStartingPoint,
-                    };
-
-        return [
-            new Trapezoid({
-                angle,
-                canvasContext,
-                counterClockwise,
-                fillStyle,
-                lineWidth,
-                parallelLineDataPair: [firstLineData, secondLineData],
-                strokeStyle,
-            }),
-        ];
-    }, rendererOptions);
-}
-
-export { createMovingRibbonRenderer, createMovingTrapezoidRenderer };
+export { createMovingRibbonRenderer };

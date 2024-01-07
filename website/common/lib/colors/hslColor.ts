@@ -1,4 +1,4 @@
-import { getClampedFloat, getClampedPercentage } from '~/common/utils/bounded';
+import { clampFloat, clampPercentage } from '~/common/utils/math';
 
 import type { Color } from './color';
 // eslint-disable-next-line import/no-cycle
@@ -23,97 +23,76 @@ class HslColor implements Color<HslColor> {
         lightnessPercentage: number;
         saturationPercentage: number;
     }) {
-        this.#alphaPercentage = getClampedPercentage(alphaPercentage);
+        this.#alphaPercentage = clampPercentage(alphaPercentage);
         this.#hueDegrees = hueDegrees;
-        this.#lightnessPercentage = getClampedPercentage(lightnessPercentage);
-        this.#saturationPercentage = getClampedPercentage(saturationPercentage);
+        this.#lightnessPercentage = clampPercentage(lightnessPercentage);
+        this.#saturationPercentage = clampPercentage(saturationPercentage);
     }
 
-    public darken(rawPercentage: number) {
-        const percentage = getClampedFloat({
+    public toDarkened(darkeningPercentage: number): HslColor {
+        const percentage = clampFloat(darkeningPercentage, {
             maximum: 1,
-            value: rawPercentage,
         });
 
         return new HslColor({
             alphaPercentage: this.#alphaPercentage,
             hueDegrees: this.#hueDegrees,
-            lightnessPercentage: getClampedPercentage(
+            lightnessPercentage: clampPercentage(
                 this.#lightnessPercentage * (1 - percentage),
             ),
             saturationPercentage: this.#saturationPercentage,
         });
     }
 
-    public desaturate(rawPercentage: number): HslColor {
-        const percentage = getClampedFloat({
+    public toDesaturated(desaturatingPercentage: number): HslColor {
+        const percentage = clampFloat(desaturatingPercentage, {
             maximum: 1,
-            value: rawPercentage,
         });
 
         return new HslColor({
             alphaPercentage: this.#alphaPercentage,
             hueDegrees: this.#hueDegrees,
             lightnessPercentage: this.#lightnessPercentage,
-            saturationPercentage: getClampedPercentage(
+            saturationPercentage: clampPercentage(
                 this.#saturationPercentage * (1 - percentage),
             ),
         });
     }
 
-    public interpolate<OtherColor extends Color>(
+    public toHslColor(): HslColor {
+        return new HslColor({
+            alphaPercentage: this.#alphaPercentage,
+            hueDegrees: this.#hueDegrees,
+            lightnessPercentage: this.#lightnessPercentage,
+            saturationPercentage: this.#saturationPercentage,
+        });
+    }
+
+    public toInterpolated<OtherColor extends Color>(
         otherColor: OtherColor,
-        rawPercentage: number,
+        interpolatingPercentage: number,
     ): HslColor {
         return this.toRgbColor()
-            .interpolate(otherColor, rawPercentage)
+            .toInterpolated(otherColor, interpolatingPercentage)
             .toHslColor();
     }
 
-    public lighten(rawPercentage: number): HslColor {
-        const percentage = getClampedFloat({
+    public toLightened(lighteningPercentage: number): HslColor {
+        const percentage = clampFloat(lighteningPercentage, {
             minimum: -1,
-            value: rawPercentage,
         });
 
         return new HslColor({
             alphaPercentage: this.#alphaPercentage,
             hueDegrees: this.#hueDegrees,
-            lightnessPercentage: getClampedPercentage(
+            lightnessPercentage: clampPercentage(
                 this.#lightnessPercentage * (1 + percentage),
             ),
             saturationPercentage: this.#saturationPercentage,
         });
     }
 
-    public saturate(rawPercentage: number): HslColor {
-        const percentage = getClampedFloat({
-            minimum: -1,
-            value: rawPercentage,
-        });
-
-        return new HslColor({
-            alphaPercentage: this.#alphaPercentage,
-            hueDegrees: this.#hueDegrees,
-            lightnessPercentage: this.#lightnessPercentage,
-            saturationPercentage: getClampedPercentage(
-                this.#saturationPercentage * (1 + percentage),
-            ),
-        });
-    }
-
-    public toHslColor() {
-        return new HslColor({
-            alphaPercentage: this.#alphaPercentage,
-            hueDegrees: this.#hueDegrees,
-            lightnessPercentage: this.#lightnessPercentage,
-            saturationPercentage: this.#saturationPercentage,
-        });
-    }
-
-    // This method and `##getRgbChannel` are derived from the alternate algorithm proposed by
-    // https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_RGB_alternative.
-    public toRgbColor() {
+    public toRgbColor(): RgbColor {
         return new RgbColor({
             alphaPercentage: this.#alphaPercentage,
             bluePercentage: this.#getRgbChannel('blue'),
@@ -122,7 +101,22 @@ class HslColor implements Color<HslColor> {
         });
     }
 
-    public toString() {
+    public toSaturated(saturatingPercentage: number): HslColor {
+        const percentage = clampFloat(saturatingPercentage, {
+            minimum: -1,
+        });
+
+        return new HslColor({
+            alphaPercentage: this.#alphaPercentage,
+            hueDegrees: this.#hueDegrees,
+            lightnessPercentage: this.#lightnessPercentage,
+            saturationPercentage: clampPercentage(
+                this.#saturationPercentage * (1 + percentage),
+            ),
+        });
+    }
+
+    public toString(): string {
         const formattedHueDegrees = parseFloat(this.#hueDegrees.toFixed(3));
         const formattedSaturationPercentage = parseFloat(
             (this.#saturationPercentage * 100).toFixed(3),
@@ -137,7 +131,9 @@ class HslColor implements Color<HslColor> {
         return `hsl(${formattedHueDegrees}deg ${formattedSaturationPercentage}% ${formattedLightnessPercentage}% / ${formattedAlphaPercentage})`;
     }
 
-    #getRgbChannel(rgbChannelName: RgbChannelName) {
+    // This method is derived from the alternate algorithm proposed by
+    // https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_RGB_alternative.
+    #getRgbChannel(rgbChannelName: RgbChannelName): number {
         const hueDegrees = this.#hueDegrees;
         const saturationPercentage = this.#saturationPercentage;
         const lightnessPercentage = this.#lightnessPercentage;

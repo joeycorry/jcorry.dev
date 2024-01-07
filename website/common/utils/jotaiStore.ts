@@ -5,16 +5,18 @@ import { techNameAtom } from '~/common/atoms/techName';
 
 import type { AtomSetValueParameters } from './atom';
 
-type JotaiStore = ReturnType<typeof createJotaiStore>;
+type JotaiStore = ReturnType<typeof createStore>;
 
 type JotaiStoreAtomSetValueParametersByName = {
     colorScheme: AtomSetValueParameters<typeof colorSchemeAtom>;
     techName: AtomSetValueParameters<typeof techNameAtom>;
 };
 
-function createJotaiStore(
-    atomSetValueParametersByName: JotaiStoreAtomSetValueParametersByName,
-) {
+function createJotaiStore({
+    atomSetValueParametersByName,
+}: {
+    atomSetValueParametersByName: JotaiStoreAtomSetValueParametersByName;
+}): JotaiStore {
     const store = createStore();
 
     if ('colorScheme' in atomSetValueParametersByName) {

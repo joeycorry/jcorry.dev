@@ -1,60 +1,56 @@
-import type { SetStateAction } from 'jotai';
 import type { RefObject } from 'react';
 
+import { Angle } from '~/common/lib/angle';
 import type { Color } from '~/common/lib/colors/color';
 import { Point } from '~/common/lib/point';
 import type { Renderer } from '~/common/lib/renderer';
-import { getRendererManager } from '~/common/lib/rendererManager';
 import { Subject } from '~/common/lib/subject';
 import { createMovingRibbonRenderer } from '~/common/renderers/shape';
-import {
-    getBackgroundRendererAnimationDurationScalar,
-    getBackgroundRendererMappedStyleSubject,
-    getBackgroundRendererRibbonsEdgeGutter,
-    getBackgroundRendererRibbonsHeight,
-} from '~/common/utils/background';
-import { getBoundedRandomInteger } from '~/common/utils/bounded';
 import type {
-    ColorVariantName,
+    ColorVariantSubjectsByName,
     PrimaryColorVariantName,
 } from '~/common/utils/color';
 import { getComplementaryColorVariantName } from '~/common/utils/color';
+import { getBoundedRandomInteger } from '~/common/utils/math';
+import type { RendererCleanupCallback } from '~/common/utils/renderer';
 import { createCompositeRenderer } from '~/common/utils/renderer';
-import type { UnregisterObserverCallback } from '~/common/utils/subject';
+import type {
+    SubjectAndUnregisterObserverCallback,
+    UnregisterObserverCallback,
+} from '~/common/utils/subject';
+import { mapSubjects } from '~/common/utils/subject';
 import type { Viewport } from '~/common/utils/viewport';
 
+import { createNoopRenderer } from './function';
 import { createNumberTransitionRenderer } from './math';
 
 const ribbonWidthMaximum = 80;
 const ribbonWidthMinimum = 20;
 const ribbonsInterstitialGutter = 5;
-const xAxisAdjacentAngle = 0.35 * Math.PI;
+const xAxisAdjacentAngle = new Angle({ radians: 0.35 * Math.PI });
+const piAngle = new Angle({ radians: Math.PI });
 
-function setupBackgroundRenderer({
+function createBackgroundRenderer({
     canvasElementRef,
     colorVariantSubjectsByName,
-    setBackgroundIsVisible,
     viewport,
 }: {
     canvasElementRef: RefObject<HTMLCanvasElement>;
-    colorVariantSubjectsByName: Record<ColorVariantName, Subject<Color>>;
-    setBackgroundIsVisible: (value: SetStateAction<boolean>) => void;
+    colorVariantSubjectsByName: ColorVariantSubjectsByName;
     viewport: Viewport;
-}) {
+}): Renderer {
     if (canvasElementRef.current === null) {
-        return;
+        return createNoopRenderer();
     }
-
-    setBackgroundIsVisible(true);
 
     const canvasElement = canvasElementRef.current;
     const canvasContext = canvasElement.getContext('2d')!;
-    const rendererManager = getRendererManager();
     const renderersByStartingTimeEntries: Array<[number, Renderer]> = [];
-    const ribbonsEdgeGutter = getBackgroundRendererRibbonsEdgeGutter({
-        viewport,
-    });
-    const ribbonsHeight = getBackgroundRendererRibbonsHeight({ viewport });
+    const ribbonsEdgeGutter =
+        viewport.width >= 1500 ? 200 : viewport.width >= 750 ? 150 : 100;
+    const ribbonsHeight =
+        (viewport.width >= 1500 ? 0.8 : viewport.width >= 750 ? 0.6 : 0.4) *
+        viewport.height;
     const colorVariantNames: PrimaryColorVariantName[] = [
         'foregroundColor',
         'accentColor',
@@ -67,16 +63,13 @@ function setupBackgroundRenderer({
     ] of colorVariantNames.entries()) {
         const colorVariantSubject =
             colorVariantSubjectsByName[colorVariantName];
-        const complementaryColorVariantName = getComplementaryColorVariantName({
-            colorVariantName,
-        });
+        const complementaryColorVariantName =
+            getComplementaryColorVariantName(colorVariantName);
         const complementaryColorVariantSubject =
             colorVariantSubjectsByName[complementaryColorVariantName];
         const animationDurationScalar =
-            getBackgroundRendererAnimationDurationScalar({
-                colorVariantName,
-                viewport,
-            });
+            (viewport.width >= 1500 ? 0.8 : viewport.width >= 750 ? 0.9 : 1) *
+            (colorVariantName === 'foregroundColor' ? 15 : 7);
         const leftStartingYs = [ribbonsEdgeGutter];
         const leftYLimit = ribbonsHeight;
 
@@ -87,43 +80,43 @@ function setupBackgroundRenderer({
             leftStartingYs.push(
                 ribbonsInterstitialGutter +
                     leftStartingYs.at(-1)! +
-                    getBoundedRandomInteger({
-                        maximum: ribbonWidthMaximum,
-                        minimum: ribbonWidthMinimum,
-                    }),
+                    getBoundedRandomInteger(
+                        ribbonWidthMinimum,
+                        ribbonWidthMaximum,
+                    ),
             );
         }
 
         for (const [startingYIndex, startingY] of leftStartingYs
             .slice(0, -1)
             .entries()) {
-            const interpolationPercentageSubject = new Subject<number>();
+            const interpolatingPercentageSubject = new Subject(0);
             const [styleSubject, unregisterObserver] =
-                getBackgroundRendererMappedStyleSubject({
+                createCanvasContextStyleSubject({
                     colorVariantSubject,
                     complementaryColorVariantSubject,
-                    interpolationPercentageSubject,
+                    interpolatingPercentageSubject,
                 });
             const startingTime =
                 startingYIndex * 250 +
                 (colorVariantNameIndex * 250) / colorVariantNames.length;
+            const firstStartPoint = new Point(
+                0,
+                (startingYIndex > 0 ? ribbonsInterstitialGutter : 0) +
+                    startingY,
+            );
+            const secondStartPoint = new Point(
+                0,
+                leftStartingYs[startingYIndex + 1] - ribbonsInterstitialGutter,
+            );
             const movingRibbonRenderer = createMovingRibbonRenderer({
                 animationDurationScalar,
                 animationStartingDirection: 'alternate',
                 canvasContext,
-                directionAngle: -xAxisAdjacentAngle,
+                directionAngle: xAxisAdjacentAngle.toOpposed(),
                 fillStyle: styleSubject,
-                firstRibbonLineStartingPoint: new Point(
-                    0,
-                    (startingYIndex > 0 ? ribbonsInterstitialGutter : 0) +
-                        startingY,
-                ),
                 getYLength: point => point.y,
-                secondRibbonLineStartingPoint: new Point(
-                    0,
-                    leftStartingYs[startingYIndex + 1] -
-                        ribbonsInterstitialGutter,
-                ),
+                startingPointPair: [firstStartPoint, secondStartPoint],
                 strokeStyle: styleSubject,
                 xAxisAdjacentAngle,
             });
@@ -133,7 +126,7 @@ function setupBackgroundRenderer({
                 animationStartingDirection: 'alternate',
                 maximum: 1,
                 minimum: 0,
-                numberSubject: interpolationPercentageSubject,
+                numberSubject: interpolatingPercentageSubject,
             });
 
             renderersByStartingTimeEntries.push([
@@ -157,43 +150,43 @@ function setupBackgroundRenderer({
             rightStartingYs.push(
                 ribbonsInterstitialGutter +
                     rightStartingYs.at(-1)! +
-                    getBoundedRandomInteger({
-                        maximum: ribbonWidthMaximum,
-                        minimum: ribbonWidthMinimum,
-                    }),
+                    getBoundedRandomInteger(
+                        ribbonWidthMinimum,
+                        ribbonWidthMaximum,
+                    ),
             );
         }
 
         for (const [startingYIndex, startingY] of [
             ...rightStartingYs.slice(0, -1).entries(),
         ]) {
-            const interpolationPercentageSubject = new Subject<number>();
+            const interpolatingPercentageSubject = new Subject(0);
             const [styleSubject, unregisterObserver] =
-                getBackgroundRendererMappedStyleSubject({
+                createCanvasContextStyleSubject({
                     colorVariantSubject,
                     complementaryColorVariantSubject,
-                    interpolationPercentageSubject,
+                    interpolatingPercentageSubject,
                 });
             const startingTime =
                 (rightStartingYs.length - startingYIndex - 2) * 250 +
                 (colorVariantNameIndex * 250) / colorVariantNames.length;
+            const firstStartPoint = new Point(
+                viewport.width,
+                (startingYIndex > 0 ? ribbonsInterstitialGutter : 0) +
+                    startingY,
+            );
+            const secondStartPoint = new Point(
+                viewport.width,
+                rightStartingYs[startingYIndex + 1] - ribbonsInterstitialGutter,
+            );
             const movingRibbonRenderer = createMovingRibbonRenderer({
                 animationDurationScalar,
                 animationStartingDirection: 'alternate-reverse',
                 canvasContext,
-                directionAngle: Math.PI - xAxisAdjacentAngle,
+                directionAngle: piAngle.toSubtracted(xAxisAdjacentAngle),
                 fillStyle: styleSubject,
-                firstRibbonLineStartingPoint: new Point(
-                    viewport.width,
-                    (startingYIndex > 0 ? ribbonsInterstitialGutter : 0) +
-                        startingY,
-                ),
                 getYLength: point => viewport.height - point.y,
-                secondRibbonLineStartingPoint: new Point(
-                    viewport.width,
-                    rightStartingYs[startingYIndex + 1] -
-                        ribbonsInterstitialGutter,
-                ),
+                startingPointPair: [firstStartPoint, secondStartPoint],
                 strokeStyle: styleSubject,
                 xAxisAdjacentAngle,
             });
@@ -203,7 +196,7 @@ function setupBackgroundRenderer({
                 animationStartingDirection: 'alternate',
                 maximum: 1,
                 minimum: 0,
-                numberSubject: interpolationPercentageSubject,
+                numberSubject: interpolatingPercentageSubject,
             });
 
             renderersByStartingTimeEntries.push([
@@ -218,19 +211,38 @@ function setupBackgroundRenderer({
         }
     }
 
-    const compositeRenderer = createCompositeRenderer({
-        renderersByStartingTimeEntries,
-    });
-    const unregisterRenderer =
-        rendererManager.registerRenderer(compositeRenderer);
-
-    return () => {
-        unregisterRenderer();
-
-        for (const unregisterObserver of unregisterObserverCallbacks) {
+    const handleCleanup: RendererCleanupCallback = () => {
+        for (const unregisterObserver of unregisterObserverCallbacks.toReversed()) {
             unregisterObserver();
         }
     };
+
+    return createCompositeRenderer({
+        onCleanup: handleCleanup,
+        renderersByStartingTimeEntries,
+    });
 }
 
-export { setupBackgroundRenderer };
+function createCanvasContextStyleSubject({
+    colorVariantSubject,
+    complementaryColorVariantSubject,
+    interpolatingPercentageSubject,
+}: {
+    colorVariantSubject: Subject<Color>;
+    complementaryColorVariantSubject: Subject<Color>;
+    interpolatingPercentageSubject: Subject<number>;
+}): SubjectAndUnregisterObserverCallback<string> {
+    return mapSubjects(
+        [
+            colorVariantSubject,
+            complementaryColorVariantSubject,
+            interpolatingPercentageSubject,
+        ],
+        (color, complementaryColor, interpolatingPercentage) =>
+            color
+                .toInterpolated(complementaryColor, interpolatingPercentage)
+                .toString(),
+    );
+}
+
+export { createBackgroundRenderer };

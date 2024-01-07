@@ -1,4 +1,5 @@
 import { useAtomValue } from 'jotai';
+import type { ReactNode } from 'react';
 import { memo, useRef } from 'react';
 
 import { backgroundIsVisibleAtom } from '~/common/atoms/background';
@@ -8,12 +9,12 @@ import styles from '~/common/styles/Background.module.css';
 
 const Background = memo(UnmemoizedBackground);
 
-function UnmemoizedBackground() {
+function UnmemoizedBackground(): ReactNode {
     const backgroundIsVisible = useAtomValue(backgroundIsVisibleAtom);
     const canvasElementRef = useRef<HTMLCanvasElement>(null);
 
     useRendererManagerEffects();
-    useBackgroundEffects({ canvasElementRef });
+    useBackgroundEffects(canvasElementRef);
 
     return (
         <canvas

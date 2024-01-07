@@ -1,3 +1,7 @@
+type ConvertibleToString = {
+    toString(): string;
+};
+
 type KebabCase<
     T extends string,
     A extends string = '',
@@ -5,4 +9,4 @@ type KebabCase<
     ? KebabCase<R, `${A}${F extends Lowercase<F> ? '' : '-'}${Lowercase<F>}`>
     : A;
 
-export type { KebabCase };
+export type { ConvertibleToString, KebabCase };

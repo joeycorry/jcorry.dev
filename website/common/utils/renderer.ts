@@ -8,13 +8,17 @@ type RendererAnimationStartingDirection =
     | RendererAnimationMountingDirection
     | RendererAnimationProgressingDirection;
 
+type RendererCleanupCallback = () => void;
+
 function createCompositeRenderer({
     animationIterationCount,
+    onCleanup,
     renderersByStartingTimeEntries,
 }: {
     animationIterationCount?: number;
+    onCleanup?: RendererCleanupCallback;
     renderersByStartingTimeEntries: Iterable<[number, Renderer]>;
-}) {
+}): Renderer {
     const compositeRendererTotalDuration = Array.from(
         renderersByStartingTimeEntries,
     ).reduce(
@@ -26,8 +30,12 @@ function createCompositeRenderer({
         0,
     );
 
-    return new Renderer(
-        ({ totalElapsedTime: compositeRendererTotalElapsedTime }) => {
+    return new Renderer({
+        animationDuration: compositeRendererTotalDuration,
+        animationIterationCount,
+        computeNextRenderables({
+            totalElapsedTime: compositeRendererTotalElapsedTime,
+        }) {
             const currentlyAnimatingRenderers: Renderer[] = [];
 
             for (const [
@@ -47,32 +55,30 @@ function createCompositeRenderer({
                 const animationDuration = renderer.getAnimationDuration();
                 const totalElapsedTime =
                     compositeRendererTotalElapsedTime - startingTime;
-                let rawAnimationPercentage =
+                let animationPercentage =
                     totalElapsedTime / animationDuration -
                     elapsedAnimationIterationCount;
 
-                while (rawAnimationPercentage > 1) {
-                    rawAnimationPercentage--;
+                while (animationPercentage > 1) {
+                    animationPercentage--;
 
-                    renderer.onIterationFinish();
+                    renderer.finishIteration();
                 }
 
-                renderer.setAnimationPercentage(rawAnimationPercentage);
+                renderer.setAnimationPercentage(animationPercentage);
                 currentlyAnimatingRenderers.push(renderer);
             }
 
             return currentlyAnimatingRenderers;
         },
-        {
-            animationDuration: compositeRendererTotalDuration,
-            animationIterationCount,
-        },
-    );
+        onCleanup,
+    });
 }
 
 export type {
     RendererAnimationMountingDirection,
     RendererAnimationProgressingDirection,
     RendererAnimationStartingDirection,
+    RendererCleanupCallback,
 };
 export { createCompositeRenderer };

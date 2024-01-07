@@ -1,16 +1,16 @@
-import { getClampedFloat } from './bounded';
+import { clampFloat } from './math';
 
 const defaultDelayMilliseconds = 50;
 
-function debounceFunction<T extends unknown[]>(
-    func: (...args: T) => void,
-    options?: { milliseconds?: number },
-) {
-    const { milliseconds: rawMilliseconds = defaultDelayMilliseconds } =
-        options || {};
-    const milliseconds = getClampedFloat({
+function createDebouncedFunction<T extends unknown[]>({
+    callback,
+    milliseconds: rawMilliseconds = defaultDelayMilliseconds,
+}: {
+    callback: (...args: T) => void;
+    milliseconds?: number;
+}): (...args: T) => void {
+    const milliseconds = clampFloat(rawMilliseconds, {
         minimum: 0,
-        value: rawMilliseconds,
     });
     let timeout: number | undefined;
 
@@ -18,20 +18,20 @@ function debounceFunction<T extends unknown[]>(
         window.clearTimeout(timeout);
 
         timeout = window.setTimeout(() => {
-            func(...args);
+            callback(...args);
         }, milliseconds);
     };
 }
 
-function throttleFunction<T extends unknown[]>(
-    func: (...args: T) => void,
-    options?: { milliseconds?: number },
-) {
-    const { milliseconds: rawMilliseconds = defaultDelayMilliseconds } =
-        options || {};
-    const milliseconds = getClampedFloat({
+function createThrottledFunction<T extends unknown[]>({
+    callback,
+    milliseconds: rawMilliseconds = defaultDelayMilliseconds,
+}: {
+    callback: (...args: T) => void;
+    milliseconds?: number;
+}): (...args: T) => void {
+    const milliseconds = clampFloat(rawMilliseconds, {
         minimum: 0,
-        value: rawMilliseconds,
     });
     let throttlePause: boolean | undefined;
 
@@ -43,11 +43,14 @@ function throttleFunction<T extends unknown[]>(
         throttlePause = true;
 
         window.setTimeout(() => {
-            func(...args);
+            callback(...args);
 
             throttlePause = false;
         }, milliseconds);
     };
 }
 
-export { debounceFunction, throttleFunction };
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function evaluateNoop(): void {}
+
+export { createDebouncedFunction, createThrottledFunction, evaluateNoop };

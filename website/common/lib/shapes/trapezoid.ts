@@ -1,76 +1,58 @@
 import type { Point } from '~/common/lib/point';
 import type { FixedArray } from '~/common/utils/array';
-import type { LineData } from '~/common/utils/geometry';
-import type { ValueOrMutableRef } from '~/common/utils/react';
+import type { Line } from '~/common/utils/line';
+import type { ValueOrSubject } from '~/common/utils/subject';
 
 import { Shape } from './shape';
 
 class Trapezoid extends Shape {
-    #angle: number;
-    #cachedBoundingPoints?: FixedArray<Point, 4>;
-    #counterClockwise: boolean;
-    #parallelLineDataPair: FixedArray<LineData, 2>;
+    #boundingPoints: FixedArray<Point, 4>;
 
     public constructor({
-        angle,
-        counterClockwise,
-        parallelLineDataPair,
+        linePair,
         ...shapeConstructorParameter
     }: {
-        angle: number;
         canvasContext: CanvasRenderingContext2D;
-        counterClockwise?: boolean;
-        fillStyle?: ValueOrMutableRef<string>;
-        lineWidth?: ValueOrMutableRef<number>;
-        parallelLineDataPair: FixedArray<LineData, 2>;
-        strokeStyle?: ValueOrMutableRef<string>;
+        fillStyle?: ValueOrSubject<string>;
+        linePair: FixedArray<Line, 2>;
+        lineWidth?: ValueOrSubject<number>;
+        strokeStyle?: ValueOrSubject<string>;
     }) {
         super(shapeConstructorParameter);
 
-        this.#angle = angle;
-        this.#counterClockwise = counterClockwise ?? false;
-        this.#parallelLineDataPair = parallelLineDataPair;
+        this.#boundingPoints = this.#computeBoundingPoints(linePair);
     }
 
-    get #boundingPoints(): FixedArray<Point, 4> {
-        if (this.#cachedBoundingPoints !== undefined) {
-            return this.#cachedBoundingPoints;
-        }
-
-        const [
-            firstOriginalPoint,
-            firstComputedPoint,
-            secondOriginalPoint,
-            secondComputedPoint,
-        ] = this.#parallelLineDataPair.flatMap(({ length, point }) => [
-            point,
-            point.addAngleAndLength({
-                angle: this.#angle,
-                counterClockwise: this.#counterClockwise,
-                length,
-            }),
-        ]);
-
-        this.#cachedBoundingPoints = [
-            firstOriginalPoint,
-            firstComputedPoint,
-            secondComputedPoint,
-            secondOriginalPoint,
-        ];
-
-        return this.#cachedBoundingPoints;
-    }
-
-    protected _calculateNextPath() {
+    protected _computeNextPath(): Path2D {
         const path = new Path2D();
+        const [firstBoundingPoint, ...remainingBoundingPoints] =
+            this.#boundingPoints;
 
-        path.moveTo(this.#boundingPoints[0].x, this.#boundingPoints[0].y);
+        path.moveTo(firstBoundingPoint.x, firstBoundingPoint.y);
 
-        for (const point of this.#boundingPoints.slice(1)) {
+        for (const point of remainingBoundingPoints) {
             path.lineTo(point.x, point.y);
         }
 
         return path;
+    }
+
+    #computeBoundingPoints(
+        linePair: FixedArray<Line, 2>,
+    ): FixedArray<Point, 4> {
+        const [
+            firstStartingPoint,
+            firstEndingPoint,
+            secondStartingPoint,
+            secondEndingPoint,
+        ] = linePair.flatMap(line => line);
+
+        return [
+            firstStartingPoint,
+            firstEndingPoint,
+            secondEndingPoint,
+            secondStartingPoint,
+        ];
     }
 }
 

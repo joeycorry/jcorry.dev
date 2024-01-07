@@ -1,92 +1,82 @@
-import type { Point } from '~/common/lib/point';
 import type { RenderableObject } from '~/common/lib/renderable';
-import type { ValueOrMutableRef } from '~/common/utils/react';
-import { getValueFromValueOrMutableRef } from '~/common/utils/react';
+import type { ValueOrSubject } from '~/common/utils/subject';
+import { getSubjectValue } from '~/common/utils/subject';
 
 abstract class Shape implements RenderableObject {
     protected _canvasContext: CanvasRenderingContext2D;
     protected _lastPath: Path2D | null;
 
-    #fillStyle?: ValueOrMutableRef<string>;
-    #lineWidth?: ValueOrMutableRef<number>;
-    #strokeStyle?: ValueOrMutableRef<string>;
+    #fillStyle: string | null;
+    #isRendered = false;
+    #lineWidth: number | null;
+    #strokeStyle: string | null;
 
-    public constructor(parameter: {
+    public constructor({
+        canvasContext,
+        fillStyle: rawFillStyle,
+        lineWidth: rawLineWidth,
+        strokeStyle: rawStrokeStyle,
+    }: {
         canvasContext: CanvasRenderingContext2D;
-        fillStyle?: ValueOrMutableRef<string>;
-        lineWidth?: ValueOrMutableRef<number>;
-        strokeStyle?: ValueOrMutableRef<string>;
+        fillStyle?: ValueOrSubject<string>;
+        lineWidth?: ValueOrSubject<number>;
+        strokeStyle?: ValueOrSubject<string>;
     }) {
-        this._canvasContext = parameter.canvasContext;
+        this._canvasContext = canvasContext;
         this._lastPath = null;
-        this.#fillStyle = parameter.fillStyle;
-        this.#lineWidth = parameter.lineWidth;
-        this.#strokeStyle = parameter.strokeStyle;
+        this.#fillStyle =
+            rawFillStyle === undefined ? null : getSubjectValue(rawFillStyle);
+        this.#lineWidth =
+            rawLineWidth === undefined ? null : getSubjectValue(rawLineWidth);
+        this.#strokeStyle =
+            rawStrokeStyle === undefined
+                ? null
+                : getSubjectValue(rawStrokeStyle);
     }
 
-    public onBeforeFrameRender() {
+    public clearLastRender(): void {
+        if (!this.#isRendered) {
+            return;
+        }
+
         const { width, height } = this._canvasContext.canvas;
 
         this._canvasContext.clearRect(0, 0, width, height);
+
+        this.#isRendered = false;
     }
 
-    public pointIsWithin(candidatePoint: Point) {
-        return this._lastPath !== null
-            ? this._canvasContext.isPointInPath(
-                  this._lastPath,
-                  candidatePoint.x,
-                  candidatePoint.y,
-              )
-            : false;
-    }
+    public render(): void {
+        if (this.#isRendered) {
+            return;
+        }
 
-    public render() {
-        this._lastPath = this._calculateNextPath();
+        this._lastPath = this._computeNextPath();
 
         this._canvasContext.save();
-        this.#setBaseContextAttributes();
+        this.#synchronizeCanvasContextAttributes();
         this._canvasContext.fill(this._lastPath);
         this._canvasContext.stroke(this._lastPath);
         this._canvasContext.restore();
+
+        this.#isRendered = true;
     }
 
-    #getFillStyle() {
-        return this.#fillStyle === undefined
-            ? null
-            : getValueFromValueOrMutableRef(this.#fillStyle);
-    }
-
-    #getLineWidth() {
-        return this.#lineWidth === undefined
-            ? null
-            : getValueFromValueOrMutableRef(this.#lineWidth);
-    }
-
-    #getStrokeStyle() {
-        return this.#strokeStyle === undefined
-            ? null
-            : getValueFromValueOrMutableRef(this.#strokeStyle);
-    }
-
-    #setBaseContextAttributes() {
-        const fillStyle = this.#getFillStyle();
-        const lineWidth = this.#getLineWidth();
-        const strokeStyle = this.#getStrokeStyle();
-
-        if (fillStyle !== null) {
-            this._canvasContext.fillStyle = fillStyle;
+    #synchronizeCanvasContextAttributes(): void {
+        if (this.#fillStyle !== null) {
+            this._canvasContext.fillStyle = this.#fillStyle;
         }
 
-        if (lineWidth !== null) {
-            this._canvasContext.lineWidth = lineWidth;
+        if (this.#lineWidth !== null) {
+            this._canvasContext.lineWidth = this.#lineWidth;
         }
 
-        if (strokeStyle !== null) {
-            this._canvasContext.strokeStyle = strokeStyle;
+        if (this.#strokeStyle !== null) {
+            this._canvasContext.strokeStyle = this.#strokeStyle;
         }
     }
 
-    protected abstract _calculateNextPath(): Path2D;
+    protected abstract _computeNextPath(): Path2D;
 }
 
 export { Shape };

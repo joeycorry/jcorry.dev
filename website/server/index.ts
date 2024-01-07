@@ -1,3 +1,4 @@
+import type { App, H3Event } from 'h3';
 import {
     createApp,
     eventHandler,
@@ -15,15 +16,15 @@ import { URL } from 'url';
 import { renderPage } from 'vike/server';
 import type { UserConfig } from 'vite';
 
+import type { ServerPageContext } from '~/renderer/types';
+
 const __dirname = new URL('.', import.meta.url).pathname.slice(0, -1);
 const root = `${__dirname}/..`;
 
 const isProduction = process.env.NODE_ENV === 'production';
 const port = parseInt(process.env.JCORRY_DEV_SERVER_PORT || '3000');
 
-async function startServer() {
-    const app = createApp({ onBeforeResponse: useCompressionStream });
-
+async function addMiddleware(app: App): Promise<void> {
     if (isProduction) {
         const sirv = (await import('sirv')).default;
 
@@ -44,7 +45,9 @@ async function startServer() {
 
         app.use(fromNodeMiddleware(viteDevMiddleware));
     }
+}
 
+function addOkRoute(app: App): void {
     app.use(
         '/ok',
         eventHandler(event => {
@@ -62,21 +65,28 @@ async function startServer() {
             return `${hostname} is OK!`;
         }),
     );
+}
 
+function addVikeRoutes(app: App): void {
     app.use(
         '*',
         eventHandler(async event => {
-            const vikeResponse = (
-                await renderPage({
-                    originalEvent: event,
-                    urlOriginal: event.path,
-                })
-            ).httpResponse!;
+            const vikeResponse = await renderPage<
+                ServerPageContext,
+                { originalEvent: H3Event; urlOriginal: string }
+            >({
+                originalEvent: event,
+                urlOriginal: event.path,
+            });
 
-            const { earlyHints, statusCode } = vikeResponse;
+            const vikeHttpResponse = vikeResponse.httpResponse!;
+            const { earlyHints, statusCode } = vikeHttpResponse!;
 
             setResponseStatus(event, statusCode);
-            setResponseHeaders(event, Object.fromEntries(vikeResponse.headers));
+            setResponseHeaders(
+                event,
+                Object.fromEntries(vikeHttpResponse.headers),
+            );
 
             if (earlyHints) {
                 writeEarlyHints(event, {
@@ -84,10 +94,17 @@ async function startServer() {
                 });
             }
 
-            return vikeResponse.getReadableWebStream();
+            return vikeHttpResponse.getReadableWebStream();
         }),
     );
+}
 
+async function startServer(): Promise<void> {
+    const app = createApp({ onBeforeResponse: useCompressionStream });
+
+    await addMiddleware(app);
+    addOkRoute(app);
+    addVikeRoutes(app);
     createServer(toNodeListener(app)).listen(port);
     console.log(`Serving at http://localhost:${port}`);
 }

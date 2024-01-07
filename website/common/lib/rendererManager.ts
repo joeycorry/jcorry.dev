@@ -2,11 +2,7 @@ import type { UnregisterRendererCallback } from '~/common/utils/rendererManager'
 
 import type { Renderer } from './renderer';
 
-const isConstructingRenderingManagerSymbol = Symbol(
-    'isConstructingRenderingManager',
-);
-
-let maybeRendererManager: RendererManager | undefined;
+const _rendererManagerConstructorTokenSymbol = Symbol();
 
 class RendererManager {
     #animationFrameRequestId?: number;
@@ -14,16 +10,16 @@ class RendererManager {
     #renderers: Renderer[] = [];
 
     public constructor(
-        constructorSymbol: typeof isConstructingRenderingManagerSymbol,
+        constructorToken: typeof _rendererManagerConstructorTokenSymbol,
     ) {
-        if (constructorSymbol !== isConstructingRenderingManagerSymbol) {
+        if (constructorToken !== _rendererManagerConstructorTokenSymbol) {
             throw new Error(
-                `Instances of \`${RendererManager.name}\` can only be constructed indirectly via \`getRendererManger()\`.`,
+                `An instance of \`${RendererManager.name}\` can only be accessed via \`getRendererManger()\` from '~/common/utils/rendererManager'.`,
             );
         }
     }
 
-    public isAnimating() {
+    public isAnimating(): boolean {
         return this.#isAnimating;
     }
 
@@ -33,7 +29,7 @@ class RendererManager {
         return () => this.#unregisterRenderer(renderer);
     }
 
-    public startAnimation() {
+    public startAnimation(): void {
         if (this.#isAnimating) {
             return;
         }
@@ -44,7 +40,7 @@ class RendererManager {
         );
     }
 
-    public stopAnimation() {
+    public stopAnimation(): void {
         if (!this.#isAnimating) {
             return;
         }
@@ -53,18 +49,18 @@ class RendererManager {
             window.cancelAnimationFrame(this.#animationFrameRequestId);
         }
 
-        this.#onBeforeFrameRender();
+        this.#clearLastRender();
 
         this.#isAnimating = false;
     }
 
-    #onBeforeFrameRender() {
+    #clearLastRender(): void {
         for (const renderer of this.#renderers) {
-            renderer.onBeforeFrameRender();
+            renderer.clearLastRender();
         }
     }
 
-    #removeFinishedRenderers() {
+    #removeFinishedRenderers(): void {
         const newRenderers = [];
 
         for (const renderer of this.#renderers) {
@@ -80,19 +76,19 @@ class RendererManager {
         this.#renderers = newRenderers;
     }
 
-    #renderFrame(timestamp: number) {
+    #renderFrame(timestamp: number): void {
         for (const renderer of this.#renderers) {
             renderer.setTimestamp(timestamp);
             renderer.render();
         }
     }
 
-    #stepAnimation = (timestamp: number) => {
+    #stepAnimation = (timestamp: number): void => {
         if (!this.#isAnimating) {
             return;
         }
 
-        this.#onBeforeFrameRender();
+        this.#clearLastRender();
         this.#renderFrame(timestamp);
         this.#removeFinishedRenderers();
 
@@ -101,7 +97,7 @@ class RendererManager {
         );
     };
 
-    #unregisterRenderer(renderer: Renderer) {
+    #unregisterRenderer(renderer: Renderer): void {
         if (
             this.#renderers.findIndex(renderer_ => renderer === renderer_) ===
             -1
@@ -109,18 +105,12 @@ class RendererManager {
             return;
         }
 
+        renderer.handleUnregistration();
+
         this.#renderers = this.#renderers.filter(
             renderer_ => renderer !== renderer_,
         );
     }
 }
 
-function getRendererManager(): RendererManager {
-    maybeRendererManager ??= new RendererManager(
-        isConstructingRenderingManagerSymbol,
-    );
-
-    return maybeRendererManager;
-}
-
-export { getRendererManager };
+export { _rendererManagerConstructorTokenSymbol, RendererManager };

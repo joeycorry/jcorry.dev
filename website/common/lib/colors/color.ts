@@ -2,16 +2,16 @@ import type { HslColor } from './hslColor';
 import type { RgbColor } from './rgbColor';
 
 interface Color<This extends Color = HslColor | RgbColor> {
-    darken(rawPercentage: number): This;
-    desaturate(rawPercentage: number): This;
-    interpolate<OtherColor extends Color>(
-        otherColor: OtherColor,
-        rawPercentage: number,
-    ): This;
-    lighten(rawPercentage: number): This;
-    saturate(rawPercentage: number): This;
+    toDarkened(darkeningPercentage: number): This;
+    toDesaturated(desaturatingPercentage: number): This;
     toHslColor(): HslColor;
+    toInterpolated<OtherColor extends Color>(
+        otherColor: OtherColor,
+        interpolatingPercentage: number,
+    ): This;
+    toLightened(lighteningPercentage: number): This;
     toRgbColor(): RgbColor;
+    toSaturated(saturatingPercentage: number): This;
     toString(): string;
 }
 

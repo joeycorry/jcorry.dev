@@ -10,7 +10,9 @@ import {
 import { rootHtmlId } from './root';
 import type { ServerPageContext } from './types';
 
-async function render(pageContext: ServerPageContext) {
+async function render(
+    pageContext: ServerPageContext,
+): Promise<ReturnType<typeof escapeInject>> {
     const { Page, pageProps } = pageContext;
     const readableStream = await renderToReadableStream(
         <Page {...pageProps} />,

@@ -4,7 +4,7 @@ import { techNameAtom } from '~/common/atoms/techName';
 
 import { useNoArgumentSetAtom } from './atom';
 
-function useContinuousTechNameAnimationEffect() {
+function useContinuousTechNameAnimationEffect(): void {
     const setNextTechName = useNoArgumentSetAtom(techNameAtom);
 
     useEffect(() => {
@@ -14,7 +14,7 @@ function useContinuousTechNameAnimationEffect() {
     }, [setNextTechName]);
 }
 
-function useTechNameEffects() {
+function useTechNameEffects(): void {
     useContinuousTechNameAnimationEffect();
 }
 
