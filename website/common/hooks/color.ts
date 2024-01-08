@@ -15,7 +15,6 @@ import { setCookie } from '~/common/utils/cookie';
 import { setFaviconColor } from '~/common/utils/favicon';
 import { setThemeColor } from '~/common/utils/meta';
 import { getRendererManager } from '~/common/utils/rendererManager';
-import type { UnregisterObserverCallback } from '~/common/utils/subject';
 
 function useColorEffects(): void {
     useHandleUnknownColorSchemeEffect();
@@ -81,9 +80,9 @@ function useSynchronizeColorVariantSubjectsByNameObserversEffect(): void {
     );
 
     useEffect(() => {
+        const abortController = new AbortController();
+        const abortSignal = abortController.signal;
         const colorVariantNames = getColorVariantNames();
-        const unregisterObserverCallbacks: Array<UnregisterObserverCallback> =
-            [];
 
         for (const colorVariantName of colorVariantNames) {
             const colorVariantSubject =
@@ -91,28 +90,22 @@ function useSynchronizeColorVariantSubjectsByNameObserversEffect(): void {
             const setColorVariantCssVariable =
                 createColorVariantCssVariableSetter(colorVariantName);
 
-            unregisterObserverCallbacks.push(
-                colorVariantSubject.registerObserver(
-                    setColorVariantCssVariable,
-                ),
-            );
+            colorVariantSubject.registerObserver(setColorVariantCssVariable, {
+                abortSignal,
+            });
         }
 
         const secondaryForegroundColorSubject =
             colorVariantSubjectsByName.secondaryForegroundColor;
 
-        unregisterObserverCallbacks.push(
-            secondaryForegroundColorSubject.registerObserver(setFaviconColor),
-        );
-        unregisterObserverCallbacks.push(
-            secondaryForegroundColorSubject.registerObserver(setThemeColor),
-        );
+        secondaryForegroundColorSubject.registerObserver(setFaviconColor, {
+            abortSignal,
+        });
+        secondaryForegroundColorSubject.registerObserver(setThemeColor, {
+            abortSignal,
+        });
 
-        return () => {
-            for (const unregisterObserver of unregisterObserverCallbacks.toReversed()) {
-                unregisterObserver();
-            }
-        };
+        return () => abortController.abort();
     }, [colorVariantSubjectsByName]);
 }
 

@@ -23,10 +23,30 @@ class RendererManager {
         return this.#isAnimating;
     }
 
-    public registerRenderer(renderer: Renderer): UnregisterRendererCallback {
+    public registerRenderer(
+        renderer: Renderer,
+        options?: { abortSignal: undefined },
+    ): UnregisterRendererCallback;
+    public registerRenderer(
+        renderer: Renderer,
+        options: { abortSignal: AbortSignal },
+    ): void;
+    public registerRenderer(
+        renderer: Renderer,
+        { abortSignal }: { abortSignal?: AbortSignal } = {},
+    ): UnregisterRendererCallback | void {
         this.#renderers.push(renderer);
 
-        return () => this.#unregisterRenderer(renderer);
+        if (!abortSignal) {
+            return () => this.#unregisterRenderer(renderer);
+        }
+
+        const unregister: UnregisterRendererCallback = () => {
+            abortSignal.removeEventListener('abort', unregister);
+            this.#unregisterRenderer(renderer);
+        };
+
+        abortSignal.addEventListener('abort', unregister);
     }
 
     public startAnimation(): void {

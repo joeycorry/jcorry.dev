@@ -19,21 +19,57 @@ class Subject<T> {
 
     public map<U>(
         mapper: (value: T) => U,
-    ): SubjectAndUnregisterObserverCallback<U> {
+        options?: { abortSignal: undefined },
+    ): SubjectAndUnregisterObserverCallback<U>;
+    public map<U>(
+        mapper: (value: T) => U,
+        options: { abortSignal: AbortSignal },
+    ): Subject<U>;
+    public map<U>(
+        mapper: (value: T) => U,
+        { abortSignal }: { abortSignal?: AbortSignal } = {},
+    ): SubjectAndUnregisterObserverCallback<U> | Subject<U> {
         const subject = new Subject(mapper(this.#value));
 
-        const unregisterParentObserver = this.registerObserver(value =>
-            subject.set(mapper(value)),
-        );
+        if (!abortSignal) {
+            return [
+                subject,
+                this.registerObserver(value => subject.set(mapper(value))),
+            ];
+        }
 
-        return [subject, unregisterParentObserver];
+        this.registerObserver(value => subject.set(mapper(value)), {
+            abortSignal,
+        });
+
+        return subject;
     }
 
-    public registerObserver(observer: Observer<T>): UnregisterObserverCallback {
+    public registerObserver(
+        observer: Observer<T>,
+        options?: { abortSignal: undefined },
+    ): UnregisterObserverCallback;
+    public registerObserver(
+        observer: Observer<T>,
+        options: { abortSignal: AbortSignal },
+    ): void;
+    public registerObserver(
+        observer: Observer<T>,
+        { abortSignal }: { abortSignal?: AbortSignal } = {},
+    ): UnregisterObserverCallback | void {
         this.#observers.push(observer);
         observer(this.#value);
 
-        return () => this.#unregisterObserver(observer);
+        if (!abortSignal) {
+            return () => this.#unregisterObserver(observer);
+        }
+
+        const unregister: UnregisterObserverCallback = () => {
+            abortSignal.removeEventListener('abort', unregister);
+            this.#unregisterObserver(observer);
+        };
+
+        abortSignal.addEventListener('abort', unregister);
     }
 
     public set(newValue: T): void {

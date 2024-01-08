@@ -14,10 +14,6 @@ import { getComplementaryColorVariantName } from '~/common/utils/color';
 import { getBoundedRandomInteger } from '~/common/utils/math';
 import type { RendererCleanupCallback } from '~/common/utils/renderer';
 import { createCompositeRenderer } from '~/common/utils/renderer';
-import type {
-    SubjectAndUnregisterObserverCallback,
-    UnregisterObserverCallback,
-} from '~/common/utils/subject';
 import { mapSubjects } from '~/common/utils/subject';
 import type { Viewport } from '~/common/utils/viewport';
 
@@ -43,6 +39,8 @@ function createBackgroundRenderer({
         return createNoopRenderer();
     }
 
+    const abortController = new AbortController();
+    const abortSignal = abortController.signal;
     const canvasElement = canvasElementRef.current;
     const canvasContext = canvasElement.getContext('2d')!;
     const renderersByStartingTimeEntries: Array<[number, Renderer]> = [];
@@ -55,7 +53,6 @@ function createBackgroundRenderer({
         'foregroundColor',
         'accentColor',
     ];
-    const unregisterObserverCallbacks: Array<UnregisterObserverCallback> = [];
 
     for (const [
         colorVariantNameIndex,
@@ -91,12 +88,12 @@ function createBackgroundRenderer({
             .slice(0, -1)
             .entries()) {
             const interpolatingPercentageSubject = new Subject(0);
-            const [styleSubject, unregisterObserver] =
-                createCanvasContextStyleSubject({
-                    colorVariantSubject,
-                    complementaryColorVariantSubject,
-                    interpolatingPercentageSubject,
-                });
+            const styleSubject = createCanvasContextStyleSubject({
+                abortSignal,
+                colorVariantSubject,
+                complementaryColorVariantSubject,
+                interpolatingPercentageSubject,
+            });
             const startingTime =
                 startingYIndex * 250 +
                 (colorVariantNameIndex * 250) / colorVariantNames.length;
@@ -137,7 +134,6 @@ function createBackgroundRenderer({
                 startingTime,
                 interpolationRenderer,
             ]);
-            unregisterObserverCallbacks.push(unregisterObserver);
         }
 
         const rightStartingYs = [viewport.height - ribbonsHeight];
@@ -161,12 +157,12 @@ function createBackgroundRenderer({
             ...rightStartingYs.slice(0, -1).entries(),
         ]) {
             const interpolatingPercentageSubject = new Subject(0);
-            const [styleSubject, unregisterObserver] =
-                createCanvasContextStyleSubject({
-                    colorVariantSubject,
-                    complementaryColorVariantSubject,
-                    interpolatingPercentageSubject,
-                });
+            const styleSubject = createCanvasContextStyleSubject({
+                abortSignal,
+                colorVariantSubject,
+                complementaryColorVariantSubject,
+                interpolatingPercentageSubject,
+            });
             const startingTime =
                 (rightStartingYs.length - startingYIndex - 2) * 250 +
                 (colorVariantNameIndex * 250) / colorVariantNames.length;
@@ -207,15 +203,11 @@ function createBackgroundRenderer({
                 startingTime,
                 interpolationRenderer,
             ]);
-            unregisterObserverCallbacks.push(unregisterObserver);
         }
     }
 
-    const handleCleanup: RendererCleanupCallback = () => {
-        for (const unregisterObserver of unregisterObserverCallbacks.toReversed()) {
-            unregisterObserver();
-        }
-    };
+    const handleCleanup: RendererCleanupCallback = () =>
+        abortController.abort();
 
     return createCompositeRenderer({
         onCleanup: handleCleanup,
@@ -224,14 +216,16 @@ function createBackgroundRenderer({
 }
 
 function createCanvasContextStyleSubject({
+    abortSignal,
     colorVariantSubject,
     complementaryColorVariantSubject,
     interpolatingPercentageSubject,
 }: {
+    abortSignal: AbortSignal;
     colorVariantSubject: Subject<Color>;
     complementaryColorVariantSubject: Subject<Color>;
     interpolatingPercentageSubject: Subject<number>;
-}): SubjectAndUnregisterObserverCallback<string> {
+}): Subject<string> {
     return mapSubjects(
         [
             colorVariantSubject,
@@ -242,6 +236,7 @@ function createCanvasContextStyleSubject({
             color
                 .toInterpolated(complementaryColor, interpolatingPercentage)
                 .toString(),
+        { abortSignal },
     );
 }
 
