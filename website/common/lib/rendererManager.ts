@@ -98,18 +98,15 @@ class RendererManager {
     };
 
     #unregisterRenderer(renderer: Renderer): void {
-        if (
-            this.#renderers.findIndex(renderer_ => renderer === renderer_) ===
-            -1
-        ) {
-            return;
-        }
+        this.#renderers = this.#renderers.filter(renderer_ => {
+            if (renderer !== renderer_) {
+                return true;
+            }
 
-        renderer.handleUnregistration();
+            renderer.handleUnregistration();
 
-        this.#renderers = this.#renderers.filter(
-            renderer_ => renderer !== renderer_,
-        );
+            return false;
+        });
     }
 }
 

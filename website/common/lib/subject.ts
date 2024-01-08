@@ -45,11 +45,9 @@ class Subject<T> {
     }
 
     #unregisterObserver(observer: Observer<T>): void {
-        const index = this.#observers.indexOf(observer);
-
-        if (index !== -1) {
-            this.#observers.splice(index, 1);
-        }
+        this.#observers = this.#observers.filter(
+            observer_ => observer !== observer_,
+        );
     }
 }
 
