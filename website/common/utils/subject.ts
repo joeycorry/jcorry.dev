@@ -1,6 +1,6 @@
 import { Subject } from '~/common/lib/subject';
 
-import { assertSignalIsNotAborted } from './abort';
+import { assertSignalIsNotAborted } from './aborting';
 
 type CombinedSubject<T extends readonly unknown[]> = Subject<{
     [K in keyof T]: T[K];

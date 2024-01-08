@@ -1,4 +1,4 @@
-import { assertSignalIsNotAborted } from '~/common/utils/abort';
+import { assertSignalIsNotAborted } from '~/common/utils/aborting';
 import type { UnregisterRendererCallback } from '~/common/utils/rendererManager';
 
 import type { Renderer } from './renderer';
