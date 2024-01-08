@@ -1,5 +1,7 @@
 import { Subject } from '~/common/lib/subject';
 
+import { assertSignalIsNotAborted } from './abort';
+
 type CombinedSubject<T extends readonly unknown[]> = Subject<{
     [K in keyof T]: T[K];
 }>;
@@ -33,6 +35,8 @@ function combineSubjects<const T extends readonly unknown[]>(
     subjects: Subjects<T>,
     { abortSignal }: { abortSignal?: AbortSignal } = {},
 ): CombinedSubject<T> | CombinedSubjectAndUnregisterObserverCallback<T> {
+    assertSignalIsNotAborted(abortSignal);
+
     const combinedValue = subjects.map(subject => subject.get()) as {
         [K in keyof T]: T[K];
     };
@@ -103,6 +107,8 @@ function mapSubjects<const T extends readonly unknown[], U>(
     mapper: (...values: [...T]) => U,
     { abortSignal }: { abortSignal?: AbortSignal } = {},
 ): Subject<U> | SubjectAndUnregisterObserverCallback<U> {
+    assertSignalIsNotAborted(abortSignal);
+
     if (abortSignal) {
         return combineSubjects(subjects, { abortSignal }).map(
             values => mapper(...values),

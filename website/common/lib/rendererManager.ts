@@ -1,3 +1,4 @@
+import { assertSignalIsNotAborted } from '~/common/utils/abort';
 import type { UnregisterRendererCallback } from '~/common/utils/rendererManager';
 
 import type { Renderer } from './renderer';
@@ -35,6 +36,8 @@ class RendererManager {
         renderer: Renderer,
         { abortSignal }: { abortSignal?: AbortSignal } = {},
     ): UnregisterRendererCallback | void {
+        assertSignalIsNotAborted(abortSignal);
+
         this.#renderers.push(renderer);
 
         if (!abortSignal) {

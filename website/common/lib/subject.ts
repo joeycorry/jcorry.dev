@@ -1,3 +1,4 @@
+import { assertSignalIsNotAborted } from '~/common/utils/abort';
 import type {
     SubjectAndUnregisterObserverCallback,
     UnregisterObserverCallback,
@@ -29,6 +30,8 @@ class Subject<T> {
         mapper: (value: T) => U,
         { abortSignal }: { abortSignal?: AbortSignal } = {},
     ): SubjectAndUnregisterObserverCallback<U> | Subject<U> {
+        assertSignalIsNotAborted(abortSignal);
+
         const subject = new Subject(mapper(this.#value));
 
         if (!abortSignal) {
@@ -57,6 +60,8 @@ class Subject<T> {
         observer: Observer<T>,
         { abortSignal }: { abortSignal?: AbortSignal } = {},
     ): UnregisterObserverCallback | void {
+        assertSignalIsNotAborted(abortSignal);
+
         this.#observers.push(observer);
         observer(this.#value);
 
