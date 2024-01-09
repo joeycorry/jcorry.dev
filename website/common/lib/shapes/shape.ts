@@ -39,9 +39,7 @@ abstract class Shape implements RenderableObject {
             return;
         }
 
-        const { width, height } = this._canvasContext.canvas;
-
-        this._canvasContext.clearRect(0, 0, width, height);
+        this._canvasContext.reset();
 
         this.#isRendered = false;
     }

@@ -51,8 +51,8 @@ function useSynchronizeBackgroundCanvasDimensionsEffect(
 
         const canvasElement = canvasElementRef.current;
         const canvasContext = canvasElement.getContext('2d')!;
-        canvasElement.width = viewport.width * viewport.devicePixelRatio;
-        canvasElement.height = viewport.height * viewport.devicePixelRatio;
+        canvasElement.width = viewport.physicalWidth;
+        canvasElement.height = viewport.physicalHeight;
         canvasElement.style.width = `${viewport.width}px`;
         canvasElement.style.height = `${viewport.height}px`;
 

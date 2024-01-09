@@ -45,10 +45,17 @@ function createBackgroundRenderer({
     const canvasContext = canvasElement.getContext('2d')!;
     const renderersByStartingTimeEntries: Array<[number, Renderer]> = [];
     const ribbonsEdgeGutter =
-        viewport.width >= 1500 ? 200 : viewport.width >= 750 ? 150 : 100;
+        viewport.physicalWidth >= 1500
+            ? 200
+            : viewport.physicalWidth >= 750
+              ? 150
+              : 100;
     const ribbonsHeight =
-        (viewport.width >= 1500 ? 0.8 : viewport.width >= 750 ? 0.6 : 0.4) *
-        viewport.height;
+        (viewport.physicalWidth >= 1500
+            ? 0.8
+            : viewport.physicalWidth >= 750
+              ? 0.6
+              : 0.4) * viewport.physicalHeight;
     const colorVariantNames: PrimaryColorVariantName[] = [
         'foregroundColor',
         'accentColor',
@@ -65,8 +72,11 @@ function createBackgroundRenderer({
         const complementaryColorVariantSubject =
             colorVariantSubjectsByName[complementaryColorVariantName];
         const animationDurationScalar =
-            (viewport.width >= 1500 ? 0.8 : viewport.width >= 750 ? 0.9 : 1) *
-            (colorVariantName === 'foregroundColor' ? 15 : 7);
+            (viewport.physicalWidth >= 1500
+                ? 0.8
+                : viewport.physicalWidth >= 750
+                  ? 0.9
+                  : 1) * (colorVariantName === 'foregroundColor' ? 15 : 7);
         const leftStartingYs = [ribbonsEdgeGutter];
         const leftYLimit = ribbonsHeight;
 
@@ -136,8 +146,8 @@ function createBackgroundRenderer({
             ]);
         }
 
-        const rightStartingYs = [viewport.height - ribbonsHeight];
-        const rightYLimit = viewport.height - ribbonsEdgeGutter;
+        const rightStartingYs = [viewport.physicalHeight - ribbonsHeight];
+        const rightYLimit = viewport.physicalHeight - ribbonsEdgeGutter;
 
         while (
             ribbonsInterstitialGutter + rightStartingYs.at(-1)! <=
@@ -167,12 +177,12 @@ function createBackgroundRenderer({
                 (rightStartingYs.length - startingYIndex - 2) * 250 +
                 (colorVariantNameIndex * 250) / colorVariantNames.length;
             const firstStartPoint = new Point(
-                viewport.width,
+                viewport.physicalWidth,
                 (startingYIndex > 0 ? ribbonsInterstitialGutter : 0) +
                     startingY,
             );
             const secondStartPoint = new Point(
-                viewport.width,
+                viewport.physicalWidth,
                 rightStartingYs[startingYIndex + 1] - ribbonsInterstitialGutter,
             );
             const movingRibbonRenderer = createMovingRibbonRenderer({
@@ -181,7 +191,7 @@ function createBackgroundRenderer({
                 canvasContext,
                 directionAngle: piAngle.toSubtracted(xAxisAdjacentAngle),
                 fillStyle: styleSubject,
-                getYLength: point => viewport.height - point.y,
+                getYLength: point => viewport.physicalHeight - point.y,
                 startingPointPair: [firstStartPoint, secondStartPoint],
                 strokeStyle: styleSubject,
                 xAxisAdjacentAngle,
