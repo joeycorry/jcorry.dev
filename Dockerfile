@@ -14,4 +14,6 @@ ENTRYPOINT ["npm", "run", "dev"]
 
 FROM development AS production
 
-ENTRYPOINT ["npm", "run", "prod"]
+RUN npm run prod:build
+
+ENTRYPOINT ["npm", "run", "prod:serve"]
