@@ -17,18 +17,11 @@
         "strict": true,
         "sourceMap": true,
         "types": ["vite/client", "node"],
-        "baseUrl": ".",
+        "baseUrl": "../",
         "paths": {
-            "~/*": ["./*"]
+            "~/*": ["./src/*"]
         }
     },
-    "include": [
-        "common",
-        "pages",
-        "renderer",
-        "server",
-        "globals.d.ts",
-        "vite.config.ts"
-    ],
-    "exclude": ["dist", "node_modules"]
+    "include": ["../src", "./vite.config.ts"],
+    "exclude": ["../dist", "../node_modules"]
 }

@@ -8,21 +8,18 @@
         "url": "https://jcorry.dev"
     },
     "description": "A personal website about Joey Corry",
-    "engines": {
-        "node": ">=18.13.0",
-        "npm": ">=8.19.3"
-    },
     "scripts": {
-        "dev": "nodemon",
+        "dev": "cross-env NODE_ENV=development nodemon --config ./config/nodemon.json",
         "format": "npm run format:write",
-        "format:check": "prettier . --check",
-        "format:write": "prettier . --write",
-        "lint": "eslint --cache --ext .ts,.tsx .",
+        "format:check": "prettier --config ./config/.prettierrc --cache --cache-location ./config/.prettier-cache . --check",
+        "format:write": "prettier --config ./config/.prettierrc --cache --cache-location ./config/.prettier-cache . --write",
+        "lint": "eslint --config ./config/.eslintrc --cache --cache-location ./config/.eslintcache --ext .ts,.tsx .",
         "prod": "npm run prod:build && npm run prod:serve",
-        "prod:build": "rm -rf dist/ && npm run typecheck && vite build && npm run prod:build:server",
-        "prod:build:server": "esbuild --minify --target=es2022 ./server/index.ts --outfile=./dist/server.js",
-        "prod:serve": "cross-env NODE_ENV=production node --experimental-network-imports ./dist/server.js",
-        "typecheck": "tsc --noEmit"
+        "prod:build": "rm -rf dist/ && npm run typecheck && npm run prod:build:client && npm run prod:build:server",
+        "prod:build:server": "cross-env NODE_ENV=production esbuild --bundle --minify --splitting --external:./node_modules/* --format=esm --outdir=./dist --platform=node --target=$(browserslist-to-esbuild | sed \"s/ /,/g\") --tsconfig=./config/tsconfig.json ./src/server/index.ts",
+        "prod:build:client": "cross-env NODE_ENV=production vite --config ./config/vite.config.ts build",
+        "prod:serve": "cross-env NODE_ENV=production node --experimental-network-imports ./dist/index.js",
+        "typecheck": "tsc --project ./config/tsconfig.json --noEmit"
     },
     "dependencies": {
         "@vitejs/plugin-react": "4.2.1",
@@ -31,6 +28,7 @@
         "esbuild": "0.19.9",
         "h3": "1.9.0",
         "h3-compression": "0.3.2",
+        "http-proxy": "1.18.1",
         "jotai": "2.6.0",
         "react": "18.2.0",
         "react-dom": "18.2.0",
@@ -44,11 +42,14 @@
     },
     "devDependencies": {
         "@types/compression": "1.7.5",
+        "@types/http-proxy": "1.17.15",
         "@types/node": "20.10.5",
         "@types/react": "18.2.45",
         "@types/react-dom": "18.2.18",
         "@typescript-eslint/eslint-plugin": "6.14.0",
         "@typescript-eslint/parser": "6.14.0",
+        "browserslist": "4.24.2",
+        "browserslist-to-esbuild": "2.1.1",
         "eslint": "8.56.0",
         "eslint-config-prettier": "9.1.0",
         "eslint-import-resolver-typescript": "3.6.1",
@@ -64,9 +65,7 @@
         "prettier": "3.1.1"
     },
     "browserslist": [
-        "defaults",
-        "not IE 11",
-        "not op_mini all"
+        "defaults"
     ],
     "type": "module"
 }

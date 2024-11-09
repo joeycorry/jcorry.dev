@@ -256,7 +256,7 @@
     },
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "project": "./tsconfig.eslint.json",
+        "project": "./config/tsconfig.eslint.json",
         "ecmaVersion": 2021,
         "sourceType": "module",
         "ecmaFeatures": {
@@ -272,7 +272,7 @@
         },
         "import/resolver": {
             "typescript": {
-                "project": "./tsconfig.eslint.json",
+                "project": "./config/tsconfig.eslint.json",
                 "alwaysTryTypes": true
             }
         }

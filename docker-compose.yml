@@ -1,38 +1,14 @@
-version: '3.7'
-
 services:
-  caddy:
-    container_name: jcorry-dev_caddy
-    depends_on:
-      local:
-        condition: service_healthy
-    image: caddy:2.6.4
-    ports:
-      - '0.0.0.0:80:80'
-      - '0.0.0.0:443:443'
-      - '0.0.0.0:443:443/udp'
-    volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
-      - ./caddy/certs/bare.pem:/etc/ssl/bare.pem
-      - ./caddy/certs/bare.key.pem:/etc/ssl/bare.key.pem
-  local:
-    build: ./website
-    container_name: jcorry-dev_local
-    environment:
-      - JCORRY_DEV_DOCUMENT_TITLE=Joey Corry (Local)
-      - JCORRY_DEV_IS_VIA_DOCKER=true
-    expose:
-      - 3000
-      - 3001
-    healthcheck:
-      test: curl -f http://localhost:3000 || exit 1
-      interval: 10s
-      start_period: 30s
-      timeout: 10s
-    volumes:
-      - ./website/common:/home/website/common
-      - ./website/globals.d.ts:/home/website/globals.d.ts
-      - ./website/pages:/home/website/pages
-      - ./website/renderer:/home/website/renderer
-      - ./website/server:/home/website/server
-
+    web:
+        build:
+            context: ./
+            target: development
+        environment:
+            - JCORRY_PORT=${JCORRY_PORT-3000}
+        labels:
+            dev.orbstack.domains: jcorry.local
+        ports:
+            - '0.0.0.0:${JCORRY_DOCKER_HOST_PORT-3000}:${JCORRY_PORT-3000}'
+        volumes:
+            - ./config:/home/jcorry.dev/config
+            - ./src:/home/jcorry.dev/src

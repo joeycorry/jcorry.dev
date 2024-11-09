@@ -4,6 +4,7 @@
     "editor.codeActionsOnSave": ["source.fixAll.eslint"],
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
+    "prettier.configPath": "config/.prettierrc",
     "typescript.tsdk": "node_modules/typescript/lib",
     "typescript.preferences.useAliasesForRenames": false
 }

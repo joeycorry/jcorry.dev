@@ -1,0 +1,10 @@
+{
+    "exec": "tsx --tsconfig ./config/tsconfig.json ./src/server/index.ts",
+    "ext": "css,ts,tsx",
+    "watch": [
+        "./config/vite.config.ts",
+        "./src/pages",
+        "./src/renderer",
+        "./src/server"
+    ]
+}

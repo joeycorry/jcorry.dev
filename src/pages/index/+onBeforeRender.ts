@@ -15,10 +15,11 @@ import type {
     ServerOnBeforeRenderResult,
     ServerPageContext,
 } from '~/renderer/types';
+import { isDev } from '~/server/config';
 
 import type { PageProps } from './+Page';
 
-const title = process.env.JCORRY_DEV_DOCUMENT_TITLE || 'Joey Corry';
+const title = `Joey Corry${isDev ? ' (Local)' : ''}`;
 
 async function onBeforeRender({
     originalEvent,

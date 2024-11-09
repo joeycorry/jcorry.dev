@@ -1,5 +1,0 @@
-{
-    "exec": "tsx ./server/index.ts",
-    "ext": "css,ts,tsx",
-    "watch": ["pages/", "renderer/", "server/", "vite.config.ts"]
-}

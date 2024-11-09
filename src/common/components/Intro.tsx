@@ -10,7 +10,7 @@ function UnmemoizedIntro(): ReactNode {
         <section className={styles.intro}>
             <h1>
                 Hi, I&apos;m{' '}
-                <span className={styles['intro-name']}>Joey Corry</span>.
+                <span className={styles['intro-name']}>Joey Corry</span>!
             </h1>
         </section>
     );
