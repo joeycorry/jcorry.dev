@@ -18,7 +18,7 @@
         "prod:build": "rm -rf dist/ && npm run typecheck && npm run prod:build:client && npm run prod:build:server",
         "prod:build:server": "cross-env NODE_ENV=production esbuild --bundle --minify --splitting --external:./node_modules/* --format=esm --outdir=./dist --platform=node --target=$(browserslist-to-esbuild | sed \"s/ /,/g\") --tsconfig=./config/tsconfig.json ./src/server/index.ts",
         "prod:build:client": "cross-env NODE_ENV=production vite --config ./config/vite.config.ts build",
-        "prod:serve": "cross-env NODE_ENV=production node --experimental-network-imports ./dist/index.js",
+        "prod:serve": "cross-env NODE_ENV=production node ./dist/index.js",
         "typecheck": "tsc --project ./config/tsconfig.json --noEmit"
     },
     "dependencies": {
